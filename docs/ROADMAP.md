@@ -1,4 +1,4 @@
-# LETTERFALL — Roadmap to the App Store
+# DECKABET — Roadmap to the App Store
 
 > Word Klondike. Every deal winnable. This document is the **canonical roadmap**:
 > epics, tickets, and the game-design specs (scoring, difficulty, leaderboards,

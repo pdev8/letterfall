@@ -465,7 +465,7 @@ export default function App() {
 
   const onShare = async () => {
     const message =
-      `LETTERFALL ♠\n` +
+      `DECKABET ♠\n` +
       `cleared in ${state.played.length} words · best: ${bestWord.toUpperCase()}\n` +
       `word klondike — every deal winnable`;
     try {
@@ -482,7 +482,7 @@ export default function App() {
       <View style={styles.root}>
         {/* top bar */}
         <View style={styles.topBar}>
-          <Text style={styles.wordmark}>LETTERFALL</Text>
+          <Text style={styles.wordmark}>DECKABET</Text>
           <View style={styles.topBarRight}>
             <View style={styles.statBlock}>
               <Text style={styles.statValue}>

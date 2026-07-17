@@ -1,6 +1,6 @@
 # The Living Deck — Deal Generation v2 (canonical)
 
-> **This is the core of LETTERFALL.** Infinite deals, every one winnable, none
+> **This is the core of DECKABET.** Infinite deals, every one winnable, none
 > predictable, none railroaded. Implemented by epic **E7** in `ROADMAP.md`.
 > The static 290-deal pool in `assets/seeds.json` is interim scaffolding and
 > retires when E7 lands.

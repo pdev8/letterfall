@@ -1,4 +1,4 @@
-// Shared types for LETTERFALL.
+// Shared types for DECKABET.
 
 export interface Deal {
   /** 7 columns, each column's cards BOTTOM -> TOP as dealt; TOP card = LAST character. */
