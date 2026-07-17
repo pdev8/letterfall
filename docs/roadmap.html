@@ -173,9 +173,9 @@
     <div class="statrow">
       <div class="stat"><div class="v green">✓</div><div class="k">core loop playable</div></div>
       <div class="stat"><div class="v green">✓</div><div class="k">design specced</div></div>
-      <div class="stat"><div class="v">21 / 56</div><div class="k">tickets shipped</div></div>
-      <div class="stat"><div class="v orange">DB-130</div><div class="k">in review</div></div>
-      <div class="stat"><div class="v">34 + 1</div><div class="k">PRs merged + open</div></div>
+      <div class="stat"><div class="v">22 / 56</div><div class="k">tickets shipped</div></div>
+      <div class="stat"><div class="v orange">DB-131</div><div class="k">up next</div></div>
+      <div class="stat"><div class="v">35 + 1</div><div class="k">PRs merged + open</div></div>
     </div>
   </header>
 
@@ -345,13 +345,13 @@
     <div class="epic">
       <div class="epic-head"><span class="e-id">E3</span><span class="e-name">Settings &amp; Difficulty</span><span class="e-count">0/4</span><span class="e-mile">M2</span></div>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-130</span><span class="t-name">Settings screen + persisted store <span class="t-note">(PR #35 — 13 tests)</span></span><span class="t-size">S</span><span class="st open">in review</span></summary>
+        <summary class="trow"><span class="t-id">DB-130</span><span class="t-name">Settings screen + persisted store <span class="t-note">(PR #35 — 13 tests)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>A settings screen behind a gear icon, with choices that persist between sessions. It's the home for difficulty, sound, and accessibility options.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-131</span><span class="t-name">Difficulty presets (Casual ×1.0 / Standard ×1.25 / Expert ×1.6)</span><span class="t-size">M</span><span class="st next">next</span></summary>
+        <summary class="trow"><span class="t-id">DB-131</span><span class="t-name">Difficulty configurations <span class="t-note">(knobs, not presets: recycles + bays derive the multiplier, ×1.0–×1.4)</span></span><span class="t-size">M</span><span class="st next">next</span></summary>
         <div class="t-body">
           <p>Pick your challenge level: harder presets allow fewer recycles and park bays but multiply your score in return. Changes take effect on your next deal, never mid-game.</p>
         </div>
@@ -692,7 +692,7 @@ Encore          the FINAL word of a winning deal scores ×2
 dealScore = round( base × wordEconomy × stockEconomy × difficulty )
 wordEconomy     ≤4:1.75  5:1.60  6:1.45  7:1.30  8:1.20  9:1.10  10:1.05  11+:1.00
 stockEconomy    clamp(1.5 − 0.08·reserveUsed − 0.05·parks − 0.08·recycles, 1.0, 1.5)
-difficulty      Casual ×1.00 · Standard ×1.25 · Expert ×1.60</div>
+configMult      1.0 + 0.10×(2−recycles) + 0.10×(3−parkBays)  → ×1.0–×1.4</div>
         <p>Only wins bank points. Total points = Σ banked deal scores; daily total = Σ the day's 5 games.</p>
         <p><strong>Players never see this math.</strong> In-game it's named bonus chips — "Word Economy +30%",
         "Stock Discipline +21%", "PURIST ★", "ENCORE ×2" — tallied on the win screen; the rulebook explains
