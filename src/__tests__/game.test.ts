@@ -5,6 +5,7 @@ import {
   makeDealState,
   randomDealIndex,
   reducer,
+  sanitizeGameState,
   tableauCount,
 } from '../game';
 import { deals } from '../dict';
@@ -304,5 +305,106 @@ describe('scoring counters', () => {
     expect(s.reserveLettersPlayed).toBe(0);
     expect(s.parksUsed).toBe(0);
     expect(s.recyclesUsed).toBe(0);
+  });
+});
+
+describe('sanitizeGameState (DB-122 resume guard)', () => {
+  it('accepts a genuine fresh deal', () => {
+    const s = makeDealState(0, { won: 0, played: 0, streak: 0 });
+    expect(sanitizeGameState(s)).toBe(s);
+  });
+
+  it('accepts a mid-game state with tray entries and a parked stock card', () => {
+    let s = reducer(base(), { type: 'parkReserve', col: 0 }); // fromStock card on the board
+    s = reducer(s, { type: 'tapColumn', col: 4 });
+    s = reducer(s, { type: 'tapReserve' }); // tray holds a column entry and a reserve entry
+    expect(s.columns[0][0].fromStock).toBe(true);
+    expect(s.tray).toHaveLength(2);
+    expect(sanitizeGameState(s)).toBe(s);
+  });
+
+  it.each([
+    ['null', null],
+    ['a string', 'state'],
+    ['a number', 42],
+    ['an array', []],
+    ['undefined', undefined],
+  ])('rejects %s', (_name, value) => {
+    expect(sanitizeGameState(value)).toBeNull();
+  });
+
+  it('rejects a wrong column count', () => {
+    const s = base();
+    expect(sanitizeGameState({ ...s, columns: s.columns.slice(0, 6) })).toBeNull();
+    expect(sanitizeGameState({ ...s, columns: [...s.columns, []] })).toBeNull();
+  });
+
+  it('rejects malformed cards', () => {
+    const s = base();
+    expect(sanitizeGameState({ ...s, columns: [[{ letter: 'a' }], [], [], [], [], [], []] })).toBeNull(); // no fromStock
+    expect(
+      sanitizeGameState({ ...s, columns: [[{ letter: 'a', fromStock: 1 }], [], [], [], [], [], []] }),
+    ).toBeNull(); // non-boolean fromStock
+    expect(sanitizeGameState({ ...s, columns: [['a'], [], [], [], [], [], []] })).toBeNull(); // bare string
+  });
+
+  it('rejects uppercase and multi-char letters', () => {
+    const s = base();
+    expect(sanitizeGameState({ ...s, stock: ['A'] })).toBeNull();
+    expect(sanitizeGameState({ ...s, reserve: ['ab'] })).toBeNull();
+    expect(
+      sanitizeGameState({ ...s, columns: [[card('Q')], [], [], [], [], [], []] }),
+    ).toBeNull();
+    expect(
+      sanitizeGameState({ ...s, tray: [{ letter: 'xy', source: 4, fromStock: false }] }),
+    ).toBeNull();
+  });
+
+  it('rejects a tray source out of range', () => {
+    const s = base();
+    expect(sanitizeGameState({ ...s, tray: [{ letter: 'c', source: 7, fromStock: false }] })).toBeNull();
+    expect(sanitizeGameState({ ...s, tray: [{ letter: 'c', source: -1, fromStock: false }] })).toBeNull();
+    expect(sanitizeGameState({ ...s, tray: [{ letter: 'c', source: 'waste', fromStock: true }] })).toBeNull();
+  });
+
+  it('rejects a tray longer than MAX_WORD', () => {
+    const tray = Array.from({ length: MAX_WORD + 1 }, () => ({
+      letter: 'a' as const,
+      source: 'reserve' as const,
+      fromStock: true,
+    }));
+    expect(sanitizeGameState({ ...base(), tray })).toBeNull();
+  });
+
+  it('rejects negative or non-finite counters', () => {
+    expect(sanitizeGameState({ ...base(), movesMade: -1 })).toBeNull();
+    expect(sanitizeGameState({ ...base(), reserveLettersPlayed: -2 })).toBeNull();
+    expect(sanitizeGameState({ ...base(), parksUsed: NaN })).toBeNull();
+    expect(sanitizeGameState({ ...base(), recyclesUsed: Infinity })).toBeNull();
+    expect(sanitizeGameState({ ...base(), recyclesLeft: -1 })).toBeNull();
+    expect(sanitizeGameState({ ...base(), dealIndex: -1 })).toBeNull();
+  });
+
+  it('rejects recyclesLeft above RECYCLES_PER_DEAL', () => {
+    expect(sanitizeGameState({ ...base(), recyclesLeft: RECYCLES_PER_DEAL + 1 })).toBeNull();
+  });
+
+  it('rejects won states — finished deals are never restored', () => {
+    expect(sanitizeGameState({ ...base(), won: true })).toBeNull();
+  });
+
+  it('rejects missing or malformed stats', () => {
+    const { stats: _stats, ...noStats } = base();
+    expect(sanitizeGameState(noStats)).toBeNull();
+    expect(sanitizeGameState({ ...base(), stats: { won: 1, played: 2 } })).toBeNull(); // no streak
+    expect(sanitizeGameState({ ...base(), stats: { won: '1', played: 2, streak: 0 } })).toBeNull();
+  });
+});
+
+describe('restore', () => {
+  it('returns the given state identically', () => {
+    const current = base({ movesMade: 9 });
+    const snapshot = reducer(base(), { type: 'tapColumn', col: 4 });
+    expect(reducer(current, { type: 'restore', state: snapshot })).toBe(snapshot);
   });
 });

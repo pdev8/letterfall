@@ -1,5 +1,5 @@
 import { deals, isValidWord } from './dict';
-import type { Action, GameState, SessionStats } from './types';
+import type { Action, ColumnCard, GameState, SessionStats } from './types';
 
 export const MAX_WORD = 8;
 export const RECYCLES_PER_DEAL = 2;
@@ -49,6 +49,74 @@ export function tableauCount(state: GameState): number {
 
 function countNative(columns: GameState['columns']): number {
   return columns.reduce((n, c) => n + c.filter((card) => !card.fromStock).length, 0);
+}
+
+// ---------------------------------------------------------------- resume (DB-122)
+
+const COLUMN_COUNT = 7;
+
+function isLetter(x: unknown): x is string {
+  return typeof x === 'string' && /^[a-z]$/.test(x);
+}
+
+function isCard(x: unknown): x is ColumnCard {
+  if (typeof x !== 'object' || x === null) return false;
+  const c = x as ColumnCard;
+  return isLetter(c.letter) && typeof c.fromStock === 'boolean';
+}
+
+function isCount(x: unknown): x is number {
+  return typeof x === 'number' && Number.isFinite(x) && x >= 0;
+}
+
+/**
+ * Structural guard for persisted snapshots (DB-122). Returns `x` typed as
+ * GameState only if every field a resumed deal depends on checks out;
+ * anything malformed (or an already-won deal) returns null. Never throws.
+ */
+export function sanitizeGameState(x: unknown): GameState | null {
+  if (typeof x !== 'object' || x === null) return null;
+  const s = x as GameState;
+  if (s.won !== false) return null; // finished deals are never restored
+  if (!Array.isArray(s.columns) || s.columns.length !== COLUMN_COUNT) return null;
+  if (!s.columns.every((col) => Array.isArray(col) && col.every(isCard))) return null;
+  if (!Array.isArray(s.stock) || !s.stock.every(isLetter)) return null;
+  if (!Array.isArray(s.reserve) || !s.reserve.every(isLetter)) return null;
+  if (!Array.isArray(s.tray) || s.tray.length > MAX_WORD) return null;
+  for (const entry of s.tray) {
+    if (typeof entry !== 'object' || entry === null) return null;
+    if (!isLetter(entry.letter) || typeof entry.fromStock !== 'boolean') return null;
+    const src: unknown = entry.source;
+    const sourceOk =
+      src === 'reserve' ||
+      (typeof src === 'number' && Number.isInteger(src) && src >= 0 && src < COLUMN_COUNT);
+    if (!sourceOk) return null;
+  }
+  if (!isCount(s.recyclesLeft) || s.recyclesLeft > RECYCLES_PER_DEAL) return null;
+  if (!isCount(s.movesMade) || !isCount(s.reserveLettersPlayed)) return null;
+  if (!isCount(s.parksUsed) || !isCount(s.recyclesUsed)) return null;
+  if (!Array.isArray(s.played) || !s.played.every((w) => typeof w === 'string')) return null;
+  if (!isCount(s.dealIndex) || !Number.isInteger(s.dealIndex)) return null;
+  const stats: unknown = s.stats;
+  if (typeof stats !== 'object' || stats === null) return null;
+  const { won, played, streak } = stats as SessionStats;
+  if (typeof won !== 'number' || typeof played !== 'number' || typeof streak !== 'number') {
+    return null;
+  }
+  return s;
+}
+
+/** An in-progress deal as persisted: the state plus time already spent on it. */
+export type SavedGame = { state: GameState; elapsedMs: number };
+
+/** Validates a raw persisted value into a SavedGame (null if malformed). Never throws. */
+export function parseSavedGame(raw: unknown): SavedGame | null {
+  if (typeof raw !== 'object' || raw === null) return null;
+  const { state, elapsedMs } = raw as SavedGame;
+  const sanitized = sanitizeGameState(state);
+  if (sanitized === null) return null;
+  if (typeof elapsedMs !== 'number' || !Number.isFinite(elapsedMs) || elapsedMs < 0) return null;
+  return { state: sanitized, elapsedMs };
 }
 
 export function reducer(state: GameState, action: Action): GameState {
@@ -194,6 +262,11 @@ export function reducer(state: GameState, action: Action): GameState {
         ? { ...state.stats, played: state.stats.played + 1, streak: 0 }
         : state.stats;
       return makeDealState(randomDealIndex(state.dealIndex), stats);
+    }
+
+    case 'restore': {
+      // The caller sanitizes (sanitizeGameState) before dispatching.
+      return action.state;
     }
 
     default:
