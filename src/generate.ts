@@ -264,6 +264,7 @@ function buildState(candidate: Candidate): GameState {
     reserveLettersPlayed: 0,
     parksUsed: 0,
     recyclesUsed: 0,
+    rerollsUsed: 0,
     won: false,
     stats: { won: 0, played: 0, streak: 0 },
   };

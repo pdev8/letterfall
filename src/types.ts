@@ -60,10 +60,16 @@ export interface GameState {
   played: string[];
   /** Draws + plays this deal; used to decide if an abandoned deal counts as played. */
   movesMade: number;
-  /** Scoring counters (spec §3): reserve letters played into words, parks, recycles. */
+  /** Scoring counters (spec §3): reserve letters played into words, parks, recycles, returns. */
   reserveLettersPlayed: number;
   parksUsed: number;
   recyclesUsed: number;
+  /**
+   * Opening reroll cards taken (DB-178): count of face-up tops the player
+   * exchanged with the stock before play. Free (no scoring effect); records
+   * that the opening was gambled (useful for stats / a future "as dealt" badge).
+   */
+  rerollsUsed: number;
   won: boolean;
   stats: SessionStats;
 }
@@ -73,6 +79,8 @@ export type Action =
   | { type: 'tapColumn'; col: number }
   | { type: 'tapReserve' }
   | { type: 'parkReserve'; col: number }
+  /** Opening reroll (DB-178): exchange the given columns' face-up top cards with the stock. */
+  | { type: 'reroll'; cols: number[] }
   | { type: 'tapTray'; index: number }
   | { type: 'swapTray'; a: number; b: number }
   | { type: 'clearTray' }

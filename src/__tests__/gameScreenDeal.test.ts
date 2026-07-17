@@ -44,6 +44,7 @@ describe('dealToState', () => {
     expect(s.reserveLettersPlayed).toBe(0);
     expect(s.parksUsed).toBe(0);
     expect(s.recyclesUsed).toBe(0);
+    expect(s.rerollsUsed).toBe(0);
     expect(s.won).toBe(false);
   });
 

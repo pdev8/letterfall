@@ -29,6 +29,7 @@ import CardBack from '../components/CardBack';
 import LetterCard from '../components/LetterCard';
 import Overlay from '../components/Overlay';
 import PopIn from '../components/PopIn';
+import RerollPanel, { type RerollTop } from '../components/RerollPanel';
 import WordChip from '../components/WordChip';
 import { existsPlayableWord, isValidWord } from '../dict';
 import { hapticFor, type FeedbackKind } from '../feedback';
@@ -101,6 +102,10 @@ export default function GameScreen({
   );
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
+  // Opening reroll (DB-178): a fresh deal starts by offering the swap panel;
+  // Skip or the first real move dismisses it, a resumed mid-deal hides it, and
+  // a redeal re-arms it.
+  const [showReroll, setShowReroll] = useState(true);
 
   // Fire a haptic for a game event, honoring the toggle (DB-132). Sound joins
   // at DB-163. Wrapped in try/catch — haptics can throw on unsupported devices.
@@ -270,6 +275,7 @@ export default function GameScreen({
           if (saved !== null) {
             dispatch({ type: 'restore', state: saved.state });
             dealStartRef.current = Date.now() - saved.elapsedMs;
+            setShowReroll(false); // resumed mid-deal — the opening is long past
           }
         })
         .catch(() => {}); // storage never crashes the game
@@ -359,6 +365,26 @@ export default function GameScreen({
     }
     fire('tap');
     dispatch({ type: 'tapReserve' });
+  };
+
+  // ---------------- opening reroll (DB-178)
+  const rerollTops: RerollTop[] = state.columns
+    .map((col, i) => ({
+      col: i,
+      letter: col.length > 0 ? col[col.length - 1].letter : '',
+      rerollable: col.length > 0 && !col[col.length - 1].fromStock,
+    }))
+    .filter((t) => t.letter !== '');
+
+  const onRerollSwap = (cols: number[]) => {
+    fire('tap');
+    dispatch({ type: 'reroll', cols });
+    setShowReroll(false); // one shot — commit the swap and reveal the new board
+  };
+
+  const onRerollSkip = () => {
+    fire('tap');
+    setShowReroll(false);
   };
 
   // ---------------- reserve drag (park onto an empty column)
@@ -616,6 +642,7 @@ export default function GameScreen({
     // The new deal picks up the player's current knobs (DB-131).
     dispatch({ type: 'redeal', config: settingsRef.current.config });
     dealStartRef.current = Date.now(); // the new deal's clock starts now
+    setShowReroll(true); // a fresh deal earns a fresh opening reroll
   };
 
   // Daily mode (DB-174): a game ends by banking its result and leaving to the
@@ -968,6 +995,19 @@ export default function GameScreen({
       </View>
 
       {/* win overlay */}
+      {showReroll &&
+        !state.won &&
+        state.movesMade === 0 &&
+        state.reserve.length === 0 &&
+        state.played.length === 0 && (
+          <RerollPanel
+            tops={rerollTops}
+            onSwap={onRerollSwap}
+            onSkip={onRerollSkip}
+            reduceMotion={reduceMotion}
+          />
+        )}
+
       {state.won && (
         <Overlay reduceMotion={reduceMotion}>
           <Text style={styles.overlayTitle}>TABLEAU CLEARED</Text>

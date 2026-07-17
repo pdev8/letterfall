@@ -204,6 +204,132 @@ describe('parkReserve', () => {
   });
 });
 
+describe('reroll (DB-178 — opening card exchange with the stock)', () => {
+  // A pristine, pre-play opening: 7 single-card native columns + a small stock,
+  // nothing drawn/trayed/played. `card()` defaults fromStock:false.
+  const opening = (o: Partial<GameState> = {}): GameState =>
+    base({
+      columns: [
+        [card('a')],
+        [card('b')],
+        [card('c')],
+        [card('d')],
+        [card('e')],
+        [card('f')],
+        [card('g')],
+      ],
+      stock: ['h', 'i', 'j'],
+      reserve: [],
+      tray: [],
+      played: [],
+      ...o,
+    });
+
+  const multiset = (s: GameState): string =>
+    [...s.columns.flat().map((c) => c.letter), ...s.stock].sort().join('');
+
+  it('rotates picked tops to the stock bottom and evicts that many off the top onto the board', () => {
+    // tops a,b picked; stock ['h','i','j'] evicts h,i off the FRONT.
+    const s = opening();
+    const next = reducer(s, { type: 'reroll', cols: [0, 1] });
+    // Evicted stock cards take the vacated spots, arriving ORANGE (stock-origin).
+    expect(next.columns[0][0]).toEqual({ letter: 'h', fromStock: true });
+    expect(next.columns[1][0]).toEqual({ letter: 'i', fromStock: true });
+    // Unselected columns are untouched.
+    expect(next.columns.slice(2).map((c) => c[c.length - 1].letter)).toEqual([
+      'c',
+      'd',
+      'e',
+      'f',
+      'g',
+    ]);
+    // The remaining stock, then the swapped-out tops appended to the bottom.
+    expect(next.stock).toEqual(['j', 'a', 'b']);
+    // Nothing created or destroyed — a pure rotation of the 48-card multiset.
+    expect(multiset(next)).toBe(multiset(s));
+    expect(next.rerollsUsed).toBe(2); // two cards swapped
+  });
+
+  it('lowers the clear-count: rerolled tops are orange and no longer count toward the win', () => {
+    const s = opening(); // 7 native tops → tableauCount 7
+    expect(tableauCount(s)).toBe(7);
+    const next = reducer(s, { type: 'reroll', cols: [0, 1] });
+    expect(tableauCount(next)).toBe(5); // two natives became orange
+  });
+
+  it('is deterministic: same state + same picks → identical result', () => {
+    const s = opening();
+    expect(reducer(s, { type: 'reroll', cols: [0, 1, 2] })).toEqual(
+      reducer(s, { type: 'reroll', cols: [0, 1, 2] }),
+    );
+  });
+
+  it('has no cap — swaps as many tops as the player picks (stock permitting)', () => {
+    // 7 two-card columns so buried natives survive; a 7-card stock covers all.
+    const wide = opening({
+      columns: 'abcdefg'.split('').map((t, i) => [card(String.fromCharCode(111 + i)), card(t)]),
+      stock: ['n', 'o', 'p', 'q', 'r', 's', 't'],
+    });
+    const next = reducer(wide, { type: 'reroll', cols: [0, 1, 2, 3, 4, 5, 6] });
+    expect(next.rerollsUsed).toBe(7);
+    expect(next.columns.every((c) => c[c.length - 1].fromStock)).toBe(true); // all tops orange now
+    expect(multiset(next)).toBe(multiset(wide));
+  });
+
+  it('is bounded by the stock size (can only evict what the stock has)', () => {
+    const s = opening({ stock: ['h'] });
+    const next = reducer(s, { type: 'reroll', cols: [0, 1, 2] });
+    expect(next.rerollsUsed).toBe(1); // only one card could be covered
+    expect(next.columns[0][0]).toEqual({ letter: 'h', fromStock: true });
+    expect(next.columns[1][0].letter).toBe('b'); // untouched
+    expect(next.stock).toEqual(['a']); // swapped-out top to the bottom
+  });
+
+  it('dedupes picks and ignores empty, out-of-range, and already-orange columns', () => {
+    const s = opening({
+      columns: [
+        [{ letter: 'z', fromStock: true }], // already orange — not rerollable
+        [card('b')],
+        [], // empty
+        [card('d')],
+        [card('e')],
+        [card('f')],
+        [card('g')],
+      ],
+    });
+    const next = reducer(s, { type: 'reroll', cols: [0, 0, 2, 99, 1] });
+    expect(next.columns[0][0]).toEqual({ letter: 'z', fromStock: true }); // orange col untouched
+    expect(next.columns[1][0]).toEqual({ letter: 'h', fromStock: true }); // only col 1 rerolled
+    expect(next.rerollsUsed).toBe(1);
+    expect(multiset(next)).toBe(multiset(s));
+  });
+
+  it('is a no-op when nothing is eligible, no cols are given, or the stock is empty', () => {
+    const noneEligible = opening({
+      columns: [[{ letter: 'z', fromStock: true }], [], [], [], [], [], []],
+    });
+    expect(reducer(noneEligible, { type: 'reroll', cols: [0, 1] })).toBe(noneEligible);
+    const clean = opening();
+    expect(reducer(clean, { type: 'reroll', cols: [] })).toBe(clean);
+    const dryStock = opening({ stock: [] });
+    expect(reducer(dryStock, { type: 'reroll', cols: [0] })).toBe(dryStock);
+  });
+
+  it('refuses to reroll once play has begun (drawn, trayed, or played)', () => {
+    const drawn = opening({ reserve: ['x'] });
+    expect(reducer(drawn, { type: 'reroll', cols: [0] })).toBe(drawn);
+    const trayed = opening({ tray: [{ letter: 'a', source: 0, fromStock: false }] });
+    expect(reducer(trayed, { type: 'reroll', cols: [1] })).toBe(trayed);
+    const midGame = opening({ played: ['cat'] });
+    expect(reducer(midGame, { type: 'reroll', cols: [0] })).toBe(midGame);
+  });
+
+  it('is a no-op once the deal is won', () => {
+    const won = opening({ won: true });
+    expect(reducer(won, { type: 'reroll', cols: [0] })).toBe(won);
+  });
+});
+
 describe('tray editing', () => {
   it('tapTray removes one entry; out-of-range is inert', () => {
     let s = reducer(base(), { type: 'tapColumn', col: 4 });
@@ -421,8 +547,17 @@ describe('sanitizeGameState (DB-122 resume guard)', () => {
     expect(sanitizeGameState({ ...base(), reserveLettersPlayed: -2 })).toBeNull();
     expect(sanitizeGameState({ ...base(), parksUsed: NaN })).toBeNull();
     expect(sanitizeGameState({ ...base(), recyclesUsed: Infinity })).toBeNull();
+    expect(sanitizeGameState({ ...base(), rerollsUsed: -1 })).toBeNull();
+    expect(sanitizeGameState({ ...base(), rerollsUsed: NaN })).toBeNull();
     expect(sanitizeGameState({ ...base(), recyclesLeft: -1 })).toBeNull();
     expect(sanitizeGameState({ ...base(), dealIndex: -1 })).toBeNull();
+  });
+
+  it('coerces a missing rerollsUsed to 0 for pre-DB-178 snapshots (back-compat)', () => {
+    const { rerollsUsed: _drop, ...legacy } = base();
+    const out = sanitizeGameState(legacy);
+    expect(out).not.toBeNull();
+    expect(out?.rerollsUsed).toBe(0);
   });
 
   it('rejects recyclesLeft above RECYCLES_PER_DEAL', () => {

@@ -38,6 +38,7 @@ export function dealToState(
     reserveLettersPlayed: 0,
     parksUsed: 0,
     recyclesUsed: 0,
+    rerollsUsed: 0,
     won: false,
     stats,
   };
@@ -77,6 +78,7 @@ export function makeDealState(
     reserveLettersPlayed: 0,
     parksUsed: 0,
     recyclesUsed: 0,
+    rerollsUsed: 0,
     won: false,
     stats,
   };
@@ -162,6 +164,11 @@ export function sanitizeGameState(x: unknown): GameState | null {
   if (!isCount(s.recyclesLeft) || s.recyclesLeft > s.config.recycles) return null;
   if (!isCount(s.movesMade) || !isCount(s.reserveLettersPlayed)) return null;
   if (!isCount(s.parksUsed) || !isCount(s.recyclesUsed)) return null;
+  // rerollsUsed (DB-178) post-dates the snapshot format at SCHEMA_VERSION 2, so
+  // an in-progress deal saved before this feature simply lacks it — coerce a
+  // missing counter to 0 rather than discard the resume; reject only bad values.
+  if (s.rerollsUsed === undefined) s.rerollsUsed = 0;
+  else if (!isCount(s.rerollsUsed)) return null;
   if (!Array.isArray(s.played) || !s.played.every((w) => typeof w === 'string')) return null;
   if (!isCount(s.dealIndex) || !Number.isInteger(s.dealIndex)) return null;
   const stats: unknown = s.stats;
@@ -267,6 +274,55 @@ export function reducer(state: GameState, action: Action): GameState {
         tray: state.tray.filter((e) => e.source !== 'reserve'),
         movesMade: state.movesMade + 1,
         parksUsed: state.parksUsed + 1,
+      };
+    }
+
+    case 'reroll': {
+      // Opening reroll (DB-178): before play, exchange the selected columns'
+      // face-up TOP cards with the stock — a mulligan for a bad-looking deal.
+      // A deterministic rotation, not a shuffle: each picked top goes to the
+      // BOTTOM of the stock, and the same number of cards evict off the FRONT
+      // of the stock (the next draws) to take the vacated board spots. The
+      // 48-card multiset is conserved — you relocate letters, never conjure
+      // them — and a discarded top can resurface later through the stock.
+      //
+      // The rotated-in cards land as STOCK-ORIGIN (fromStock:true → orange):
+      // playable, but like parked cards they never count toward the win
+      // (countNative filters them). So a reroll trades a native card you'd have
+      // to clear for an orange one you don't — that's the strategic upside, and
+      // the swapped-out native card sinks into the stock.
+      //
+      // Deliberately a GAMBLE (owner call): the stock is face-down, so you
+      // don't know what you'll get, and there's no solver check — a reroll can
+      // strand the board. The deal AS DEALT keeps the every-deal-winnable
+      // promise; only this voluntary swap is exempt. No cap on how many tops.
+      // Pre-play only (nothing drawn, trayed, or played), native tops only
+      // (already-orange tops aren't rerollable). Free: no scoring effect.
+      if (state.won) return state;
+      if (state.played.length > 0 || state.reserve.length > 0 || state.tray.length > 0) return state;
+      const eligible = Array.from(new Set(action.cols)).filter((c) => {
+        const col = state.columns[c];
+        return col && col.length > 0 && !col[col.length - 1].fromStock;
+      });
+      // Bounded only by how many cards the stock can cover the swap with.
+      const k = Math.min(eligible.length, state.stock.length);
+      if (k === 0) return state;
+      const picks = eligible.slice(0, k);
+      const evicted = state.stock.slice(0, k); // front of the stock — the next draws
+      const pickedLetters = picks.map((c) => state.columns[c][state.columns[c].length - 1].letter);
+      const columns = state.columns.map((col, i) => {
+        const idx = picks.indexOf(i);
+        if (idx === -1) return col;
+        const next = col.slice();
+        next[next.length - 1] = { letter: evicted[idx], fromStock: true }; // orange, parked-like
+        return next;
+      });
+      return {
+        ...state,
+        columns,
+        // Evicted cards leave the front; the swapped-out tops join the bottom.
+        stock: [...state.stock.slice(k), ...pickedLetters],
+        rerollsUsed: state.rerollsUsed + k,
       };
     }
 

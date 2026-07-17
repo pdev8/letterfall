@@ -13,7 +13,7 @@ PR title. Tickets are sized S (≤half day), M (~1 day), L (multi-day).
 **Progress tracking:** `docs/roadmap.html` (the published artifact) is the
 live tracker — journey stepper, per-ticket status, shipped log. Update ticket
 status there **in the same PR that completes the work**. Current position:
-0/41 tickets shipped; next up DB-100; DB-177 is flagged ready-early.
+0/42 tickets shipped; next up DB-100; DB-177 is flagged ready-early.
 
 **Where we are (v0, done):** core loop — 7-column tableau, stock → reserve
 draw, 2 recycles, word tray (drag-to-swap, tap-to-return), park bays (first 3
@@ -153,6 +153,7 @@ Retires the static deal pool. Gates the daily-set half of E4.*
 | DB-176 | Seed service: phase 1 + phase 2 stub | M | Launch: hash(date, gameIndex, salt) on device; documented server-issued-seed + move-log replay validation design for phase 2 |
 | DB-186 | Backend foundation on Supabase | L | Supabase project + schema: daily seeds, score submissions, move logs, word-usage aggregates; anonymous device auth with optional Game Center identity link; RLS policies; DB-176 phase 2, DB-184, and DB-185 all build on this |
 | DB-177 | Dynamic bays (rule change — ships before the rest of E7) | M | Park onto ANY empty column; parked cards capped at `config.parkBays` (unifies with the DB-131 knob; `parkedCount` enforces); dead-deal rescue + park-target UI updated; reducer tests cover the cap; full sim rerun lands with DB-172 steering |
+| DB-178 | Opening reroll — exchange cards with the stock (rule change) | S | Before play a panel fans the deal's face-up column tops; tap to raise/lower, then **Swap** (one shot — closes the panel and shows the new board) or **Skip** (play as dealt). Swap is a deterministic **rotation**: each raised top goes to the BOTTOM of the stock and that many cards evict off the FRONT of the stock into the vacated spots, so the 48-card multiset is conserved. The rolled-in cards arrive **orange** (stock-origin — playable but, like parked cards, **not required to clear**), so each swap lowers the clear-count. No cap (bounded only by stock size); **free** (no scoring effect). Deliberately a **gamble**: the stock is face-down and there's no solver check, so a reroll may strand the board — the deal *as dealt* keeps the every-deal-winnable promise; only the voluntary reroll is exempt. Only the 7 face-up tops are shown (buried cards stay hidden). `reroll` action (pre-play only, native tops only); `rerollsUsed` counts cards swapped; reducer tests (rotation, orange/clear-count, no-cap, stock-bound, guards) + `RerollPanel` UI; pre-DB-178 resume snapshots coerce the missing counter to 0 |
 
 ## Epic E8 — Word Ladder & Living Meta (post-launch, M5)
 
@@ -284,6 +285,8 @@ stockEconomyMult = clamp( 1.5
 ```
 
 Draws themselves are free — browsing the stock is fine; *consuming* it costs.
+The opening reroll (DB-178) has **no scoring effect** — it's a free pre-play
+setup choice, not a stock lean.
 
 **Difficulty** (see Configurations spec): no named presets — the multiplier
 derives from how the player hardens the game:
