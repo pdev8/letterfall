@@ -44,7 +44,12 @@ import { recordDeal, type DealRecord, type LifetimeStats } from '../stats';
 import { C } from '../theme';
 import type { TrayEntry } from '../types';
 
-export default function GameScreen() {
+export default function GameScreen({
+  // Optional with a no-op default so existing usage/tests don't break.
+  onOpenSettings = () => {},
+}: {
+  onOpenSettings?: () => void;
+} = {}) {
   const { width } = useWindowDimensions();
   const [state, dispatch] = useReducer(reducer, null, () =>
     makeDealState(randomDealIndex(), { won: 0, played: 0, streak: 0 }),
@@ -562,9 +567,19 @@ export default function GameScreen() {
             <Pressable
               onPress={onRedeal}
               hitSlop={8}
+              accessibilityLabel="Redeal"
               style={({ pressed }) => [styles.redealBtn, pressed && { opacity: 0.6 }]}
             >
               <Text style={styles.redealGlyph}>↻</Text>
+            </Pressable>
+            <Pressable
+              onPress={onOpenSettings}
+              hitSlop={8}
+              accessibilityLabel="Settings"
+              style={({ pressed }) => [styles.redealBtn, pressed && { opacity: 0.6 }]}
+            >
+              {/* U+FE0E keeps the gear a text glyph, not an emoji */}
+              <Text style={styles.redealGlyph}>{'⚙︎'}</Text>
             </Pressable>
           </View>
         </View>

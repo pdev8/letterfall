@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { parseSavedGame, type SavedGame } from './game';
 import { emptyHistory, type HistoryState } from './history';
 import type { MissedWords } from './missedWords';
+import { sanitizeSettings, type Settings } from './settings';
 import { emptyStats, type LifetimeStats } from './stats';
 import { createStore } from './storage';
 
@@ -62,6 +63,23 @@ export function loadMissedWords(): Promise<MissedWords> {
 
 export function saveMissedWords(m: MissedWords): Promise<void> {
   return store.set(MISSED_KEY, m);
+}
+
+// ---------------------------------------------------------------- settings (DB-130)
+
+export const SETTINGS_KEY = 'settings';
+
+/**
+ * Missing/corrupt data sanitizes to DEFAULT_SETTINGS (per-field for partial
+ * corruption) — storage never crashes the game.
+ */
+export async function loadSettings(): Promise<Settings> {
+  const raw = await store.get<unknown>(SETTINGS_KEY, null);
+  return sanitizeSettings(raw);
+}
+
+export function saveSettings(s: Settings): Promise<void> {
+  return store.set(SETTINGS_KEY, s);
 }
 
 // ---------------------------------------------------------------- history (DB-123)
