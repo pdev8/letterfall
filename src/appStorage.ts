@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { parseSavedGame, type SavedGame } from './game';
 import { emptyHistory, type HistoryState } from './history';
+import type { MissedWords } from './missedWords';
 import { emptyStats, type LifetimeStats } from './stats';
 import { createStore } from './storage';
 
@@ -42,6 +43,25 @@ export async function loadGame(): Promise<SavedGame | null> {
 
 export function clearGame(): Promise<void> {
   return store.remove(GAME_KEY);
+}
+
+// ---------------------------------------------------------------- missed words (DB-203)
+
+/**
+ * Export = the stored JSON envelope under this key
+ * (`{"v":1,"data":{"<word>":<count>,...}}` in AsyncStorage). Read it off a
+ * dev device / simulator to inspect dictionary gaps; Supabase sync lands
+ * with DB-186.
+ */
+export const MISSED_KEY = 'missedWords';
+
+/** Missing/corrupt data resolves to an empty map — storage never crashes the game. */
+export function loadMissedWords(): Promise<MissedWords> {
+  return store.get(MISSED_KEY, {});
+}
+
+export function saveMissedWords(m: MissedWords): Promise<void> {
+  return store.set(MISSED_KEY, m);
 }
 
 // ---------------------------------------------------------------- history (DB-123)

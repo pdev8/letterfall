@@ -15,9 +15,11 @@ import {
   clearGame,
   loadGame,
   loadHistory,
+  loadMissedWords,
   loadStats,
   saveGame,
   saveHistory,
+  saveMissedWords,
   saveStats,
 } from '../appStorage';
 import BigButton from '../components/BigButton';
@@ -36,6 +38,7 @@ import {
   tableauCount,
 } from '../game';
 import { makeRecord, recordGame, type GameRecord, type HistoryState } from '../history';
+import { recordMiss, topMisses, type MissedWords } from '../missedWords';
 import { dealScore, stockEconomyMult, wordEconomyMult, wordScore } from '../scoring';
 import { recordDeal, type DealRecord, type LifetimeStats } from '../stats';
 import { C } from '../theme';
@@ -123,6 +126,22 @@ export default function GameScreen() {
     saveStats(lifetimeRef.current).catch(() => {}); // storage never crashes the game
   }, []);
 
+  // ---------------- missed-word feedback loop (DB-203)
+  // Same shape as the lifetime layer: null until loadMissedWords resolves;
+  // misses attempted before then queue up and fold in on load. Local-only
+  // until Supabase sync (DB-186).
+  const missedRef = useRef<MissedWords | null>(null);
+  const pendingMissesRef = useRef<string[]>([]);
+
+  const recordMissedWord = useCallback((attempt: string) => {
+    if (missedRef.current === null) {
+      pendingMissesRef.current.push(attempt);
+      return;
+    }
+    missedRef.current = recordMiss(missedRef.current, attempt);
+    saveMissedWords(missedRef.current).catch(() => {}); // storage never crashes the game
+  }, []);
+
   // ---------------- game history + personal bests (DB-123)
   // Same shape as the lifetime layer: null until loadHistory resolves;
   // records finishing before then queue up and fold in on load. Surfaced in
@@ -149,6 +168,16 @@ export default function GameScreen() {
         pendingDealsRef.current = [];
         saveStats(s).catch(() => {});
       }
+    });
+    loadMissedWords().then((loaded) => {
+      let m = loaded;
+      for (const w of pendingMissesRef.current) m = recordMiss(m, w);
+      missedRef.current = m;
+      if (pendingMissesRef.current.length > 0) {
+        pendingMissesRef.current = [];
+        saveMissedWords(m).catch(() => {});
+      }
+      if (__DEV__) console.log('[missed-words] top:', topMisses(loaded, 10));
     });
     loadHistory().then((loaded) => {
       let h = loaded;
@@ -448,7 +477,14 @@ export default function GameScreen() {
   };
 
   const onPlay = () => {
-    if (busyRef.current || !wordValid) return;
+    if (busyRef.current) return;
+    if (!wordValid) {
+      // Rejected attempt: log playable-looking words so dictionary gaps
+      // become data (DB-203), shake the tray as feedback, and stay put.
+      if (state.tray.length >= 3) recordMissedWord(word);
+      runShake(trayShakeX);
+      return;
+    }
     busyRef.current = true;
     setBusy(true);
     // Tray cards fly up toward the foundation, then the play commits.
@@ -758,7 +794,7 @@ export default function GameScreen() {
           </Pressable>
           <Pressable
             onPress={onPlay}
-            disabled={busy || !wordValid}
+            disabled={busy}
             style={({ pressed }) => [
               styles.playButton,
               wordValid ? styles.playButtonReady : styles.playButtonIdle,
