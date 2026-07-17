@@ -156,8 +156,11 @@ The fixes, all sim-informed:
 | 5 | Steep [1,1,2,4,6,7,7] | Minimal (least-helpful legal letters) | 0 | 1 |
 
 Daily total = Σ of the five deal scores (scoring spec in `ROADMAP.md`).
-A per-game difficulty multiplier may replace the preset multiplier for the
-daily set — decide in DB-173.
+**Decided (DB-173): no separate daily multiplier.** Difficulty comes from the
+knobs (recycles + max-parked), and `configMult` already derives the score
+multiplier from them — game 5's 0-recycle / 1-bay config is ×1.4 — so harder
+games in the ramp are automatically worth more. The ramp lives in
+`src/dailyRamp.ts` (`DAILY_RAMP`).
 
 The daily set is the **only publicly ranked mode**; free play is unlimited,
 locally seeded, and feeds personal stats only (see "Modes & Leaderboards" in
