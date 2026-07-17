@@ -15,6 +15,7 @@ const LETTERS = 'DECKABET'.split('');
 const SEGMENTS = 3; // string links — more = ropier bend
 const PARALLAX = 16; // px shift at full tilt, scaled by depth
 const STRING_W = 1.5;
+const OFFSCREEN = 280; // string continues this far above the top edge (the puppeteer)
 const SEG_AMP = [1.1, 1.5, 2.1]; // idle bend per link, growing toward the card
 const DEG = { inputRange: [-90, 90], outputRange: ['-90deg', '90deg'] };
 
@@ -45,13 +46,14 @@ function makeHangers(width: number, height: number): Hanger[] {
   return LETTERS.map((letter, i) => ({
     letter,
     x: Math.round(startX + i * (cardW + gap) + cardW / 2),
-    stringLen: baseTop + Math.round(rand(-12, 12)), // slight per-card offset
+    // Full rope length: off-screen puppeteer run + the visible drop to the card.
+    stringLen: OFFSCREEN + baseTop + Math.round(rand(-12, 12)),
     cardW,
     cardH,
     depth: rand(0.82, 1),
-    startAngle: rand(9, 15) * (i % 2 === 0 ? 1 : -1),
+    startAngle: rand(13, 20) * (i % 2 === 0 ? 1 : -1),
     period: rand(2800, 3800),
-    delay: Math.round(i * 60 + rand(0, 120)),
+    delay: Math.round(i * 70 + rand(0, 140)),
   }));
 }
 
@@ -70,15 +72,16 @@ export default function HangingCards({ reduceMotion = false }: { reduceMotion?: 
 
   useEffect(() => {
     if (reduceMotion) return;
-    // Smooth vertical reel-up (ease-out, no bounce) + a damped pendulum swing-in
-    // (spring overshoots and settles → the rope whips into place).
+    // Released-from-tension: the card starts stretched well below the bottom,
+    // then a bouncy spring snaps it up past its rest and settles (elastic
+    // release), while a damped pendulum swing whips the rope in.
     const anims = hangers.flatMap((h, i) => [
       Animated.sequence([
         Animated.delay(h.delay),
-        Animated.timing(rise[i], {
+        Animated.spring(rise[i], {
           toValue: 1,
-          duration: 1000,
-          easing: Easing.out(Easing.cubic),
+          friction: 5.5,
+          tension: 42,
           useNativeDriver: true,
         }),
       ]),
@@ -141,7 +144,8 @@ export default function HangingCards({ reduceMotion = false }: { reduceMotion?: 
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       {hangers.map((h, i) => {
         const segLen = h.stringLen / SEGMENTS;
-        const start = height - h.stringLen + h.cardH + 100; // begins fully below screen
+        // Stretched: the card begins well below the bottom edge, then is released.
+        const start = height - h.stringLen + OFFSCREEN + h.cardH + 200;
         const riseY = rise[i].interpolate({ inputRange: [0, 1], outputRange: [start, 0] });
         const px = Animated.multiply(tilt.x, h.depth * PARALLAX);
         const py = Animated.multiply(tilt.y, h.depth * PARALLAX);
@@ -178,7 +182,10 @@ export default function HangingCards({ reduceMotion = false }: { reduceMotion?: 
         }
 
         return (
-          <View key={i} style={[styles.anchor, { left: h.x - h.cardW / 2, width: h.cardW }]}>
+          <View
+            key={i}
+            style={[styles.anchor, { left: h.x - h.cardW / 2, top: -OFFSCREEN, width: h.cardW }]}
+          >
             {node}
           </View>
         );
