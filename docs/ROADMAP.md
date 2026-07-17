@@ -99,13 +99,14 @@ Retires the static deal pool. Gates the daily-set half of E4.*
 
 | ID | Ticket | Size | Acceptance criteria |
 |---|---|---|---|
-| LF-170 | On-device deal generator (TS port, seeded PRNG) | M | Solution-first tableau construction from a seed; same seed ⇒ same deal; distribution guards (duplicate caps, vowel/consonant window, rarity budget); openness threshold; unit-tested |
+| LF-170 | On-device deal generator (TS port, seeded PRNG) | M | Solution-first tableau construction from a seed; same seed ⇒ same deal; distribution guards (duplicate caps, vowel/consonant window, rarity budget); board-shape parameter with position-shuffled heights; altitude guards (rares surface early, vowel-biased column bottoms); openness threshold; unit-tested |
 | LF-171 | Solvability checker | L | Bounded memoized solver answers "is this state completable?" fast enough for draw time; escape-plan maintenance; property-tested against random play |
 | LF-172 | Draw-time stock steering | L | Next card = f(seed, move history); invariant never broken; guards enforced; generosity knob (helpful ↔ least-helpful legal letter); deterministic replay verified in tests |
-| LF-173 | Difficulty ramp parameters | M | Per-game (1–5) steering generosity + recycles + bays per GENERATION.md table; decide daily-set score multiplier |
+| LF-173 | Difficulty ramp parameters | M | Per-game (1–5) board shape + steering generosity + recycles + max-parked per GENERATION.md table; decide daily-set score multiplier |
 | LF-174 | Daily set mode | M | 5 scored games/day, same for all players, cumulative daily total, reset countdown UX; free play unlimited/unscored |
 | LF-175 | Par estimation + score bands | M | Generator estimates achievable score; deals outside the par band rejected; band documented and tested |
 | LF-176 | Seed service: phase 1 + phase 2 stub | M | Launch: hash(date, gameIndex, salt) on device; documented server-issued-seed + move-log replay validation design for phase 2 |
+| LF-177 | Dynamic bays (rule change — ships before the rest of E7) | M | Park onto ANY empty column; max 3 parked cards on board (`PARK_COLS` → `MAX_PARKED`); dead-deal rescue + park-target UI updated; reducer tests cover the cap; sim rerun confirms the left-first trap is gone |
 
 ## Epic E8 — Word Ladder & Living Meta (post-launch, M5)
 
@@ -212,6 +213,15 @@ Standard difficulty, cleared in 7 words, base Σ = 240, used 3 reserve letters,
 stockEconomyMult = 1.5 − 0.24 − 0.05 − 0 = 1.21
 dealScore = round(240 × 1.30 × 1.21 × 1.25) = 472
 ```
+
+### 4b. Encore — the closer scores double
+
+The **final word of a winning deal earns 2× its wordScore** (applied inside
+`baseScore`). Simulation showed word lengths structurally fade toward
+3-letter scraps as columns empty; Encore (with dynamic bays, E7) turns the
+ending into a planned climax — hold breadth, stage a long closer — instead
+of a grind. Example: closing with PRIZED (2+1+8+10+1+2 = 24 × 2.0 = 48) banks
+96.
 
 ### 5. Edge rules
 

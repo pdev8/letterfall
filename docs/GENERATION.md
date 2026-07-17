@@ -86,15 +86,56 @@ high-tier deal must be winnable *without* that day's banned words; free play
 always uses the full lexicon. The solver, `isValidWord`, and the generator
 all take the effective lexicon as a parameter, never a global.
 
+## Board geometry & the endgame (added 2026-07-17)
+
+Simulation over all 290 deals (bot policies through the real reducer) proved
+two problems with the classic staircase [1..7] + fixed left bays:
+
+1. **The intuitive strategy is a trap.** A bay-hungry, clear-the-left-first
+   bot wins 61% with word lengths collapsing to ~3.2 letters by its *third*
+   word (avg score 88, 11.7 parks). A breadth-preserving bot ("level the
+   board, drain tall columns, avoid emptying") wins 87% at score 106. The
+   obvious line is quietly the worst line — frustration by design.
+2. **The fade is structural.** Even optimal play collapses to ~3.2-letter
+   words at the end: max word length = non-empty columns + 1, and the last
+   words must drain the last columns. No scoring tweak alone fixes geometry.
+
+The fixes, all sim-informed:
+
+- **Dynamic bays (rule change, ships pre-v2 — LF-177).** Parking is no longer
+  positional: the reserve card may be parked on **any empty column**, with at
+  most **3 parked cards on the board** at once. The left side loses its false
+  magnetism, emptied columns become tools anywhere, and the endgame gains
+  *breadth repair* — parking into empties stages a long closing word
+  (2 native columns + 3 parked + reserve = a 6-letter closer).
+- **Board shape is a difficulty lever.** Flat boards neutralize the trap and
+  keep long words alive twice as long (flat [4×7]: ~4.7-letter words through
+  word 4, and even the naive bot plays well — win rates converge). Steeper
+  shapes are harder and grindier. The daily set ramps shape (table below);
+  **column heights are always position-shuffled** so no side is ever the
+  cheap side.
+- **Letter altitude rules (generation guards).** Rare letters (value ≥ 5)
+  surface early — tops of columns or shallow columns — while breadth can
+  still support them; column *bottoms* are biased toward vowels and flexible
+  letters so the late game never devolves into consonant sludge.
+- **Vowel lifeline (steering invariant).** Whenever visible vowels < 2, the
+  steering guarantees a vowel within the next few draws. (Strengthens the
+  existing vowel/consonant window guard into an explicit invariant. We do
+  *not* move all vowels to the stock — that would tax stock economy and
+  force reserve dependence.)
+- **Encore (scoring).** The final word of a winning deal scores **double**
+  (see ROADMAP scoring spec). The structural narrowing becomes a puzzle to
+  plan around — hold breadth, stage the closer — instead of a fade.
+
 ## Daily set structure
 
-| Game | Steering generosity | Recycles | Park bays |
-|---|---|---|---|
-| 1 | High (helpful legal letters) | 2 | 3 |
-| 2 | Medium-high | 2 | 3 |
-| 3 | Medium | 1 | 2 |
-| 4 | Low | 1 | 2 |
-| 5 | Minimal (least-helpful legal letters) | 0 | 1 |
+| Game | Board shape (heights, position-shuffled) | Steering generosity | Recycles | Max parked |
+|---|---|---|---|---|
+| 1 | Flat [4,4,4,4,4,4,4] | High (helpful legal letters) | 2 | 3 |
+| 2 | Gentle [2,3,4,4,5,5,5] | Medium-high | 2 | 3 |
+| 3 | Gentle [2,3,4,4,5,5,5] | Medium | 1 | 2 |
+| 4 | Staircase [1,2,3,4,5,6,7] | Low | 1 | 2 |
+| 5 | Steep [1,1,2,4,6,7,7] | Minimal (least-helpful legal letters) | 0 | 1 |
 
 Daily total = Σ of the five deal scores (scoring spec in `ROADMAP.md`).
 A per-game difficulty multiplier may replace the preset multiplier for the

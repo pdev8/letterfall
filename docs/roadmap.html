@@ -377,6 +377,7 @@
       <tr><td class="id">LF-174</td><td>Daily set mode</td><td><span class="size m">M</span></td><td class="crit">5 scored games/day, same for everyone, cumulative total, reset countdown; free play unlimited/unscored</td></tr>
       <tr><td class="id">LF-175</td><td>Par estimation + score bands</td><td><span class="size m">M</span></td><td class="crit">Achievable-score estimate at generation; out-of-band deals rejected</td></tr>
       <tr><td class="id">LF-176</td><td>Seed service (phase 1 + phase 2 stub)</td><td><span class="size m">M</span></td><td class="crit">Launch: hash(date, game, salt) on device; server-issued seeds + move-log replay validation designed</td></tr>
+      <tr><td class="id">LF-177</td><td>Dynamic bays (rule change, ships early)</td><td><span class="size m">M</span></td><td class="crit">Park onto ANY empty column, max 3 parked at once; kills the clear-the-left-first trap (sim-proven: 61%→87% win gap); endgame breadth repair</td></tr>
     </table></div>
   </section>
 
@@ -473,6 +474,12 @@ stockEconomyMult = clamp( 1.5 − 0.08·reserveLettersPlayed
 dealScore = round( 240 × 1.30 × 1.21 × 1.25 ) = 472</div>
     </div>
 
+    <div class="callout">
+      <div class="c-title">Encore — the closer scores double</div>
+      <p>The final word of a winning deal earns 2× its wordScore. Word lengths structurally
+      fade as columns empty (sim-proven); Encore plus dynamic bays turns the ending into a
+      planned climax — hold breadth, stage a long closer — instead of a 3-letter grind.</p>
+    </div>
     <p class="crit">Dead or abandoned deals bank no points (their words still count toward
     achievements). Total points — the leaderboard currency — is the sum of banked deal scores.</p>
   </section>
