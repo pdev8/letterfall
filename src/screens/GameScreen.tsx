@@ -327,6 +327,11 @@ export default function GameScreen({
   const pad = 12;
   const colW = Math.floor((width - pad * 2 - 4 * 6) / 7);
   const cardH = Math.round(colW * 1.35);
+  // How much of each stacked face-down card peeks out below the one in front —
+  // enough to show its rounded top corners so every hidden card reads as a full
+  // card, not a flat stub. Kept below liftShift so a trayed top card still rises
+  // clear of the stack.
+  const cascadeReveal = Math.round(cardH * 0.18);
   const pileW = colW + 8;
   const pileH = Math.round(pileW * 1.3);
   const trayW = Math.floor((width - pad * 2 - 5 * 7) / MAX_WORD);
@@ -823,23 +828,21 @@ export default function GameScreen({
             const inTray = state.tray.some((e) => e.source === i);
             const faceDown = Math.max(0, col.length - 1);
             const top = col.length > 0 ? col[col.length - 1] : null;
-            // Lifted cards slide down 20% in layout (no transform, so nothing
-            // clips). The face-down card beneath shows as a full card back.
+            // Lifted cards slide up out of the stack in layout (no transform, so
+            // nothing clips). Every face-down card renders as a full card back,
+            // cascaded so only its top edge (cascadeReveal) peeks out.
             const liftShift = Math.round(cardH * 0.2);
-            const showBack = inTray && faceDown > 0;
+            const cascade = { marginTop: cascadeReveal - cardH };
             return (
               <View key={i} style={{ width: colW }}>
-                {Array.from({ length: showBack ? faceDown - 1 : faceDown }, (_, j) => (
-                  <View key={j} style={[styles.stub, j > 0 && styles.stubOverlap]} />
-                ))}
-                {showBack ? (
-                  <View style={faceDown > 1 ? styles.topCardOverlap : undefined}>
+                {Array.from({ length: faceDown }, (_, j) => (
+                  <View key={j} style={j > 0 ? cascade : undefined}>
                     <CardBack width={colW} height={cardH} />
                   </View>
-                ) : null}
-                {inTray && !showBack ? (
-                  // No face-down card to reveal: a ghost spot marks the
-                  // lifted card's home instead.
+                ))}
+                {inTray && faceDown === 0 ? (
+                  // Nothing beneath to reveal: a ghost spot marks the lifted
+                  // card's home instead.
                   <View style={[styles.emptyColSlot, { width: colW, height: cardH }]} />
                 ) : null}
                 {top !== null ? (
@@ -847,9 +850,14 @@ export default function GameScreen({
                     key={`${state.dealIndex}-c${i}-${col.length}`}
                     style={
                       inTray
-                        ? { marginTop: liftShift - cardH }
+                        ? faceDown > 0
+                          ? // Selected over a stack: slide down from the cascade
+                            // resting spot so more of the card back behind shows.
+                            { marginTop: cascadeReveal - cardH + liftShift }
+                          : // Selected on a bare column: slide down over the ghost home.
+                            { marginTop: liftShift - cardH }
                         : faceDown > 0
-                          ? styles.topCardOverlap
+                          ? cascade
                           : undefined
                     }
                   >
@@ -1280,19 +1288,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 14,
-  },
-  stub: {
-    height: 14,
-    borderRadius: 4,
-    backgroundColor: C.surfaceHi,
-    borderWidth: 1,
-    borderColor: C.border,
-  },
-  stubOverlap: {
-    marginTop: -8,
-  },
-  topCardOverlap: {
-    marginTop: -5,
   },
   // Ghost spot: same treatment as the tray slots, no accent outline.
   emptyColSlot: {
