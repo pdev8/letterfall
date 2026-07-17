@@ -30,7 +30,7 @@ theme, win/dead-deal overlays, session stats.
 | **M2 — Sticky** | The game remembers | E2, E10, E3 | Stats/streaks survive relaunch; the lexicon is a real dictionary; difficulty is player-controlled; game resumes mid-deal |
 | **M3 — Social** | The game competes | E7, E4, E5 | Living deck generates the daily set; Game Center leaderboards live; badges unlock and display |
 | **M4 — Shipped** | The game ships | E6 | App Store approval |
-| **M5 — Alive** | The game evolves (post-launch) | E8, E9, E7 phase 2 | Word ladder with community-driven retirement; Toolkit fun mechanics; server-issued seeds + replay validation |
+| **M5 — Alive** | The game evolves (post-launch) | E8, E9, E11, E7 phase 2 | Word ladder with community-driven retirement; Toolkit fun mechanics; server-issued seeds + replay validation |
 
 ---
 
@@ -191,6 +191,23 @@ invariant survives tool use.*
 | DB-193 | Tool: Scrap | M | Remove one visible letter card outright (native card removal counts toward clearing); solvability re-verified; satisfying destruction animation |
 | DB-194 | Charges + gating persistence | M | Daily charge refresh at play-day rollover; per-mode gating (never in challenge, toggle in free play, default-on in Casual); assisted flag threads into stats/history |
 | DB-195 | Wildcards — earned, banked, played as any letter | M | Earned at career-point milestones (thresholds configurable, e.g. every 500 banked points); balance persists via the storage layer and **accumulates with no daily reset** (unlike tool charges); played from the tray as a distinct ♠ blank that completes any word — counts toward word length, letter value 0 (Scrabble-blank rule), max one per word; validation supports the blank (any completing letter); shown distinctly in the win tally; follows Toolkit gating (never in the daily challenge; assisted marking applies) |
+
+## Epic E11 — The Buy Round (post-launch, M5)
+
+*Wheel-of-Fortune meets Counter-Strike: between games, points earned in the
+LAST game buy letters for the NEXT one. Buy power never rolls over — spend it
+or lose it — and below the minimum threshold there is no buy at all (the eco
+round). Letters are tiered: bigger performances unlock better shelves. In the
+daily set this is the connective tissue between games 1–5: everyone starts
+game 1 clean, and because pricing is deterministic and identical for all
+players, it stays leaderboard-fair — good plays literally fund the run.*
+
+| ID | Ticket | Size | Acceptance criteria |
+|---|---|---|---|
+| DB-210 | Buy Round design finalization | S | Pricing/tier table locked (proposal: <150 pts = eco, no buy; 150+ = common shelf, 1 pick; 300+ = mid shelf incl. premium consonants, 2 picks; 500+ = top shelf incl. J/Q/X/Z + choice vowels, 3 picks); pocket cap; scoring interaction (bought letters pre-paid — no stock-economy tax); game 1 never has a buy; free-play variant decided |
+| DB-211 | Buy screen | M | Between-games shop with tier shelves; locked shelves visible (aspiration); shows buy power and its expiry; skippable; fits the card-room aesthetic |
+| DB-212 | Pocket letters gameplay | M | Purchased letters ride into the next deal as a pocket row — playable like parked cards, never count toward clearing, distinct visual; solvability unaffected (strictly additive); tests per the standard |
+| DB-213 | Economy wiring | M | dealScore → buy-power conversion at set thresholds; **no rollover** (unspent power expires when the next game starts); daily-set integration between games; telemetry hooks for tuning |
 
 ## Epic E6 — App Store Readiness
 
