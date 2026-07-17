@@ -72,4 +72,6 @@ export type Action =
   | { type: 'swapTray'; a: number; b: number }
   | { type: 'clearTray' }
   | { type: 'play' }
-  | { type: 'redeal' };
+  | { type: 'redeal' }
+  /** Replace the whole state with a persisted snapshot (DB-122 resume). */
+  | { type: 'restore'; state: GameState };

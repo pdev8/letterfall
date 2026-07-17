@@ -11,7 +11,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 
-import { loadStats, saveStats } from '../appStorage';
+import { clearGame, loadGame, loadStats, saveGame, saveStats } from '../appStorage';
 import BigButton from '../components/BigButton';
 import CardBack from '../components/CardBack';
 import LetterCard from '../components/LetterCard';
@@ -125,7 +125,30 @@ export default function GameScreen() {
         saveStats(s).catch(() => {});
       }
     });
+    // Resume a killed-mid-deal game (DB-122). The board may swap a few ms
+    // after first paint — acceptable. Backdating the deal clock by the saved
+    // elapsed time keeps DB-121's time-played honest across the relaunch.
+    loadGame()
+      .then((saved) => {
+        if (saved !== null) {
+          dispatch({ type: 'restore', state: saved.state });
+          dealStartRef.current = Date.now() - saved.elapsedMs;
+        }
+      })
+      .catch(() => {}); // storage never crashes the game
   }, []);
+
+  // Persist the in-progress deal on every change (DB-122). A restore dispatch
+  // re-triggers this and re-saves the same state — harmless.
+  useEffect(() => {
+    if (state.won) {
+      clearGame().catch(() => {}); // finished deals are never restored
+    } else if (state.movesMade > 0 || state.tray.length > 0) {
+      saveGame({ state, elapsedMs: Date.now() - dealStartRef.current }).catch(() => {});
+    } else {
+      clearGame().catch(() => {}); // fresh untouched deal: don't resurrect a stale save
+    }
+  }, [state]);
 
   // Record each win exactly once, on the false -> true transition.
   const prevWonRef = useRef(state.won);
