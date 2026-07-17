@@ -16,6 +16,7 @@ import {
   loadGame,
   loadHistory,
   loadMissedWords,
+  loadSettings,
   loadStats,
   saveGame,
   saveHistory,
@@ -29,17 +30,17 @@ import Overlay from '../components/Overlay';
 import PopIn from '../components/PopIn';
 import WordChip from '../components/WordChip';
 import { existsPlayableWord, isValidWord } from '../dict';
-import {
-  MAX_WORD,
-  PARK_COLS,
-  makeDealState,
-  randomDealIndex,
-  reducer,
-  tableauCount,
-} from '../game';
+import { MAX_WORD, makeDealState, randomDealIndex, reducer, tableauCount } from '../game';
 import { makeRecord, recordGame, type GameRecord, type HistoryState } from '../history';
 import { recordMiss, topMisses, type MissedWords } from '../missedWords';
-import { dealScore, stockEconomyMult, wordEconomyMult, wordScore } from '../scoring';
+import {
+  DEFAULT_CONFIG,
+  dealScore,
+  stockEconomyMult,
+  wordEconomyMult,
+  wordScore,
+  type GameConfig,
+} from '../scoring';
 import { recordDeal, type DealRecord, type LifetimeStats } from '../stats';
 import { C } from '../theme';
 import type { TrayEntry } from '../types';
@@ -95,19 +96,19 @@ export default function GameScreen({
   // rescue an otherwise-stuck position.
   const parkRescue =
     state.reserve.length >= 2 &&
-    state.columns.some((c, i) => i < PARK_COLS && c.length === 0);
+    state.columns.some((c, i) => i < state.config.parkBays && c.length === 0);
   const isDead = !state.won && tableauLeft > 0 && !anyPlay && !canDraw && !parkRescue;
   const showNoPlayHint = !state.won && !isDead && !anyPlay && tableauLeft > 0;
   const reserveInTray = state.tray.some((e) => e.source === 'reserve');
   const bestWord = state.played.reduce((a, b) => (b.length > a.length ? b : a), '');
-  // Difficulty presets land in E3 (DB-131); until then score at casual ×1.0.
+  // Scored under this deal's own difficulty knobs (DB-131).
   const wonScore = state.won
     ? dealScore({
         words: state.played,
         reserveLettersPlayed: state.reserveLettersPlayed,
         parksUsed: state.parksUsed,
         recyclesUsed: state.recyclesUsed,
-        difficulty: 'casual',
+        config: state.config,
       })
     : 0;
 
@@ -117,6 +118,9 @@ export default function GameScreen({
   // mode (E5) exists.
   // When the current deal started; stamped on mount and on every redeal.
   const dealStartRef = useRef(0);
+  // The player's chosen difficulty knobs (DB-131), loaded once from settings;
+  // applied to each NEW deal on redeal (never mid-deal).
+  const configRef = useRef<GameConfig>(DEFAULT_CONFIG);
   // null until loadStats resolves; outcomes finishing before then (never in
   // practice — a deal takes minutes) queue up and fold in on load.
   const lifetimeRef = useRef<LifetimeStats | null>(null);
@@ -165,6 +169,9 @@ export default function GameScreen({
 
   useEffect(() => {
     dealStartRef.current = Date.now(); // the first deal's clock starts at mount
+    loadSettings().then((s) => {
+      configRef.current = s.config; // used by the next redeal, not this deal
+    });
     loadStats().then((loaded) => {
       let s = loaded;
       for (const o of pendingDealsRef.current) s = recordDeal(s, 'free', o);
@@ -229,11 +236,10 @@ export default function GameScreen({
         words: state.played,
         dealScore: wonScore,
       });
-      // Difficulty presets land in DB-131; everything records casual/free.
       recordHistoryGame(
         makeRecord({
           mode: 'free',
-          difficulty: 'casual',
+          config: state.config,
           won: true,
           durationMs,
           words: state.played,
@@ -243,7 +249,7 @@ export default function GameScreen({
       );
     }
     prevWonRef.current = state.won;
-  }, [state.won, state.played, wonScore, recordLifetimeDeal, recordHistoryGame]);
+  }, [state.won, state.played, state.config, wonScore, recordLifetimeDeal, recordHistoryGame]);
 
   // ---------------- layout metrics
   const pad = 12;
@@ -328,7 +334,7 @@ export default function GameScreen({
         // Snapshot the park bays' screen rects for the drop hit-test.
         slotRects.current = [];
         slotRefs.current.forEach((ref, col) => {
-          if (col >= PARK_COLS) return;
+          if (col >= stateRef.current.config.parkBays) return;
           ref?.measureInWindow((x, y, w, h) => {
             slotRects.current.push({ col, x, y, w, h });
           });
@@ -521,7 +527,7 @@ export default function GameScreen({
       recordHistoryGame(
         makeRecord({
           mode: 'free',
-          difficulty: 'casual',
+          config: state.config,
           won: false,
           durationMs,
           words: state.played,
@@ -530,7 +536,8 @@ export default function GameScreen({
         }),
       );
     }
-    dispatch({ type: 'redeal' });
+    // The new deal picks up the player's current knobs (DB-131).
+    dispatch({ type: 'redeal', config: configRef.current });
     dealStartRef.current = Date.now(); // the new deal's clock starts now
   };
 
@@ -714,16 +721,16 @@ export default function GameScreen({
                     ref={(r) => {
                       slotRefs.current[i] = r;
                     }}
-                    disabled={busy || !canPark || i >= PARK_COLS}
+                    disabled={busy || !canPark || i >= state.config.parkBays}
                     onPress={() => onParkReserve(i)}
                     style={({ pressed }) => [
                       styles.emptyColSlot,
                       { width: colW, height: cardH },
-                      draggingReserve && i < PARK_COLS && styles.emptyColSlotTarget,
-                      pressed && canPark && i < PARK_COLS && { opacity: 0.6 },
+                      draggingReserve && i < state.config.parkBays && styles.emptyColSlotTarget,
+                      pressed && canPark && i < state.config.parkBays && { opacity: 0.6 },
                     ]}
                   >
-                    {canPark && i < PARK_COLS ? <Text style={styles.parkGlyph}>+</Text> : null}
+                    {canPark && i < state.config.parkBays ? <Text style={styles.parkGlyph}>+</Text> : null}
                   </Pressable>
                 )}
               </View>

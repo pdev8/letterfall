@@ -64,13 +64,45 @@ export function stockEconomyMult(
   return Math.min(1.5, Math.max(1.0, raw));
 }
 
-export type Difficulty = 'casual' | 'standard' | 'expert';
+/**
+ * Per-deal game configuration (DB-131): no named presets — difficulty is two
+ * knobs the player sets, and the score multiplier derives from them.
+ */
+export interface GameConfig {
+  /** Reserve→stock recycles allowed per deal (0–2). */
+  recycles: number;
+  /** Empty columns (from the left) that accept a parked reserve card (1–3). */
+  parkBays: number;
+}
 
-export const DIFFICULTY_MULT: Readonly<Record<Difficulty, number>> = {
-  casual: 1.0,
-  standard: 1.25,
-  expert: 1.6,
-};
+export const DEFAULT_CONFIG: GameConfig = { recycles: 2, parkBays: 3 };
+
+const clampInt = (v: unknown, lo: number, hi: number, dflt: number): number =>
+  typeof v === 'number' && Number.isFinite(v) ? Math.min(hi, Math.max(lo, Math.round(v))) : dflt;
+
+/**
+ * Clamps an unknown value into a valid GameConfig: integers within range,
+ * per-field defaults on garbage, defaults wholesale for non-objects.
+ * Never throws — corrupt storage must not crash the game.
+ */
+export function sanitizeConfig(x: unknown): GameConfig {
+  if (typeof x !== 'object' || x === null) return { ...DEFAULT_CONFIG };
+  const p = x as Record<string, unknown>;
+  return {
+    recycles: clampInt(p.recycles, 0, 2, DEFAULT_CONFIG.recycles),
+    parkBays: clampInt(p.parkBays, 1, 3, DEFAULT_CONFIG.parkBays),
+  };
+}
+
+/**
+ * configMult = 1.0 + 0.10 × (2 − recycles) + 0.10 × (3 − parkBays).
+ * Defaults ×1.0; maximum hardness (0 recycles, 1 bay) ×1.4. Computed in
+ * tenths so every step is float-exact.
+ */
+export function configMult(c: GameConfig): number {
+  const s = sanitizeConfig(c);
+  return (10 + (2 - s.recycles) + (3 - s.parkBays)) / 10;
+}
 
 /** Σ wordScore with Encore: the final word of a winning deal scores double (spec §4b). */
 export function dealBaseScore(words: string[]): number {
@@ -83,15 +115,15 @@ export interface DealOutcome {
   reserveLettersPlayed: number;
   parksUsed: number;
   recyclesUsed: number;
-  difficulty: Difficulty;
+  config: GameConfig;
 }
 
-/** dealScore = round(base × wordEconomy × stockEconomy × difficulty) — wins only (spec §3). */
+/** dealScore = round(base × wordEconomy × stockEconomy × configMult) — wins only (spec §3). */
 export function dealScore(o: DealOutcome): number {
   return Math.round(
     dealBaseScore(o.words) *
       wordEconomyMult(o.words.length) *
       stockEconomyMult(o.reserveLettersPlayed, o.parksUsed, o.recyclesUsed) *
-      DIFFICULTY_MULT[o.difficulty],
+      configMult(o.config),
   );
 }

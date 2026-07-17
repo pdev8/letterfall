@@ -1,4 +1,4 @@
-import { DEFAULT_SETTINGS, DIFFICULTIES, sanitizeSettings, type Settings } from '../settings';
+import { DEFAULT_SETTINGS, sanitizeSettings, type Settings } from '../settings';
 import { createStore, type KV } from '../storage';
 
 function memoryKV(initial: Record<string, string> = {}) {
@@ -12,7 +12,7 @@ function memoryKV(initial: Record<string, string> = {}) {
 }
 
 const FULL: Settings = {
-  difficulty: 'expert',
+  config: { recycles: 0, parkBays: 1 },
   haptics: false,
   sound: false,
   reduceMotion: true,
@@ -21,15 +21,11 @@ const FULL: Settings = {
 describe('settings defaults', () => {
   it('DEFAULT_SETTINGS has the documented shape and values', () => {
     expect(DEFAULT_SETTINGS).toEqual({
-      difficulty: 'casual',
+      config: { recycles: 2, parkBays: 3 },
       haptics: true,
       sound: true,
       reduceMotion: false,
     });
-  });
-
-  it('DIFFICULTIES lists the three presets in display order', () => {
-    expect(DIFFICULTIES).toEqual(['casual', 'standard', 'expert']);
   });
 });
 
@@ -42,14 +38,16 @@ describe('sanitizeSettings', () => {
   it('returns a fresh object (never a shared defaults reference)', () => {
     const a = sanitizeSettings(null);
     a.haptics = false;
+    a.config.recycles = 0;
     expect(DEFAULT_SETTINGS.haptics).toBe(true);
+    expect(DEFAULT_SETTINGS.config.recycles).toBe(2);
     expect(sanitizeSettings(null).haptics).toBe(true);
   });
 
   it('merges partials over the defaults', () => {
-    expect(sanitizeSettings({ difficulty: 'standard' })).toEqual({
+    expect(sanitizeSettings({ config: { recycles: 1, parkBays: 2 } })).toEqual({
       ...DEFAULT_SETTINGS,
-      difficulty: 'standard',
+      config: { recycles: 1, parkBays: 2 },
     });
     expect(sanitizeSettings({ sound: false, reduceMotion: true })).toEqual({
       ...DEFAULT_SETTINGS,
@@ -60,9 +58,9 @@ describe('sanitizeSettings', () => {
 
   it('invalid fields fall back per-field, keeping valid siblings', () => {
     expect(
-      sanitizeSettings({ difficulty: 'nightmare', haptics: false, sound: 'yes', reduceMotion: 1 }),
-    ).toEqual({ ...DEFAULT_SETTINGS, haptics: false });
-    expect(sanitizeSettings({ difficulty: 42, reduceMotion: true })).toEqual({
+      sanitizeSettings({ config: { recycles: 9, parkBays: 0 }, haptics: false, sound: 'yes', reduceMotion: 1 }),
+    ).toEqual({ ...DEFAULT_SETTINGS, config: { recycles: 2, parkBays: 1 }, haptics: false });
+    expect(sanitizeSettings({ config: 42, reduceMotion: true })).toEqual({
       ...DEFAULT_SETTINGS,
       reduceMotion: true,
     });
@@ -81,7 +79,7 @@ describe('sanitizeSettings', () => {
   it('never throws on hostile shapes', () => {
     expect(() => sanitizeSettings([])).not.toThrow();
     expect(() => sanitizeSettings(new Date())).not.toThrow();
-    expect(() => sanitizeSettings({ difficulty: { nested: true }, haptics: [false] })).not.toThrow();
+    expect(() => sanitizeSettings({ config: { nested: true }, haptics: [false] })).not.toThrow();
     expect(sanitizeSettings([])).toEqual(DEFAULT_SETTINGS);
   });
 });
@@ -108,8 +106,8 @@ describe('settings persistence (createStore + memory KV)', () => {
   it('a partially corrupt stored object keeps its valid fields', async () => {
     const { kv } = memoryKV();
     const store = createStore(kv);
-    await store.set('settings', { difficulty: 'bogus', sound: false });
+    await store.set('settings', { config: { recycles: 'bogus', parkBays: 2 }, sound: false });
     const loaded = sanitizeSettings(await store.get<unknown>('settings', null));
-    expect(loaded).toEqual({ ...DEFAULT_SETTINGS, sound: false });
+    expect(loaded).toEqual({ ...DEFAULT_SETTINGS, config: { recycles: 2, parkBays: 2 }, sound: false });
   });
 });

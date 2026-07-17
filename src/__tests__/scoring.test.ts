@@ -1,9 +1,11 @@
 import {
-  DIFFICULTY_MULT,
+  DEFAULT_CONFIG,
   LETTER_VALUES,
+  configMult,
   dealBaseScore,
   dealScore,
   letterValue,
+  sanitizeConfig,
   stockEconomyMult,
   wordEconomyMult,
   wordScore,
@@ -93,20 +95,46 @@ describe('dealBaseScore (Encore)', () => {
   });
 });
 
-describe('dealScore', () => {
-  it('reproduces the spec worked example (base 240, 7 words, 3 reserve, 1 park, standard)', () => {
-    // formula check with the spec's base held fixed
-    expect(Math.round(240 * wordEconomyMult(7) * stockEconomyMult(3, 1, 0) * 1.25)).toBe(472);
+describe('configMult (difficulty knobs, DB-131)', () => {
+  it('is 1.0 at the defaults (2 recycles, 3 bays)', () => {
+    expect(configMult(DEFAULT_CONFIG)).toBeCloseTo(1.0);
   });
-  it('composes all multipliers end to end', () => {
+  it('is 1.4 at maximum hardness (0 recycles, 1 bay)', () => {
+    expect(configMult({ recycles: 0, parkBays: 1 })).toBeCloseTo(1.4);
+  });
+  it('adds 0.10 per step below each default', () => {
+    expect(configMult({ recycles: 1, parkBays: 3 })).toBeCloseTo(1.1);
+    expect(configMult({ recycles: 2, parkBays: 2 })).toBeCloseTo(1.1);
+    expect(configMult({ recycles: 0, parkBays: 3 })).toBeCloseTo(1.2);
+  });
+});
+
+describe('sanitizeConfig', () => {
+  it('accepts valid configs and clamps out-of-range/garbage per field', () => {
+    expect(sanitizeConfig({ recycles: 1, parkBays: 2 })).toEqual({ recycles: 1, parkBays: 2 });
+    expect(sanitizeConfig({ recycles: 5, parkBays: 0 })).toEqual({ recycles: 2, parkBays: 1 });
+    expect(sanitizeConfig({ recycles: -3, parkBays: 9 })).toEqual({ recycles: 0, parkBays: 3 });
+    expect(sanitizeConfig({ recycles: 1.5, parkBays: 'x' })).toEqual(DEFAULT_CONFIG);
+    expect(sanitizeConfig(null)).toEqual(DEFAULT_CONFIG);
+    expect(sanitizeConfig('nope')).toEqual(DEFAULT_CONFIG);
+  });
+});
+
+describe('dealScore', () => {
+  it('reproduces the spec worked example (base 240, 7 words, 3 reserve, 1 park, max hardness ×1.4)', () => {
+    // hardest config: 0 recycles, 1 bay → configMult 1.4
+    expect(
+      Math.round(240 * wordEconomyMult(7) * stockEconomyMult(3, 1, 0) * configMult({ recycles: 0, parkBays: 1 })),
+    ).toBe(529);
+  });
+  it('composes all multipliers end to end at default config', () => {
     const outcome = {
       words: ['cat', 'quiz'], // base 61 with Encore
       reserveLettersPlayed: 0,
       parksUsed: 0,
       recyclesUsed: 0,
-      difficulty: 'expert' as const,
+      config: DEFAULT_CONFIG,
     };
-    expect(dealScore(outcome)).toBe(Math.round(61 * 1.75 * 1.5 * 1.6)); // 256
-    expect(DIFFICULTY_MULT.casual).toBe(1.0);
+    expect(dealScore(outcome)).toBe(Math.round(61 * 1.75 * 1.5 * 1.0)); // 160
   });
 });

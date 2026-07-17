@@ -2,25 +2,26 @@ import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
 import { loadSettings, saveSettings } from '../appStorage';
-import type { Difficulty } from '../scoring';
-import { DIFFICULTIES, type Settings } from '../settings';
+import { configMult, type GameConfig } from '../scoring';
+import type { Settings } from '../settings';
 import { C } from '../theme';
-
-const DIFFICULTY_LABEL: Readonly<Record<Difficulty, string>> = {
-  casual: 'Casual',
-  standard: 'Standard',
-  expert: 'Expert',
-};
 
 // Placeholder until a real version source (expo-constants) lands with release
 // tooling; keep in sync with app.json.
 const APP_VERSION = 'v1.0.0';
 
+/** Equation-free bonus label for a config (spec §4c): "+20%" or "standard". */
+function bonusLabel(config: GameConfig): string {
+  const pct = Math.round((configMult(config) - 1) * 100);
+  return pct === 0 ? 'standard scoring' : `score bonus +${pct}%`;
+}
+
 /**
- * Settings scaffold (DB-130). Owns its own persistence: loads on mount,
- * saves fire-and-forget on every change. App.tsx only mounts/unmounts it.
- * Difficulty wires into game config with DB-131; toggles are consumed by
- * DB-132; the rulebook row activates with DB-133.
+ * Settings (DB-130 scaffold, DB-131 difficulty knobs). Owns its own
+ * persistence: loads on mount, saves fire-and-forget on every change.
+ * Difficulty is two knobs — recycles and park bays — that harden the game
+ * and raise the score bonus; they apply from the next deal. Toggles are
+ * consumed by DB-132; the rulebook row activates with DB-133.
  */
 export default function SettingsScreen({ onClose }: { onClose: () => void }) {
   // null until loadSettings resolves — rows render once real values exist so
@@ -45,6 +46,33 @@ export default function SettingsScreen({ onClose }: { onClose: () => void }) {
       return next;
     });
   };
+
+  const knobRow = (
+    label: string,
+    key: 'recycles' | 'parkBays',
+    options: number[],
+  ) =>
+    settings === null ? null : (
+      <View style={styles.segmentRow}>
+        {options.map((v) => {
+          const selected = settings.config[key] === v;
+          return (
+            <Pressable
+              key={v}
+              accessibilityLabel={`${label} ${v}`}
+              onPress={() => update({ config: { ...settings.config, [key]: v } })}
+              style={({ pressed }) => [
+                styles.segment,
+                selected && styles.segmentSelected,
+                pressed && { opacity: 0.7 },
+              ]}
+            >
+              <Text style={[styles.segmentText, selected && styles.segmentTextSelected]}>{v}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+    );
 
   const toggleRow = (label: string, key: 'haptics' | 'sound' | 'reduceMotion') =>
     settings === null ? null : (
@@ -78,29 +106,18 @@ export default function SettingsScreen({ onClose }: { onClose: () => void }) {
 
       {settings !== null && (
         <>
-          {/* difficulty (persisted now; game config wiring is DB-131) */}
-          <Text style={styles.sectionLabel}>DIFFICULTY</Text>
-          <View style={styles.segmentRow}>
-            {DIFFICULTIES.map((d) => {
-              const selected = settings.difficulty === d;
-              return (
-                <Pressable
-                  key={d}
-                  onPress={() => update({ difficulty: d })}
-                  style={({ pressed }) => [
-                    styles.segment,
-                    selected && styles.segmentSelected,
-                    pressed && { opacity: 0.7 },
-                  ]}
-                >
-                  <Text style={[styles.segmentText, selected && styles.segmentTextSelected]}>
-                    {DIFFICULTY_LABEL[d]}
-                  </Text>
-                </Pressable>
-              );
-            })}
+          {/* difficulty knobs (DB-131): harder config → bigger score bonus */}
+          <View style={styles.knobHead}>
+            <Text style={styles.sectionLabel}>DIFFICULTY</Text>
+            <Text style={styles.bonusTag}>{bonusLabel(settings.config)}</Text>
           </View>
-          <Text style={styles.caption}>applies from your next deal — full rules land soon</Text>
+          <Text style={styles.knobLabel}>Recycles</Text>
+          {knobRow('Recycles', 'recycles', [0, 1, 2])}
+          <Text style={styles.knobLabel}>Park bays</Text>
+          {knobRow('Park bays', 'parkBays', [1, 2, 3])}
+          <Text style={styles.caption}>
+            fewer recycles and bays = harder, worth more — applies from your next deal
+          </Text>
 
           {/* toggles (persisted now; consumed by DB-132) */}
           <Text style={styles.sectionLabel}>FEEDBACK</Text>
@@ -172,10 +189,28 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 
-  // difficulty segments
+  // difficulty knobs
+  knobHead: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+  },
+  bonusTag: {
+    color: C.accent,
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1,
+  },
+  knobLabel: {
+    color: C.inkMuted,
+    fontSize: 13,
+    fontWeight: '600',
+    marginBottom: 6,
+  },
   segmentRow: {
     flexDirection: 'row',
     gap: 8,
+    marginBottom: 12,
   },
   segment: {
     flex: 1,

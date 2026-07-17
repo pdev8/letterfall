@@ -1,4 +1,5 @@
 // Shared types for DECKABET.
+import type { GameConfig } from './scoring';
 
 export interface Deal {
   /** 7 columns, each column's cards BOTTOM -> TOP as dealt; TOP card = LAST character. */
@@ -42,6 +43,11 @@ export interface SessionStats {
 
 export interface GameState {
   dealIndex: number;
+  /**
+   * This deal's difficulty knobs (DB-131), fixed at deal time — settings
+   * changes only apply from the NEXT deal, never mid-deal.
+   */
+  config: GameConfig;
   /** Each column bottom -> top. */
   columns: ColumnCard[][];
   /** Index 0 is drawn next. */
@@ -71,6 +77,7 @@ export type Action =
   | { type: 'swapTray'; a: number; b: number }
   | { type: 'clearTray' }
   | { type: 'play' }
-  | { type: 'redeal' }
+  /** New deal; `config` applies the caller's current knobs (falls back to the deal's own). */
+  | { type: 'redeal'; config?: GameConfig }
   /** Replace the whole state with a persisted snapshot (DB-122 resume). */
   | { type: 'restore'; state: GameState };

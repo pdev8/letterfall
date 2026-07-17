@@ -1,17 +1,26 @@
 import { deals, isValidWord } from './dict';
+import { DEFAULT_CONFIG, sanitizeConfig, type GameConfig } from './scoring';
 import type { Action, ColumnCard, GameState, SessionStats } from './types';
 
 export const MAX_WORD = 8;
-export const RECYCLES_PER_DEAL = 2;
-/** Only the first three columns can hold a parked reserve card. */
-export const PARK_COLS = 3;
 
-export function makeDealState(dealIndex: number, stats: SessionStats): GameState {
+/**
+ * Builds a fresh deal. `config` (DB-131) fixes this deal's difficulty knobs:
+ * recycles allowed and park-bay count. It is sanitized here so every deal in
+ * play carries a valid config.
+ */
+export function makeDealState(
+  dealIndex: number,
+  stats: SessionStats,
+  config: GameConfig = DEFAULT_CONFIG,
+): GameState {
   const safeIndex =
     deals.length > 0 ? ((dealIndex % deals.length) + deals.length) % deals.length : 0;
   const deal = deals[safeIndex];
+  const cfg = sanitizeConfig(config);
   return {
     dealIndex: safeIndex,
+    config: cfg,
     columns: deal
       ? deal.columns.map((c) =>
           c
@@ -22,7 +31,7 @@ export function makeDealState(dealIndex: number, stats: SessionStats): GameState
       : [],
     stock: deal ? deal.stock.toLowerCase().split('') : [],
     reserve: [],
-    recyclesLeft: RECYCLES_PER_DEAL,
+    recyclesLeft: cfg.recycles,
     tray: [],
     played: [],
     movesMade: 0,
@@ -70,6 +79,19 @@ function isCount(x: unknown): x is number {
 }
 
 /**
+ * Strict (non-clamping) config check for persisted snapshots. Old saves
+ * (pre-DB-131) have no config at all — they fail here and the app starts a
+ * fresh deal; that IS the migration.
+ */
+function isValidConfig(x: unknown): x is GameConfig {
+  if (typeof x !== 'object' || x === null) return false;
+  const { recycles, parkBays } = x as GameConfig;
+  if (!Number.isInteger(recycles) || recycles < 0 || recycles > 2) return false;
+  if (!Number.isInteger(parkBays) || parkBays < 1 || parkBays > 3) return false;
+  return true;
+}
+
+/**
  * Structural guard for persisted snapshots (DB-122). Returns `x` typed as
  * GameState only if every field a resumed deal depends on checks out;
  * anything malformed (or an already-won deal) returns null. Never throws.
@@ -92,7 +114,8 @@ export function sanitizeGameState(x: unknown): GameState | null {
       (typeof src === 'number' && Number.isInteger(src) && src >= 0 && src < COLUMN_COUNT);
     if (!sourceOk) return null;
   }
-  if (!isCount(s.recyclesLeft) || s.recyclesLeft > RECYCLES_PER_DEAL) return null;
+  if (!isValidConfig(s.config)) return null;
+  if (!isCount(s.recyclesLeft) || s.recyclesLeft > s.config.recycles) return null;
   if (!isCount(s.movesMade) || !isCount(s.reserveLettersPlayed)) return null;
   if (!isCount(s.parksUsed) || !isCount(s.recyclesUsed)) return null;
   if (!Array.isArray(s.played) || !s.played.every((w) => typeof w === 'string')) return null;
@@ -182,7 +205,7 @@ export function reducer(state: GameState, action: Action): GameState {
     case 'parkReserve': {
       if (state.won) return state;
       if (state.reserve.length === 0) return state;
-      if (action.col >= PARK_COLS) return state; // park bays are the first three columns
+      if (action.col >= state.config.parkBays) return state; // bays = first `parkBays` columns
       const column = state.columns[action.col];
       if (!column || column.length > 0) return state; // only onto an empty space
       const letter = state.reserve[state.reserve.length - 1];
@@ -261,7 +284,9 @@ export function reducer(state: GameState, action: Action): GameState {
       const stats: SessionStats = abandoned
         ? { ...state.stats, played: state.stats.played + 1, streak: 0 }
         : state.stats;
-      return makeDealState(randomDealIndex(state.dealIndex), stats);
+      // The action's config (the caller's current settings) applies to the NEW
+      // deal; without one the current deal's config carries forward.
+      return makeDealState(randomDealIndex(state.dealIndex), stats, action.config ?? state.config);
     }
 
     case 'restore': {

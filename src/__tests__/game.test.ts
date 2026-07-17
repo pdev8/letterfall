@@ -1,7 +1,5 @@
 import {
   MAX_WORD,
-  PARK_COLS,
-  RECYCLES_PER_DEAL,
   makeDealState,
   randomDealIndex,
   reducer,
@@ -9,7 +7,11 @@ import {
   tableauCount,
 } from '../game';
 import { deals } from '../dict';
+import { DEFAULT_CONFIG } from '../scoring';
 import type { ColumnCard, GameState } from '../types';
+
+const RECYCLES_PER_DEAL = DEFAULT_CONFIG.recycles; // 2 — default knob value
+const PARK_COLS = DEFAULT_CONFIG.parkBays; // 3 — default bay count
 
 const card = (letter: string, fromStock = false): ColumnCard => ({ letter, fromStock });
 
@@ -40,6 +42,36 @@ describe('makeDealState', () => {
   it('wraps out-of-range deal indexes safely', () => {
     expect(makeDealState(deals.length, { won: 0, played: 0, streak: 0 }).dealIndex).toBe(0);
     expect(makeDealState(-1, { won: 0, played: 0, streak: 0 }).dealIndex).toBe(deals.length - 1);
+  });
+
+  it('inits recyclesLeft from the config knob and sanitizes it (DB-131)', () => {
+    const hard = makeDealState(0, { won: 0, played: 0, streak: 0 }, { recycles: 0, parkBays: 1 });
+    expect(hard.config).toEqual({ recycles: 0, parkBays: 1 });
+    expect(hard.recyclesLeft).toBe(0);
+    const garbage = makeDealState(0, { won: 0, played: 0, streak: 0 }, { recycles: 9, parkBays: 0 } as never);
+    expect(garbage.config).toEqual({ recycles: 2, parkBays: 1 }); // clamped
+  });
+});
+
+describe('per-deal park bays (DB-131)', () => {
+  it('honors the deal config: a 1-bay deal refuses cols 1+ but allows col 0', () => {
+    const oneBay = base({ config: { recycles: 2, parkBays: 1 } });
+    expect(reducer(oneBay, { type: 'parkReserve', col: 1 })).toBe(oneBay); // beyond the single bay
+    expect(reducer(oneBay, { type: 'parkReserve', col: 0 }).columns[0]).toHaveLength(1);
+  });
+
+  it('a 3-bay deal allows parking on col 2', () => {
+    const threeBay = base({ config: { recycles: 2, parkBays: 3 } });
+    expect(reducer(threeBay, { type: 'parkReserve', col: 2 }).columns[2]).toHaveLength(1);
+  });
+
+  it('redeal carries the action config forward, falling back to the deal config', () => {
+    const s = base({ movesMade: 1 });
+    expect(reducer(s, { type: 'redeal', config: { recycles: 0, parkBays: 1 } }).config).toEqual({
+      recycles: 0,
+      parkBays: 1,
+    });
+    expect(reducer(s, { type: 'redeal' }).config).toEqual(s.config); // fallback
   });
 });
 
