@@ -32,17 +32,22 @@ export default function RerollPanel({
   tops,
   onSwap,
   onSkip,
+  onToggle,
   reduceMotion = false,
 }: {
   tops: RerollTop[];
   onSwap: (cols: number[]) => void;
   onSkip: () => void;
+  /** Fired on each raise/lower of a card — the screen turns this into a haptic tick. */
+  onToggle?: () => void;
   reduceMotion?: boolean;
 }) {
   const [selected, setSelected] = useState<number[]>([]);
 
-  const toggle = (col: number) =>
+  const toggle = (col: number) => {
+    onToggle?.();
     setSelected((prev) => (prev.includes(col) ? prev.filter((c) => c !== col) : [...prev, col]));
+  };
 
   const swap = () => {
     if (selected.length === 0) return;

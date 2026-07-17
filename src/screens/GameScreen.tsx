@@ -380,7 +380,7 @@ export default function GameScreen({
     .filter((t) => t.letter !== '');
 
   const onRerollSwap = (cols: number[]) => {
-    fire('tap');
+    fire('play'); // firmer impact as the selected cards drop to the bottom of the stock
     dispatch({ type: 'reroll', cols });
     setShowReroll(false); // one shot — commit the swap and reveal the new board
   };
@@ -1046,6 +1046,7 @@ export default function GameScreen({
             tops={rerollTops}
             onSwap={onRerollSwap}
             onSkip={onRerollSkip}
+            onToggle={() => fire('tap')}
             reduceMotion={reduceMotion}
           />
         )}
