@@ -152,7 +152,7 @@ locally seeded, and feeds personal stats only (see "Modes & Leaderboards" in
   full steering algorithm could simulate draws — accepted at launch (equal to
   the risk every offline word game carries). Casual file-peeking is already
   impossible: there is no deal file.
-- **Phase 2 (server):** seeds issued by a server per daily game; client
+- **Phase 2 (server — Supabase, DB-186):** seeds issued by a server per daily game; client
   submits the move log with the score; server replays moves through the same
   deterministic steering to validate both draws and score. This is the replay
   validator already noted in the leaderboard spec.

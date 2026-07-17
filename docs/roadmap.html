@@ -160,9 +160,9 @@
     <div class="statrow">
       <div class="stat"><div class="v green">✓</div><div class="k">core loop playable</div></div>
       <div class="stat"><div class="v green">✓</div><div class="k">design specced</div></div>
-      <div class="stat"><div class="v">12 / 46</div><div class="k">tickets shipped</div></div>
+      <div class="stat"><div class="v">13 / 51</div><div class="k">tickets shipped</div></div>
       <div class="stat"><div class="v orange">DB-121</div><div class="k">in review</div></div>
-      <div class="stat"><div class="v">22 + 1</div><div class="k">PRs merged + open</div></div>
+      <div class="stat"><div class="v">23 + 1</div><div class="k">PRs merged + open</div></div>
     </div>
   </header>
 
@@ -208,11 +208,19 @@
     </div>
 
     <div class="epic">
-      <div class="epic-head"><span class="e-id">E2</span><span class="e-name">Persistence &amp; Stats</span><span class="e-count">1/4</span><span class="e-mile">M2</span></div>
+      <div class="epic-head"><span class="e-id">E2</span><span class="e-name">Persistence &amp; Stats</span><span class="e-count">2/4</span><span class="e-mile">M2</span></div>
       <div class="trow"><span class="t-id">DB-120</span><span class="t-name">Versioned storage layer <span class="t-note">(PR #22)</span></span><span class="t-size">S</span><span class="st done">done</span></div>
-      <div class="trow"><span class="t-id">DB-121</span><span class="t-name">Lifetime stats per mode <span class="t-note">(PR #23 — 13 tests)</span></span><span class="t-size">M</span><span class="st open">in review</span></div>
+      <div class="trow"><span class="t-id">DB-121</span><span class="t-name">Lifetime stats per mode <span class="t-note">(PR #23 — 13 tests)</span></span><span class="t-size">M</span><span class="st done">done</span></div>
       <div class="trow"><span class="t-id">DB-122</span><span class="t-name">Resume in-progress deal after relaunch</span><span class="t-size">M</span><span class="st next">next</span></div>
       <div class="trow"><span class="t-id">DB-123</span><span class="t-name">Game history + personal bests</span><span class="t-size">S</span><span class="st todo">todo</span></div>
+    </div>
+
+    <div class="epic">
+      <div class="epic-head"><span class="e-id">E10</span><span class="e-name">Real Dictionary</span><span class="e-count">0/4</span><span class="e-mile">M2 · after E2</span></div>
+      <div class="trow"><span class="t-id">DB-200</span><span class="t-name">Dictionary sourcing + licensing decision <span class="t-note">(user-reported: valid words rejected)</span></span><span class="t-size">S</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">DB-201</span><span class="t-name">Lexicon build pipeline <span class="t-note">(3–8 letters, offensive-word policy, frequency metadata)</span></span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">DB-202</span><span class="t-name">Regenerate deals + witnesses on the new lexicon</span><span class="t-size">S</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">DB-203</span><span class="t-name">Missed-word feedback loop</span><span class="t-size">S</span><span class="st todo">todo</span></div>
     </div>
 
     <div class="epic">
@@ -224,7 +232,8 @@
     </div>
 
     <div class="epic">
-      <div class="epic-head"><span class="e-id">E7</span><span class="e-name">The Living Deck ★ core</span><span class="e-count">0/8</span><span class="e-mile">M3</span></div>
+      <div class="epic-head"><span class="e-id">E7</span><span class="e-name">The Living Deck ★ core</span><span class="e-count">0/9</span><span class="e-mile">M3</span></div>
+      <div class="trow"><span class="t-id">DB-186</span><span class="t-name">Backend foundation on Supabase <span class="t-note">(seeds, submissions, move logs, usage aggregates; anon auth + RLS)</span></span><span class="t-size">L</span><span class="st post">post-launch</span></div>
       <div class="trow"><span class="t-id">DB-177</span><span class="t-name">Dynamic bays — park on any empty column, max 3 parked <span class="t-note">(sim-proven fix for the left-first trap; rule change, no generator needed)</span></span><span class="t-size">M</span><span class="st ready">ready early</span></div>
       <div class="trow"><span class="t-id">DB-170</span><span class="t-name">On-device seeded generator: board shapes, distribution + altitude guards, openness</span><span class="t-size">M</span><span class="st todo">todo</span></div>
       <div class="trow"><span class="t-id">DB-171</span><span class="t-name">Solvability checker (escape-plan solver)</span><span class="t-size">L</span><span class="st todo">todo</span></div>
@@ -319,7 +328,8 @@
       <div class="pr"><span class="p-id">#20</span><span>[15. E0] DB-103: component split</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
       <div class="pr"><span class="p-id">#21</span><span>[17. chore] Ticket prefix LF → DB</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
       <div class="pr"><span class="p-id">#22</span><span>[18. E2] DB-120: versioned storage layer</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#23</span><span>[19. E2] DB-121: lifetime stats + deal timer</span><span style="margin-left:auto"><span class="st open">open</span></span></div>
+      <div class="pr"><span class="p-id">#23</span><span>[19. E2] DB-121: lifetime stats + deal timer</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#24</span><span>[20. docs] E10 dictionary epic + Supabase backend ticket</span><span style="margin-left:auto"><span class="st open">open</span></span></div>
     </div>
   </section>
 

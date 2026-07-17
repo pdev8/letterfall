@@ -27,7 +27,7 @@ theme, win/dead-deal overlays, session stats.
 | Milestone | Theme | Epics | Exit criteria |
 |---|---|---|---|
 | **M1 — Scored** | The game counts | E0, E1 | Every win produces a defensible score with a breakdown screen; CI runs on every PR |
-| **M2 — Sticky** | The game remembers | E2, E3 | Stats/streaks survive relaunch; difficulty is player-controlled; game resumes mid-deal |
+| **M2 — Sticky** | The game remembers | E2, E10, E3 | Stats/streaks survive relaunch; the lexicon is a real dictionary; difficulty is player-controlled; game resumes mid-deal |
 | **M3 — Social** | The game competes | E7, E4, E5 | Living deck generates the daily set; Game Center leaderboards live; badges unlock and display |
 | **M4 — Shipped** | The game ships | E6 | App Store approval |
 | **M5 — Alive** | The game evolves (post-launch) | E8, E9, E7 phase 2 | Word ladder with community-driven retirement; Toolkit fun mechanics; server-issued seeds + replay validation |
@@ -66,6 +66,20 @@ theme, win/dead-deal overlays, session stats.
 | DB-121 | Lifetime stats + streaks persisted | M | Per mode (challenge/free): total time played, total games/wins, average time per game, letters constructed, words played, unique words, per-word usage counts (most-played top 10), best word, streaks, total points — all survive relaunch; deal timer plumbing included |
 | DB-122 | Resume in-progress deal | M | Kill app mid-deal → relaunch restores exact state (incl. tray) |
 | DB-123 | Game history (last 50 results, personal bests) | S | Best deal score, best word score, fastest clear recorded per difficulty |
+
+## Epic E10 — Real Dictionary (M2, immediately after E2)
+
+*The seed lexicon rejects legitimate English words (user-reported in play).
+Replace it with a properly licensed real dictionary via a reproducible
+pipeline, regenerate the deal pool, and keep a feedback loop so future
+misses surface instead of silently frustrating players.*
+
+| ID | Ticket | Size | Acceptance criteria |
+|---|---|---|---|
+| DB-200 | Dictionary sourcing + licensing decision | S | Open candidates evaluated (SCOWL, ENABLE2k, EOWL, wordfreq-filtered); choice + license terms documented here; target list size for 3–8-letter play decided |
+| DB-201 | Lexicon build pipeline | M | `scripts/build-lexicon` deterministically generates the game lexicon from the chosen source: 3–8 letters, offensive-word policy applied, per-word frequency metadata retained (feeds E7 openness/steering and E8 retirement); committed with provenance header |
+| DB-202 | Regenerate deals + witnesses on the new lexicon | S | `generate-deals` runs against the new lexicon; witness-replay + schema tests green; sim spot-check (win rates, openness) reported in the PR |
+| DB-203 | Missed-word feedback loop | S | Valid-looking words the player attempts that the lexicon rejects are logged locally; top misses inspectable in dev; export documented (Supabase sync arrives with DB-186) |
 
 ## Epic E3 — Settings & Difficulty
 
@@ -111,6 +125,7 @@ Retires the static deal pool. Gates the daily-set half of E4.*
 | DB-174 | Daily set mode | M | 5 scored games/day, same for all players, cumulative daily total, reset countdown UX; free play unlimited/unscored |
 | DB-175 | Par estimation + score bands | M | Generator estimates achievable score; deals outside the par band rejected; band documented and tested |
 | DB-176 | Seed service: phase 1 + phase 2 stub | M | Launch: hash(date, gameIndex, salt) on device; documented server-issued-seed + move-log replay validation design for phase 2 |
+| DB-186 | Backend foundation on Supabase | L | Supabase project + schema: daily seeds, score submissions, move logs, word-usage aggregates; anonymous device auth with optional Game Center identity link; RLS policies; DB-176 phase 2, DB-184, and DB-185 all build on this |
 | DB-177 | Dynamic bays (rule change — ships before the rest of E7) | M | Park onto ANY empty column; max 3 parked cards on board (`PARK_COLS` → `MAX_PARKED`); dead-deal rescue + park-target UI updated; reducer tests cover the cap; sim rerun confirms the left-first trap is gone |
 
 ## Epic E8 — Word Ladder & Living Meta (post-launch, M5)
