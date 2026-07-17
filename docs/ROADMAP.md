@@ -112,7 +112,7 @@ both over time.
 | ID | Ticket | Size | Acceptance criteria |
 |---|---|---|---|
 | DB-130 | Settings screen + persisted settings store | S | Gear icon in top bar opens settings; values persist |
-| DB-131 | Difficulty presets wired to game config | M | Casual/Standard/Expert change recycles + park bays per spec; new deals only (never mid-deal); score multiplier applied |
+| DB-131 | Difficulty configurations wired to game config | M | Settings replaces the preset selector with knob rows (recycles 0–2, park bays 1–3); knobs flow into per-deal game config (constants become config; reducer reads the deal's own limits); configMult applied per scoring spec; Difficulty presets removed from settings/scoring/history |
 | DB-132 | Sound, haptics, reduce-motion toggles | M | expo-haptics on card taps/plays/wins; toggles respected everywhere incl. animations |
 | DB-133 | Rulebook screen | M | How to play (goal, tap/drag verbs, reserve, parking, recycles) in plain language with visuals; scoring as named bonuses with one worked example — **zero equations** (spec §4c); "fine print" link to exact tables; linked from settings + first launch |
 
@@ -285,7 +285,15 @@ stockEconomyMult = clamp( 1.5
 
 Draws themselves are free — browsing the stock is fine; *consuming* it costs.
 
-**Difficulty** (see Settings spec): Casual ×1.00, Standard ×1.25, Expert ×1.60.
+**Difficulty** (see Configurations spec): no named presets — the multiplier
+derives from how the player hardens the game:
+
+```
+configMult = 1.0 + 0.10 × (2 − recycles) + 0.10 × (3 − parkBays)
+```
+
+Defaults (2 recycles, 3 bays) = ×1.0; maximum hardness (0 recycles, 1 bay)
+= ×1.4. The daily set ignores player knobs and uses its own per-game ramp.
 
 ### 4. Worked example
 
@@ -389,7 +397,7 @@ Tiers: 🥉 bronze / 🥈 silver / 🥇 gold where noted. Engine is declarative
 | Big Board | Deal score ≥750 |
 | Rare Bird 🥉🥈🥇 | Play 1 / 10 / 50 words containing J, Q, X, or Z |
 | Valet | Win a deal that used all 3 park bays |
-| Tightrope | Win on Expert |
+| Tightrope | Win a max-hardness deal (0 recycles, 1 bay) |
 | Daybreak | Play your first daily challenge |
 | Dedicated | 7 daily challenges in a row |
 | Wordsmith 🥉🥈🥇 | Play 100 / 500 / 2000 words lifetime |
