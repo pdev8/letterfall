@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } 
 import { StatusBar } from 'expo-status-bar';
 import {
   Animated,
+  PanResponder,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -13,8 +14,15 @@ import {
 } from 'react-native';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { C } from './src/theme';
-import { deals, existsPlayableWord, isValidWord } from './src/dict';
-import { MAX_WORD, makeDealState, reducer } from './src/game';
+import { existsPlayableWord, isValidWord } from './src/dict';
+import {
+  MAX_WORD,
+  PARK_COLS,
+  makeDealState,
+  randomDealIndex,
+  reducer,
+  tableauCount,
+} from './src/game';
 import type { TrayEntry } from './src/types';
 
 // ---------------------------------------------------------------- helpers
@@ -39,12 +47,15 @@ function LetterCard({
   height,
   glow = false,
   lifted = false,
+  stock = false,
 }: {
   letter: string;
   width: number;
   height: number;
   glow?: boolean;
   lifted?: boolean;
+  /** Stock-origin card (reserve top or parked): solid orange outline. */
+  stock?: boolean;
 }) {
   return (
     <View
@@ -52,13 +63,28 @@ function LetterCard({
         styles.letterCard,
         { width, height, borderRadius: Math.max(6, Math.round(width * 0.15)) },
         glow && styles.letterCardGlow,
+        stock && styles.letterCardStock,
+        glow && stock && styles.letterCardStockGlow,
         lifted && styles.letterCardLifted,
+        lifted && stock && styles.letterCardStockLifted,
       ]}
     >
-      <Text style={[styles.letterCardCorner, { fontSize: Math.max(8, Math.round(width * 0.2)) }]}>
+      <Text
+        style={[
+          styles.letterCardCorner,
+          { fontSize: Math.max(8, Math.round(width * 0.2)) },
+          lifted && styles.letterCardInkLifted,
+        ]}
+      >
         {letter.toUpperCase()}
       </Text>
-      <Text style={[styles.letterCardText, { fontSize: Math.round(width * 0.52) }]}>
+      <Text
+        style={[
+          styles.letterCardText,
+          { fontSize: Math.round(width * 0.52) },
+          lifted && styles.letterCardInkLifted,
+        ]}
+      >
         {letter.toUpperCase()}
       </Text>
     </View>
@@ -130,7 +156,7 @@ function Overlay({ children }: { children: React.ReactNode }) {
 export default function App() {
   const { width } = useWindowDimensions();
   const [state, dispatch] = useReducer(reducer, null, () =>
-    makeDealState(0, { won: 0, played: 0, streak: 0 }),
+    makeDealState(randomDealIndex(), { won: 0, played: 0, streak: 0 }),
   );
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
@@ -153,28 +179,30 @@ export default function App() {
   }, []);
 
   // ---------------- derived state
-  const deal = deals[state.dealIndex];
   const word = state.tray.map((e) => e.letter).join('');
   const wordValid = isValidWord(word);
-  const tableauLeft = useMemo(
-    () => state.columns.reduce((n, c) => n + c.length, 0),
-    [state.columns],
-  );
+  const tableauLeft = useMemo(() => tableauCount(state), [state]);
   const usableLetters = useMemo(() => {
     const letters: string[] = [];
     for (const col of state.columns) {
-      if (col.length > 0) letters.push(col[col.length - 1]);
+      if (col.length > 0) letters.push(col[col.length - 1].letter);
     }
-    if (state.waste.length > 0) letters.push(state.waste[state.waste.length - 1]);
+    if (state.reserve.length > 0) letters.push(state.reserve[state.reserve.length - 1]);
     return letters;
-  }, [state.columns, state.waste]);
+  }, [state.columns, state.reserve]);
   const anyPlay = useMemo(() => existsPlayableWord(usableLetters), [usableLetters]);
-  const canRecycle = state.stock.length === 0 && state.waste.length > 0 && state.recyclesLeft > 0;
+  const canRecycle = state.stock.length === 0 && state.reserve.length > 0 && state.recyclesLeft > 0;
   const canDraw = state.stock.length > 0 || canRecycle;
-  const isDead = !state.won && tableauLeft > 0 && !anyPlay && !canDraw;
-  const showDrawHint = !state.won && !isDead && !anyPlay && tableauLeft > 0;
-  const wasteTop = state.waste.length > 0 ? state.waste[state.waste.length - 1] : null;
-  const wasteInTray = state.tray.some((e) => e.source === 'waste');
+  const reserveTop = state.reserve.length > 0 ? state.reserve[state.reserve.length - 1] : null;
+  const canPark = reserveTop !== null && !state.won;
+  // Parking with more reserve underneath exposes a fresh letter, so it can
+  // rescue an otherwise-stuck position.
+  const parkRescue =
+    state.reserve.length >= 2 &&
+    state.columns.some((c, i) => i < PARK_COLS && c.length === 0);
+  const isDead = !state.won && tableauLeft > 0 && !anyPlay && !canDraw && !parkRescue;
+  const showNoPlayHint = !state.won && !isDead && !anyPlay && tableauLeft > 0;
+  const reserveInTray = state.tray.some((e) => e.source === 'reserve');
   const bestWord = state.played.reduce((a, b) => (b.length > a.length ? b : a), '');
 
   // ---------------- layout metrics
@@ -185,6 +213,8 @@ export default function App() {
   const pileH = Math.round(pileW * 1.3);
   const trayW = Math.floor((width - pad * 2 - 5 * 7) / MAX_WORD);
   const trayH = Math.round(trayW * 1.28);
+  // Slot pitch in the space-between tray row, for the swap slide.
+  const trayStep = trayW + (width - pad * 2 - trayW * MAX_WORD) / (MAX_WORD - 1);
 
   // ---------------- handlers
   const onStockTap = () => {
@@ -198,26 +228,213 @@ export default function App() {
 
   const onTapColumn = (col: number) => {
     if (busyRef.current) return;
-    if (state.tray.length >= MAX_WORD) {
+    const withdrawing = state.tray.some((e) => e.source === col);
+    if (!withdrawing && state.tray.length >= MAX_WORD) {
       runShake(trayShakeX); // tray full
       return;
     }
     dispatch({ type: 'tapColumn', col });
   };
 
-  const onTapWaste = () => {
+  const onTapReserve = () => {
     if (busyRef.current) return;
-    if (state.tray.length >= MAX_WORD) {
+    const withdrawing = state.tray.some((e) => e.source === 'reserve');
+    if (!withdrawing && state.tray.length >= MAX_WORD) {
       runShake(trayShakeX);
       return;
     }
-    dispatch({ type: 'tapWaste' });
+    dispatch({ type: 'tapReserve' });
   };
 
-  const onTapTray = (index: number) => {
+  // ---------------- reserve drag (park onto an empty column)
+  const stateRef = useRef(state);
+  stateRef.current = state;
+  // The pan responder is created once; route taps through a ref so it always
+  // sees the current handler.
+  const onTapReserveRef = useRef(onTapReserve);
+  onTapReserveRef.current = onTapReserve;
+  const [draggingReserve, setDraggingReserve] = useState(false);
+  const draggingRef = useRef(false);
+  const dragXY = useRef(new Animated.ValueXY()).current;
+  const slotRefs = useRef<(View | null)[]>([]);
+  const slotRects = useRef<{ col: number; x: number; y: number; w: number; h: number }[]>([]);
+
+  const settleDrag = useCallback(
+    (snap: boolean) => {
+      draggingRef.current = false;
+      setDraggingReserve(false);
+      if (snap) {
+        dragXY.setValue({ x: 0, y: 0 });
+      } else {
+        Animated.spring(dragXY, {
+          toValue: { x: 0, y: 0 },
+          friction: 6,
+          useNativeDriver: false,
+        }).start();
+      }
+    },
+    [dragXY],
+  );
+
+  const reservePan = useRef(
+    PanResponder.create({
+      // Granted even while the reserve card is trayed: a tap then withdraws
+      // it, and a drag parks it (parkReserve strips the tray entry itself).
+      onStartShouldSetPanResponder: () => {
+        const s = stateRef.current;
+        return !busyRef.current && !s.won && s.reserve.length > 0;
+      },
+      onPanResponderGrant: () => {
+        // Snapshot the park bays' screen rects for the drop hit-test.
+        slotRects.current = [];
+        slotRefs.current.forEach((ref, col) => {
+          if (col >= PARK_COLS) return;
+          ref?.measureInWindow((x, y, w, h) => {
+            slotRects.current.push({ col, x, y, w, h });
+          });
+        });
+      },
+      onPanResponderMove: (_evt, gs) => {
+        if (!draggingRef.current && (Math.abs(gs.dx) > 4 || Math.abs(gs.dy) > 4)) {
+          draggingRef.current = true;
+          setDraggingReserve(true);
+        }
+        dragXY.setValue({ x: gs.dx, y: gs.dy });
+      },
+      onPanResponderRelease: (_evt, gs) => {
+        if (Math.abs(gs.dx) < 6 && Math.abs(gs.dy) < 6) {
+          settleDrag(true);
+          onTapReserveRef.current();
+          return;
+        }
+        const pad = 8;
+        const hit = slotRects.current.find(
+          (r) =>
+            gs.moveX >= r.x - pad &&
+            gs.moveX <= r.x + r.w + pad &&
+            gs.moveY >= r.y - pad &&
+            gs.moveY <= r.y + r.h + pad,
+        );
+        if (hit) {
+          dispatch({ type: 'parkReserve', col: hit.col });
+          settleDrag(true); // parked: the next reserve card pops in at rest
+        } else {
+          settleDrag(false); // no target: spring home
+        }
+      },
+      onPanResponderTerminate: () => settleDrag(false),
+    }),
+  ).current;
+
+  const onParkReserve = (col: number) => {
     if (busyRef.current) return;
-    dispatch({ type: 'tapTray', index });
+    dispatch({ type: 'parkReserve', col });
   };
+
+  // ---------------- tray drag-to-swap (a tap returns the card to its pile)
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const [displacedIdx, setDisplacedIdx] = useState<number | null>(null);
+  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+  const hoverRef = useRef<number | null>(null);
+  const dragFromRef = useRef(0);
+  const swapBusyRef = useRef(false);
+  const dragTrayXY = useRef(new Animated.ValueXY()).current;
+  const displacedX = useRef(new Animated.Value(0)).current;
+  const trayRowRef = useRef<View>(null);
+  const trayLeftRef = useRef(0);
+  const trayGeomRef = useRef({ step: trayStep, w: trayW, len: 0 });
+  trayGeomRef.current = { step: trayStep, w: trayW, len: state.tray.length };
+
+  const onTrayLayout = () => {
+    trayRowRef.current?.measureInWindow((x) => {
+      trayLeftRef.current = x;
+    });
+  };
+
+  const trayTargetFor = (dx: number) => {
+    const { step, len } = trayGeomRef.current;
+    const raw = Math.round((dragFromRef.current * step + dx) / step);
+    return Math.max(0, Math.min(len - 1, raw));
+  };
+
+  const setHover = (h: number | null) => {
+    if (hoverRef.current !== h) {
+      hoverRef.current = h;
+      setHoverIdx(h);
+    }
+  };
+
+  const settleTrayDrag = useCallback(() => {
+    Animated.spring(dragTrayXY, {
+      toValue: { x: 0, y: 0 },
+      friction: 6,
+      useNativeDriver: true,
+    }).start(() => setDragIdx(null));
+  }, [dragTrayXY]);
+
+  const trayPan = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: (evt) => {
+        if (busyRef.current || swapBusyRef.current) return false;
+        const { step, w, len } = trayGeomRef.current;
+        const x = evt.nativeEvent.pageX - trayLeftRef.current;
+        const i = Math.floor(x / step);
+        if (i < 0 || i >= len || x - i * step > w) return false; // gap or empty slot
+        dragFromRef.current = i;
+        return true;
+      },
+      onPanResponderGrant: () => {
+        dragTrayXY.setValue({ x: 0, y: 0 });
+        setDragIdx(dragFromRef.current);
+      },
+      onPanResponderMove: (_evt, gs) => {
+        dragTrayXY.setValue({ x: gs.dx, y: gs.dy });
+        const t = trayTargetFor(gs.dx);
+        setHover(t !== dragFromRef.current ? t : null);
+      },
+      onPanResponderRelease: (_evt, gs) => {
+        const from = dragFromRef.current;
+        setHover(null);
+        if (Math.abs(gs.dx) < 6 && Math.abs(gs.dy) < 6) {
+          setDragIdx(null);
+          dispatch({ type: 'tapTray', index: from }); // tap returns the card
+          return;
+        }
+        const target = trayTargetFor(gs.dx);
+        const { step } = trayGeomRef.current;
+        if (target === from) {
+          settleTrayDrag(); // no new slot: spring home
+          return;
+        }
+        // Finish the slide into the target slot while the displaced card
+        // crosses over, then commit the swap in one batched update.
+        swapBusyRef.current = true;
+        setDisplacedIdx(target);
+        displacedX.setValue(0);
+        Animated.parallel([
+          Animated.timing(dragTrayXY, {
+            toValue: { x: (target - from) * step, y: 0 },
+            duration: 120,
+            useNativeDriver: true,
+          }),
+          Animated.timing(displacedX, {
+            toValue: (from - target) * step,
+            duration: 120,
+            useNativeDriver: true,
+          }),
+        ]).start(() => {
+          dispatch({ type: 'swapTray', a: from, b: target });
+          setDragIdx(null);
+          setDisplacedIdx(null);
+          swapBusyRef.current = false;
+        });
+      },
+      onPanResponderTerminate: () => {
+        setHover(null);
+        settleTrayDrag();
+      },
+    }),
+  ).current;
 
   const onClear = () => {
     if (busyRef.current) return;
@@ -248,7 +465,7 @@ export default function App() {
 
   const onShare = async () => {
     const message =
-      `LETTERFALL ♠ deal #${state.dealIndex + 1}\n` +
+      `LETTERFALL ♠\n` +
       `cleared in ${state.played.length} words · best: ${bestWord.toUpperCase()}\n` +
       `word klondike — every deal winnable`;
     try {
@@ -286,13 +503,8 @@ export default function App() {
             </Pressable>
           </View>
         </View>
-        <View style={styles.dealRow}>
-          <Text style={styles.dealText}>deal #{state.dealIndex + 1}</Text>
-          <Text style={styles.dealLabel}>{deal ? deal.label : ''}</Text>
-        </View>
-
-        {/* stock / waste / foundation */}
-        <View style={styles.pilesRow}>
+        {/* stock / reserve / foundation */}
+        <View style={[styles.pilesRow, draggingReserve && styles.pilesRowDragging]}>
           <Animated.View style={{ transform: [{ translateX: stockShakeX }] }}>
             <Pressable onPress={onStockTap} style={({ pressed }) => pressed && canDraw ? { opacity: 0.8 } : null}>
               {state.stock.length > 0 ? (
@@ -314,23 +526,35 @@ export default function App() {
             <Text style={styles.pileCaption}>stock</Text>
           </Animated.View>
 
-          <View style={styles.wasteWrap}>
-            {wasteTop !== null ? (
-              <PopIn key={`${state.dealIndex}-w-${state.waste.length}`}>
-                <Pressable disabled={wasteInTray || busy} onPress={onTapWaste}>
-                  <LetterCard
-                    letter={wasteTop}
-                    width={pileW}
-                    height={pileH}
-                    glow={!wasteInTray}
-                    lifted={wasteInTray}
-                  />
-                </Pressable>
-              </PopIn>
-            ) : (
-              <View style={[styles.emptyPile, { width: pileW, height: pileH }]} />
-            )}
-            <Text style={[styles.pileCaption, styles.wasteCaption]}>waste</Text>
+          <View style={styles.reserveWrap}>
+            {/* The placemat always sits on the lowest layer; the card stacks on top. */}
+            <View style={{ width: pileW, height: pileH }}>
+              <View style={[styles.emptyPile, StyleSheet.absoluteFill]} />
+              {reserveTop !== null && (
+                <PopIn key={`${state.dealIndex}-r-${state.reserve.length}`}>
+                  <Animated.View
+                    {...reservePan.panHandlers}
+                    style={{
+                      marginTop: reserveInTray ? Math.round(pileH * 0.2) : 0,
+                      transform: [
+                        ...dragXY.getTranslateTransform(),
+                        { scale: draggingReserve ? 1.08 : 1 },
+                      ],
+                    }}
+                  >
+                    <LetterCard
+                      letter={reserveTop}
+                      width={pileW}
+                      height={pileH}
+                      glow={!reserveInTray}
+                      lifted={reserveInTray}
+                      stock
+                    />
+                  </Animated.View>
+                </PopIn>
+              )}
+            </View>
+            <Text style={[styles.pileCaption, styles.reserveCaption]}>reserve</Text>
           </View>
 
           <Text style={styles.flowArrow}>→</Text>
@@ -360,32 +584,67 @@ export default function App() {
             const inTray = state.tray.some((e) => e.source === i);
             const faceDown = Math.max(0, col.length - 1);
             const top = col.length > 0 ? col[col.length - 1] : null;
+            // Lifted cards slide down 20% in layout (no transform, so nothing
+            // clips). The face-down card beneath shows as a full card back.
+            const liftShift = Math.round(cardH * 0.2);
+            const showBack = inTray && faceDown > 0;
             return (
               <View key={i} style={{ width: colW }}>
-                {Array.from({ length: faceDown }, (_, j) => (
+                {Array.from({ length: showBack ? faceDown - 1 : faceDown }, (_, j) => (
                   <View key={j} style={[styles.stub, j > 0 && styles.stubOverlap]} />
                 ))}
+                {showBack ? (
+                  <View style={faceDown > 1 ? styles.topCardOverlap : undefined}>
+                    <CardBack width={colW} height={cardH} />
+                  </View>
+                ) : null}
+                {inTray && !showBack ? (
+                  // No face-down card to reveal: a ghost spot marks the
+                  // lifted card's home instead.
+                  <View style={[styles.emptyColSlot, { width: colW, height: cardH }]} />
+                ) : null}
                 {top !== null ? (
                   <PopIn
                     key={`${state.dealIndex}-c${i}-${col.length}`}
-                    style={faceDown > 0 ? styles.topCardOverlap : undefined}
+                    style={
+                      inTray
+                        ? { marginTop: liftShift - cardH }
+                        : faceDown > 0
+                          ? styles.topCardOverlap
+                          : undefined
+                    }
                   >
                     <Pressable
-                      disabled={inTray || busy}
+                      disabled={busy}
                       onPress={() => onTapColumn(i)}
-                      style={({ pressed }) => (pressed && !inTray ? { opacity: 0.8 } : null)}
+                      style={({ pressed }) => (pressed ? { opacity: 0.8 } : null)}
                     >
                       <LetterCard
-                        letter={top}
+                        letter={top.letter}
                         width={colW}
                         height={cardH}
                         glow={!inTray}
                         lifted={inTray}
+                        stock={top.fromStock}
                       />
                     </Pressable>
                   </PopIn>
                 ) : (
-                  <View style={[styles.emptyColSlot, { width: colW, height: cardH }]} />
+                  <Pressable
+                    ref={(r) => {
+                      slotRefs.current[i] = r;
+                    }}
+                    disabled={busy || !canPark || i >= PARK_COLS}
+                    onPress={() => onParkReserve(i)}
+                    style={({ pressed }) => [
+                      styles.emptyColSlot,
+                      { width: colW, height: cardH },
+                      draggingReserve && i < PARK_COLS && styles.emptyColSlotTarget,
+                      pressed && canPark && i < PARK_COLS && { opacity: 0.6 },
+                    ]}
+                  >
+                    {canPark && i < PARK_COLS ? <Text style={styles.parkGlyph}>+</Text> : null}
+                  </Pressable>
                 )}
               </View>
             );
@@ -393,32 +652,64 @@ export default function App() {
         </View>
 
         <View style={styles.hintRow}>
-          {showDrawHint ? <Text style={styles.hintText}>no plays — draw</Text> : null}
+          {showNoPlayHint ? (
+            <Text style={styles.hintText}>
+              {canDraw ? 'no plays — draw' : 'no plays — park the reserve card'}
+            </Text>
+          ) : null}
         </View>
 
         <View style={styles.spacer} />
 
         {/* word tray */}
-        <Animated.View style={[styles.trayRow, { transform: [{ translateX: trayShakeX }] }]}>
+        <Animated.View
+          ref={trayRowRef}
+          onLayout={onTrayLayout}
+          {...trayPan.panHandlers}
+          style={[styles.trayRow, { transform: [{ translateX: trayShakeX }] }]}
+        >
+          {/* Ghost spots live on their own underlay so moving cards always
+              pass over them, whatever their zIndex relative to each other. */}
+          <View style={[StyleSheet.absoluteFill, styles.trayGhostRow]} pointerEvents="none">
+            {Array.from({ length: MAX_WORD }, (_, i) => (
+              <View key={`ghost-${i}`} style={[styles.traySlot, { width: trayW, height: trayH }]} />
+            ))}
+          </View>
           {Array.from({ length: MAX_WORD }, (_, i) => {
             const entry = state.tray[i] as TrayEntry | undefined;
-            if (!entry) {
-              return (
-                <View
-                  key={`slot-${i}`}
-                  style={[styles.traySlot, { width: trayW, height: trayH }]}
-                />
-              );
+            const isDragged = dragIdx === i;
+            const isDisplaced = displacedIdx === i;
+            const isHover = hoverIdx === i;
+            // Compose one transform list: play-animation lift plus whichever
+            // of drag / displaced-slide / hover-lift applies to this card.
+            const transform: object[] = [{ translateY: trayY }];
+            if (isDragged) {
+              transform.push({ translateX: dragTrayXY.x }, { translateY: dragTrayXY.y });
+            } else if (isDisplaced) {
+              transform.push({ translateX: displacedX });
+            } else if (isHover) {
+              transform.push({ translateY: -5 }, { scale: 1.05 });
             }
             return (
-              <Animated.View
-                key={`card-${i}`}
-                style={{ opacity: trayOpacity, transform: [{ translateY: trayY }] }}
+              <View
+                key={`pos-${i}`}
+                style={[
+                  { width: trayW, height: trayH },
+                  isDragged && { zIndex: 12, elevation: 12 },
+                  isDisplaced && { zIndex: 10, elevation: 10 },
+                ]}
               >
-                <Pressable disabled={busy} onPress={() => onTapTray(i)}>
-                  <LetterCard letter={entry.letter} width={trayW} height={trayH} />
-                </Pressable>
-              </Animated.View>
+                {entry ? (
+                  <Animated.View style={{ opacity: trayOpacity, transform: transform as never }}>
+                    <LetterCard
+                      letter={entry.letter}
+                      width={trayW}
+                      height={trayH}
+                      stock={entry.fromStock}
+                    />
+                  </Animated.View>
+                ) : null}
+              </View>
             );
           })}
         </Animated.View>
@@ -467,9 +758,6 @@ export default function App() {
       {/* win overlay */}
       {state.won && (
         <Overlay>
-          <Text style={styles.overlayKicker}>
-            deal #{state.dealIndex + 1} · {deal ? deal.label : ''}
-          </Text>
           <Text style={styles.overlayTitle}>TABLEAU CLEARED</Text>
           <View style={styles.overlayRule} />
           <View style={styles.wonWordsWrap}>
@@ -488,9 +776,6 @@ export default function App() {
       {/* dead deal overlay */}
       {isDead && (
         <Overlay>
-          <Text style={styles.overlayKicker}>
-            deal #{state.dealIndex + 1} · {deal ? deal.label : ''}
-          </Text>
           <Text style={styles.overlayTitle}>DEAD DEAL</Text>
           <View style={styles.overlayRule} />
           <Text style={styles.overlayBody}>
@@ -572,28 +857,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     lineHeight: 22,
   },
-  dealRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 8,
-    marginTop: 2,
-    marginBottom: 10,
-  },
-  dealText: {
-    color: C.inkMuted,
-    fontSize: 12,
-  },
-  dealLabel: {
-    color: C.inkFaint,
-    fontSize: 11,
-    fontStyle: 'italic',
-  },
-
-  // stock / waste / foundation row
+  // stock / reserve / foundation row
   pilesRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 10,
+    marginTop: 14,
+  },
+  pilesRowDragging: {
+    zIndex: 30,
+    elevation: 30,
   },
   stockCount: {
     position: 'absolute',
@@ -629,11 +902,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 3,
   },
-  wasteWrap: {
+  reserveWrap: {
     alignItems: 'center',
   },
-  wasteCaption: {
-    marginTop: 6,
+  // Matches the stock caption's offset (pips row: 6 margin + 6 height, +3).
+  reserveCaption: {
+    marginTop: 15,
   },
   emptyPile: {
     borderRadius: 8,
@@ -721,11 +995,22 @@ const styles = StyleSheet.create({
   topCardOverlap: {
     marginTop: -5,
   },
+  // Ghost spot: same treatment as the tray slots, no accent outline.
   emptyColSlot: {
     borderRadius: 8,
     borderWidth: 1,
     borderColor: C.borderSoft,
-    opacity: 0.6,
+    backgroundColor: C.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyColSlotTarget: {
+    backgroundColor: C.stockFaint,
+  },
+  parkGlyph: {
+    color: C.stock,
+    fontSize: 20,
+    fontWeight: '300',
   },
 
   // letter cards
@@ -744,9 +1029,27 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     shadowOffset: { width: 0, height: 0 },
   },
+  letterCardStock: {
+    borderColor: C.stock,
+  },
+  letterCardStockGlow: {
+    shadowColor: C.stock,
+  },
+  // Trayed cards ghost out but stay fully opaque so nothing shows through;
+  // the 20% downshift happens in layout where the card is rendered. Each keeps
+  // a border in the inactive (dim) shade of its accent: green for native
+  // cards, orange for stock-origin cards.
   letterCardLifted: {
-    opacity: 0.35,
-    transform: [{ translateY: -5 }],
+    backgroundColor: C.surfaceHi,
+    borderColor: C.accentDim,
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  letterCardStockLifted: {
+    borderColor: C.stockDim,
+  },
+  letterCardInkLifted: {
+    color: C.inkFaint,
   },
   letterCardText: {
     color: C.cardInk,
@@ -794,6 +1097,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 12,
+  },
+  trayGhostRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   traySlot: {
     borderRadius: 7,
@@ -877,12 +1184,6 @@ const styles = StyleSheet.create({
     backgroundColor: C.surface,
     padding: 22,
     alignItems: 'center',
-  },
-  overlayKicker: {
-    color: C.inkFaint,
-    fontSize: 11,
-    letterSpacing: 1,
-    marginBottom: 6,
   },
   overlayTitle: {
     color: C.ink,

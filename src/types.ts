@@ -14,12 +14,23 @@ export interface Seeds {
   deals: Deal[];
 }
 
-/** Where a tray letter came from: a column index, or the waste top. */
-export type TraySource = number | 'waste';
+/** Where a tray letter came from: a column index, or the reserve (face-up draw). */
+export type TraySource = number | 'reserve';
 
 export interface TrayEntry {
   letter: string;
   source: TraySource;
+  /** True for the reserve card and for parked stock cards tapped off a column. */
+  fromStock: boolean;
+}
+
+/**
+ * A single tableau card. Stock-origin cards were parked from the reserve onto an
+ * empty column; they are playable but never have to be cleared to win.
+ */
+export interface ColumnCard {
+  letter: string;
+  fromStock: boolean;
 }
 
 export interface SessionStats {
@@ -30,12 +41,12 @@ export interface SessionStats {
 
 export interface GameState {
   dealIndex: number;
-  /** Each column bottom -> top as arrays of single lowercase letters. */
-  columns: string[][];
+  /** Each column bottom -> top. */
+  columns: ColumnCard[][];
   /** Index 0 is drawn next. */
   stock: string[];
-  /** In draw order; last element is the waste top. */
-  waste: string[];
+  /** In draw order; last element is the face-up reserve card. */
+  reserve: string[];
   recyclesLeft: number;
   tray: TrayEntry[];
   /** Words played to the foundation, in order. */
@@ -49,8 +60,10 @@ export interface GameState {
 export type Action =
   | { type: 'draw' }
   | { type: 'tapColumn'; col: number }
-  | { type: 'tapWaste' }
+  | { type: 'tapReserve' }
+  | { type: 'parkReserve'; col: number }
   | { type: 'tapTray'; index: number }
+  | { type: 'swapTray'; a: number; b: number }
   | { type: 'clearTray' }
   | { type: 'play' }
   | { type: 'redeal' };
