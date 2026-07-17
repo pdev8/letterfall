@@ -81,7 +81,7 @@ export default function GameScreen() {
   const showNoPlayHint = !state.won && !isDead && !anyPlay && tableauLeft > 0;
   const reserveInTray = state.tray.some((e) => e.source === 'reserve');
   const bestWord = state.played.reduce((a, b) => (b.length > a.length ? b : a), '');
-  // Difficulty presets land in E3 (LF-131); until then score at casual ×1.0.
+  // Difficulty presets land in E3 (DB-131); until then score at casual ×1.0.
   const wonScore = state.won
     ? dealScore({
         words: state.played,

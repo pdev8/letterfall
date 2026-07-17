@@ -14,7 +14,7 @@ ship a change that can break it.
 - `npm start` / `npm run ios` — Expo dev server (the user usually has it
   running with hot reload; don't restart it for them)
 - `npx tsc --noEmit` — typecheck; run before every commit
-- No test runner or linter yet (LF-100/LF-102 in the roadmap add Jest/ESLint).
+- No test runner or linter yet (DB-100/DB-102 in the roadmap add Jest/ESLint).
   Until then, reducer changes are verified with ad-hoc `npx tsx` scripts that
   import `src/game.ts` directly.
 
@@ -28,16 +28,16 @@ ship a change that can break it.
   max parked, recycle exhaustion, won-state no-ops, out-of-range actions.
   Bug fixes start with a failing test that reproduces the bug. Never merge a
   behavior change without a test that would catch its regression. (Until
-  LF-100 lands Jest, attach `npx tsx` test-script evidence to the PR.)
-- Branches: `lf-<ticket>/<slug>` for roadmap tickets, `docs/<slug>` for
+  DB-100 lands Jest, attach `npx tsx` test-script evidence to the PR.)
+- Branches: `db-<ticket>/<slug>` for roadmap tickets, `docs/<slug>` for
   doc-only changes.
 - **PR titles encode merge order:** `[<n>. <scope>] <title>`, where `n` is a
   global, monotonically increasing merge-order number (merge PRs in ascending
   `n`; never reuse a number) and scope is the epic (`E0`…`E9`) or `docs`.
   Ticket PRs include the ticket ID after the prefix
-  (`[5. E0] LF-100: Jest test suite`). Stacked PRs append `(after #N)` and
+  (`[5. E0] DB-100: Jest test suite`). Stacked PRs append `(after #N)` and
   set their GitHub base to the PR they depend on.
-- `docs/ROADMAP.md` is the canonical plan (epics LF-1xx tickets + specs for
+- `docs/ROADMAP.md` is the canonical plan (epics DB-1xx tickets + specs for
   scoring, difficulty, leaderboards, achievements). `docs/GENERATION.md` is
   the canonical core-game design ("Living Deck"). If code and docs disagree,
   docs win — or PR a doc change.
@@ -87,7 +87,7 @@ Two layers, strictly separated:
   `parkReserve` auto-return it first. Breaking this corrupts `play`.
 - Deal validity: 7 columns of heights 1–7 (28 cards, bottom→top strings in
   seeds.json), 20-card stock, every deal has a witness solution (verified at
-  generation; generator + witnesses currently live outside the repo — LF-105
+  generation; generator + witnesses currently live outside the repo — DB-105
   checks them in).
 
 ### UI conventions (learned the hard way)

@@ -72,7 +72,7 @@ constraints: par-band check, distribution guards, and an **openness metric**
 threshold so players aren't funneled into the witness).
 
 **Solvability checking at draw time** is the hard engineering problem
-(LF-171): a bounded, memoized solver over ≤28 remaining cards. The escape-plan
+(DB-171): a bounded, memoized solver over ≤28 remaining cards. The escape-plan
 approach makes it tractable — maintain one known completion; when the player's
 move breaks it, search for a new one; steering only offers letters for which a
 plan exists.
@@ -102,7 +102,7 @@ two problems with the classic staircase [1..7] + fixed left bays:
 
 The fixes, all sim-informed:
 
-- **Dynamic bays (rule change, ships pre-v2 — LF-177).** Parking is no longer
+- **Dynamic bays (rule change, ships pre-v2 — DB-177).** Parking is no longer
   positional: the reserve card may be parked on **any empty column**, with at
   most **3 parked cards on the board** at once. The left side loses its false
   magnetism, emptied columns become tools anywhere, and the endgame gains
@@ -139,7 +139,7 @@ The fixes, all sim-informed:
 
 Daily total = Σ of the five deal scores (scoring spec in `ROADMAP.md`).
 A per-game difficulty multiplier may replace the preset multiplier for the
-daily set — decide in LF-173.
+daily set — decide in DB-173.
 
 The daily set is the **only publicly ranked mode**; free play is unlimited,
 locally seeded, and feeds personal stats only (see "Modes & Leaderboards" in
