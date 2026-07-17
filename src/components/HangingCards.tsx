@@ -41,7 +41,7 @@ function makeHangers(width: number, height: number): Hanger[] {
   const cardH = Math.round(cardW * 1.4);
   const totalW = n * cardW + (n - 1) * gap;
   const startX = (width - totalW) / 2;
-  const baseTop = Math.round(height * 0.26); // the shared line the word hangs on
+  const baseTop = Math.round(height * 0.42); // the shared line the word hangs on (where the title sat)
   return LETTERS.map((letter, i) => ({
     letter,
     x: Math.round(startX + i * (cardW + gap) + cardW / 2),
