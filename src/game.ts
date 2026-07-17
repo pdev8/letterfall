@@ -60,6 +60,11 @@ function countNative(columns: GameState['columns']): number {
   return columns.reduce((n, c) => n + c.filter((card) => !card.fromStock).length, 0);
 }
 
+/** Parked stock cards currently on the board (DB-177 bay cap). */
+export function parkedCount(columns: GameState['columns']): number {
+  return columns.reduce((n, c) => n + c.filter((card) => card.fromStock).length, 0);
+}
+
 // ---------------------------------------------------------------- resume (DB-122)
 
 const COLUMN_COUNT = 7;
@@ -205,9 +210,12 @@ export function reducer(state: GameState, action: Action): GameState {
     case 'parkReserve': {
       if (state.won) return state;
       if (state.reserve.length === 0) return state;
-      if (action.col >= state.config.parkBays) return state; // bays = first `parkBays` columns
       const column = state.columns[action.col];
-      if (!column || column.length > 0) return state; // only onto an empty space
+      if (!column || column.length > 0) return state; // only onto an empty column (any of them)
+      // Dynamic bays (DB-177): park onto ANY empty column, capped at
+      // `config.parkBays` parked stock cards on the board at once. Removes the
+      // positional pull of the old first-N-columns rule (sim-proven trap).
+      if (parkedCount(state.columns) >= state.config.parkBays) return state;
       const letter = state.reserve[state.reserve.length - 1];
       const columns = state.columns.map((c, i) =>
         i === action.col ? [{ letter, fromStock: true }] : c,

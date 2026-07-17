@@ -174,7 +174,7 @@
       <div class="stat"><div class="v green">✓</div><div class="k">core loop playable</div></div>
       <div class="stat"><div class="v green">✓</div><div class="k">design specced</div></div>
       <div class="stat"><div class="v">21 / 56</div><div class="k">tickets shipped</div></div>
-      <div class="stat"><div class="v orange">DB-133</div><div class="k">up next</div></div>
+      <div class="stat"><div class="v orange">DB-133</div><div class="k">deferred</div></div>
       <div class="stat"><div class="v">34 + 1</div><div class="k">PRs merged + open</div></div>
     </div>
   </header>
@@ -379,7 +379,7 @@
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-177</span><span class="t-name">Dynamic bays — park on any empty column, max 3 parked <span class="t-note">(sim-proven fix for the left-first trap; rule change, no generator needed)</span></span><span class="t-size">M</span><span class="st ready">ready early</span></summary>
+        <summary class="trow"><span class="t-id">DB-177</span><span class="t-name">Dynamic bays — park on any empty column, max 3 parked <span class="t-note">(sim-proven fix for the left-first trap; rule change, no generator needed)</span></span><span class="t-size">M</span><span class="st open">in review</span></summary>
         <div class="t-body">
           <p>A rule change proven in simulation: park the reserve card on any empty column (with at most 3 parked cards on the board) instead of only the left three bays. It kills the trap where clearing the left side first felt smart but quietly wrecked your endgame, and it lets you stage a long closing word by parking into emptied columns.</p>
         </div>
@@ -391,7 +391,7 @@
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-171</span><span class="t-name">Solvability measurement solver — par, openness, "possible until move N"</span><span class="t-size">L</span><span class="st todo">todo</span></summary>
+        <summary class="trow"><span class="t-id">DB-171</span><span class="t-name">Solvability measurement solver — par, openness, "possible until move N"</span><span class="t-size">L</span><span class="st open">in review</span></summary>
         <div class="t-body">
           <p>A background checker that can tell whether a board can still be finished. It's used to measure — estimating a deal's par score, scoring how open a board is, and powering the post-game insight "a win was still possible until move 14" after a loss — never to bail the player out of a bad position.</p>
         </div>

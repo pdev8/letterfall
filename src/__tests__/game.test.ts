@@ -1,6 +1,7 @@
 import {
   MAX_WORD,
   makeDealState,
+  parkedCount,
   randomDealIndex,
   reducer,
   sanitizeGameState,
@@ -11,7 +12,6 @@ import { DEFAULT_CONFIG } from '../scoring';
 import type { ColumnCard, GameState } from '../types';
 
 const RECYCLES_PER_DEAL = DEFAULT_CONFIG.recycles; // 2 — default knob value
-const PARK_COLS = DEFAULT_CONFIG.parkBays; // 3 — default bay count
 
 const card = (letter: string, fromStock = false): ColumnCard => ({ letter, fromStock });
 
@@ -53,16 +53,23 @@ describe('makeDealState', () => {
   });
 });
 
-describe('per-deal park bays (DB-131)', () => {
-  it('honors the deal config: a 1-bay deal refuses cols 1+ but allows col 0', () => {
-    const oneBay = base({ config: { recycles: 2, parkBays: 1 } });
-    expect(reducer(oneBay, { type: 'parkReserve', col: 1 })).toBe(oneBay); // beyond the single bay
-    expect(reducer(oneBay, { type: 'parkReserve', col: 0 }).columns[0]).toHaveLength(1);
+describe('dynamic park bays — parkBays is a max-parked cap (DB-177)', () => {
+  it('a 1-bay deal parks onto any empty column but refuses a second park (cap)', () => {
+    const oneBay = base({ config: { recycles: 2, parkBays: 1 }, reserve: ['y', 'x', 'q'] });
+    const parked = reducer(oneBay, { type: 'parkReserve', col: 2 }); // any empty column
+    expect(parked.columns[2]).toEqual([{ letter: 'q', fromStock: true }]);
+    // Cap reached: a second park is refused on any empty column.
+    expect(reducer(parked, { type: 'parkReserve', col: 0 })).toBe(parked);
   });
 
-  it('a 3-bay deal allows parking on col 2', () => {
-    const threeBay = base({ config: { recycles: 2, parkBays: 3 } });
-    expect(reducer(threeBay, { type: 'parkReserve', col: 2 }).columns[2]).toHaveLength(1);
+  it('a 3-bay deal allows up to three parked cards across any empty columns', () => {
+    let s = base({ config: { recycles: 2, parkBays: 3 }, reserve: ['w', 'z', 'y', 'q'] });
+    s = reducer(s, { type: 'parkReserve', col: 0 });
+    s = reducer(s, { type: 'parkReserve', col: 1 });
+    s = reducer(s, { type: 'parkReserve', col: 3 });
+    expect(parkedCount(s.columns)).toBe(3);
+    // Fourth park refused at the cap even though col 2 is still empty.
+    expect(reducer(s, { type: 'parkReserve', col: 2 })).toBe(s);
   });
 
   it('redeal carries the action config forward, falling back to the deal config', () => {
@@ -169,16 +176,17 @@ describe('parkReserve', () => {
     expect(next.movesMade).toBe(base().movesMade + 1);
   });
 
-  it(`refuses columns beyond the first ${PARK_COLS}`, () => {
-    const s = base();
-    expect(reducer(s, { type: 'parkReserve', col: PARK_COLS })).toBe(s); // col 3: empty but not a bay
+  it('parks onto ANY empty column, not just the first few (DB-177)', () => {
+    const s = base(); // cols 0-3 empty, 4-6 native
+    const next = reducer(s, { type: 'parkReserve', col: 3 });
+    expect(next.columns[3]).toEqual([{ letter: 'q', fromStock: true }]);
   });
 
   it('refuses occupied columns and empty reserve', () => {
     const s = base();
-    expect(reducer(s, { type: 'parkReserve', col: 4 })).toBe(s);
+    expect(reducer(s, { type: 'parkReserve', col: 4 })).toBe(s); // native card there
     const parked = reducer(s, { type: 'parkReserve', col: 0 });
-    expect(reducer(parked, { type: 'parkReserve', col: 0 })).toBe(parked); // occupied bay
+    expect(reducer(parked, { type: 'parkReserve', col: 0 })).toBe(parked); // now occupied
     const dry = base({ reserve: [] });
     expect(reducer(dry, { type: 'parkReserve', col: 0 })).toBe(dry);
   });

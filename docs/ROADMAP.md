@@ -152,7 +152,7 @@ Retires the static deal pool. Gates the daily-set half of E4.*
 | DB-175 | Par estimation + score bands | M | Generator estimates achievable score; deals outside the par band rejected; word-length gate rates tuned here (7-discoverable on every deal, 8s ≈10%); band documented and tested |
 | DB-176 | Seed service: phase 1 + phase 2 stub | M | Launch: hash(date, gameIndex, salt) on device; documented server-issued-seed + move-log replay validation design for phase 2 |
 | DB-186 | Backend foundation on Supabase | L | Supabase project + schema: daily seeds, score submissions, move logs, word-usage aggregates; anonymous device auth with optional Game Center identity link; RLS policies; DB-176 phase 2, DB-184, and DB-185 all build on this |
-| DB-177 | Dynamic bays (rule change — ships before the rest of E7) | M | Park onto ANY empty column; max 3 parked cards on board (`PARK_COLS` → `MAX_PARKED`); dead-deal rescue + park-target UI updated; reducer tests cover the cap; sim rerun confirms the left-first trap is gone |
+| DB-177 | Dynamic bays (rule change — ships before the rest of E7) | M | Park onto ANY empty column; parked cards capped at `config.parkBays` (unifies with the DB-131 knob; `parkedCount` enforces); dead-deal rescue + park-target UI updated; reducer tests cover the cap; full sim rerun lands with DB-172 steering |
 
 ## Epic E8 — Word Ladder & Living Meta (post-launch, M5)
 

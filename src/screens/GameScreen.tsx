@@ -32,7 +32,7 @@ import PopIn from '../components/PopIn';
 import WordChip from '../components/WordChip';
 import { existsPlayableWord, isValidWord } from '../dict';
 import { hapticFor, type FeedbackKind } from '../feedback';
-import { MAX_WORD, makeDealState, randomDealIndex, reducer, tableauCount } from '../game';
+import { MAX_WORD, makeDealState, parkedCount, randomDealIndex, reducer, tableauCount } from '../game';
 import { makeRecord, recordGame, type GameRecord, type HistoryState } from '../history';
 import { recordMiss, topMisses, type MissedWords } from '../missedWords';
 import { dealScore, stockEconomyMult, wordEconomyMult, wordScore } from '../scoring';
@@ -114,12 +114,13 @@ export default function GameScreen({
   const canRecycle = state.stock.length === 0 && state.reserve.length > 0 && state.recyclesLeft > 0;
   const canDraw = state.stock.length > 0 || canRecycle;
   const reserveTop = state.reserve.length > 0 ? state.reserve[state.reserve.length - 1] : null;
-  const canPark = reserveTop !== null && !state.won;
+  // Dynamic bays (DB-177): any empty column accepts a park while under the cap.
+  const canParkMore = parkedCount(state.columns) < state.config.parkBays;
+  const canPark = reserveTop !== null && !state.won && canParkMore;
   // Parking with more reserve underneath exposes a fresh letter, so it can
   // rescue an otherwise-stuck position.
   const parkRescue =
-    state.reserve.length >= 2 &&
-    state.columns.some((c, i) => i < state.config.parkBays && c.length === 0);
+    state.reserve.length >= 2 && canParkMore && state.columns.some((c) => c.length === 0);
   const isDead = !state.won && tableauLeft > 0 && !anyPlay && !canDraw && !parkRescue;
   const showNoPlayHint = !state.won && !isDead && !anyPlay && tableauLeft > 0;
   const reserveInTray = state.tray.some((e) => e.source === 'reserve');
@@ -357,7 +358,7 @@ export default function GameScreen({
         // Snapshot the park bays' screen rects for the drop hit-test.
         slotRects.current = [];
         slotRefs.current.forEach((ref, col) => {
-          if (col >= stateRef.current.config.parkBays) return;
+          // Any empty column is a drop target while under the park cap (DB-177).
           ref?.measureInWindow((x, y, w, h) => {
             slotRects.current.push({ col, x, y, w, h });
           });
@@ -757,16 +758,16 @@ export default function GameScreen({
                     ref={(r) => {
                       slotRefs.current[i] = r;
                     }}
-                    disabled={busy || !canPark || i >= state.config.parkBays}
+                    disabled={busy || !canPark}
                     onPress={() => onParkReserve(i)}
                     style={({ pressed }) => [
                       styles.emptyColSlot,
                       { width: colW, height: cardH },
-                      draggingReserve && i < state.config.parkBays && styles.emptyColSlotTarget,
-                      pressed && canPark && i < state.config.parkBays && { opacity: 0.6 },
+                      draggingReserve && canPark && styles.emptyColSlotTarget,
+                      pressed && canPark && { opacity: 0.6 },
                     ]}
                   >
-                    {canPark && i < state.config.parkBays ? <Text style={styles.parkGlyph}>+</Text> : null}
+                    {canPark ? <Text style={styles.parkGlyph}>+</Text> : null}
                   </Pressable>
                 )}
               </View>
