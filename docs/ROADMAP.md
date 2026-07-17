@@ -10,6 +10,11 @@
 `lf-110/scoring-module`). Every PR: typecheck + tests green, ticket ID in the
 PR title. Tickets are sized S (≤half day), M (~1 day), L (multi-day).
 
+**Progress tracking:** `docs/roadmap.html` (the published artifact) is the
+live tracker — journey stepper, per-ticket status, shipped log. Update ticket
+status there **in the same PR that completes the work**. Current position:
+0/41 tickets shipped; next up LF-100; LF-177 is flagged ready-early.
+
 **Where we are (v0, done):** core loop — 7-column tableau, stock → reserve
 draw, 2 recycles, word tray (drag-to-swap, tap-to-return), park bays (first 3
 columns), tap-to-withdraw toggles, 290 solver-verified deals, dark card-room
@@ -25,7 +30,7 @@ theme, win/dead-deal overlays, session stats.
 | **M2 — Sticky** | The game remembers | E2, E3 | Stats/streaks survive relaunch; difficulty is player-controlled; game resumes mid-deal |
 | **M3 — Social** | The game competes | E7, E4, E5 | Living deck generates the daily set; Game Center leaderboards live; badges unlock and display |
 | **M4 — Shipped** | The game ships | E6 | App Store approval |
-| **M5 — Alive** | The game evolves (post-launch) | E8, E7 phase 2 | Word ladder with community-driven retirement; server-issued seeds + replay validation |
+| **M5 — Alive** | The game evolves (post-launch) | E8, E9, E7 phase 2 | Word ladder with community-driven retirement; Toolkit fun mechanics; server-issued seeds + replay validation |
 
 ---
 
@@ -51,7 +56,7 @@ theme, win/dead-deal overlays, session stats.
 | LF-110 | `src/scoring.ts`: letter values + word score | S | Matches spec tables exactly; unit tests incl. QUIZ=28 example |
 | LF-111 | Deal score: economy/stock/difficulty multipliers; reducer tracks counters | M | GameState carries reserveLettersPlayed, parksUsed, recyclesUsed; dealScore matches worked example; tests |
 | LF-112 | Live word score preview in tray | S | Building a valid word shows its score on the PLAY button |
-| LF-113 | Win screen score breakdown | M | Animated tally: per-word scores → multipliers → total; matches scoring module output |
+| LF-113 | Win screen score breakdown | M | Animated tally: per-word scores → named bonus chips (Word Economy +30%, Stock Discipline +21%, ENCORE ×2 — never raw multiplier math, spec §4c) → total; matches scoring module output |
 
 ## Epic E2 — Persistence & Stats
 
@@ -69,7 +74,7 @@ theme, win/dead-deal overlays, session stats.
 | LF-130 | Settings screen + persisted settings store | S | Gear icon in top bar opens settings; values persist |
 | LF-131 | Difficulty presets wired to game config | M | Casual/Standard/Expert change recycles + park bays per spec; new deals only (never mid-deal); score multiplier applied |
 | LF-132 | Sound, haptics, reduce-motion toggles | M | expo-haptics on card taps/plays/wins; toggles respected everywhere incl. animations |
-| LF-133 | How-to-play screen | M | Rules, park bays, scoring summary; linked from settings + first launch |
+| LF-133 | Rulebook screen | M | How to play (goal, tap/drag verbs, reserve, parking, recycles) in plain language with visuals; scoring as named bonuses with one worked example — **zero equations** (spec §4c); "fine print" link to exact tables; linked from settings + first launch |
 
 ## Epic E4 — Leaderboards
 
@@ -125,6 +130,25 @@ that day only, so the meta breathes daily instead of accumulating forever.*
 | LF-183 | Retired-words gallery + tier UI | M | Ladder screen: current tier, next promotion, list of words retired at each tier |
 | LF-184 | Phase 2: usage telemetry + daily-reset retirement | L | Challenge-mode word usage aggregated server-side over a trailing 7-day window; each play day publishes that day's retired list with the daily set (top-K, sliced per tier); yesterday's bans lift automatically — no permanent accumulation; K tuned and documented |
 | LF-185 | Weekly meta surfaces | M | Community *most-used words of the week* displayed in-app (also the source pool for daily retirement); *best word of the week* — weekly recurring GC board + personal stat; both reset weekly |
+
+## Epic E9 — The Toolkit (fun mechanics, post-launch M5)
+
+*A slide-up panel of limited-use tools that spice up the dynamic — daily
+charges, clearly gated so the competitive game stays pure. Ground rules:
+tools are **never available in the daily challenge** (leaderboard integrity);
+in free play they're a Settings toggle, on by default in Casual only.
+Assisted wins count toward stats and most achievements but are marked
+assisted and stay off the local high-score boards. Any tool that adds or
+swaps letters draws through the Living Deck steering, so the solvability
+invariant survives tool use.*
+
+| ID | Ticket | Size | Acceptance criteria |
+|---|---|---|---|
+| LF-190 | Toolkit design finalization | S | Tool list + charge economy locked (proposal: 3 charges/day shared across tools); mode gating + assisted-win scoring policy decided and documented here |
+| LF-191 | Slide-up Toolkit panel | M | Drawer slides up from the bottom edge (PanResponder, consistent with existing drag conventions); charge pips; disabled state in challenge mode with explanatory copy |
+| LF-192 | Tool: Grab Bag | M | Swap any one visible card (column top or reserve) for a card from the grab bag; replacement letter chosen through steering so the deal stays winnable; animates the exchange |
+| LF-193 | Tool: Scrap | M | Remove one visible letter card outright (native card removal counts toward clearing); solvability re-verified; satisfying destruction animation |
+| LF-194 | Charges + gating persistence | M | Daily charge refresh at play-day rollover; per-mode gating (never in challenge, toggle in free play, default-on in Casual); assisted flag threads into stats/history |
 
 ## Epic E6 — App Store Readiness
 
@@ -222,6 +246,27 @@ The **final word of a winning deal earns 2× its wordScore** (applied inside
 ending into a planned climax — hold breadth, stage a long closer — instead
 of a grind. Example: closing with PRIZED (2+1+8+10+1+2 = 24 × 2.0 = 48) banks
 96.
+
+### 4c. Player-facing presentation — no equations, ever
+
+The math above is canonical for computation and leaderboards, but players
+never see a formula. In-game, scoring is presented as **named bonuses**:
+
+| Player sees | Internally |
+|---|---|
+| "Longer words score way more" | lengthMult |
+| "Rare letters are worth more (like Scrabble)" | letter values |
+| "Fewer words — bonus!" e.g. `Word Economy +30%` | wordEconomyMult |
+| "Used little stock — bonus!" e.g. `Stock Discipline +21%`, full 1.5 shown as `PURIST ★` | stockEconomyMult |
+| "Your last word counts double" `ENCORE ×2` | Encore |
+| "Harder mode, bigger scores" `Expert ×1.6` | difficultyMult |
+
+The win-screen tally (LF-113) shows these as chips that add up in front of
+the player — teaching by showing. The rulebook (LF-133) explains them in
+plain language with a worked visual example. Exact tables live behind an
+optional "fine print" link for min-maxers. If playtesting still shows
+confusion, simplification happens at the presentation layer first; the
+underlying math changes only as a last resort (it feeds the leaderboards).
 
 ### 5. Edge rules
 
