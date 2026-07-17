@@ -59,10 +59,13 @@ Two layers, strictly separated:
   `(GameState, Action) => GameState`. No React, no I/O. All game constants
   live here: `MAX_WORD = 8`, `RECYCLES_PER_DEAL = 2`, `PARK_COLS = 3`.
   `makeDealState(dealIndex, stats)` builds a game from `assets/seeds.json`.
-- **`App.tsx`** — all UI in one file (split is LF-103): components (PopIn,
-  LetterCard, CardBack), layout math, three PanResponder-driven drag systems,
-  and the reducer hookup. `src/dict.ts` (lexicon + anagram-key index for
-  dead-deal detection), `src/theme.ts` (color tokens), `src/types.ts`.
+- **UI** — `App.tsx` is a thin shell (SafeAreaView + StatusBar) around
+  `src/screens/GameScreen.tsx`, which owns the game UI: hooks, layout math,
+  three PanResponder drag systems, reducer hookup, and screen-level styles.
+  Presentational pieces live in `src/components/` (PopIn, LetterCard,
+  CardBack, WordChip, BigButton, Overlay), each owning its own styles.
+  `src/dict.ts` (lexicon + anagram-key index for dead-deal detection),
+  `src/scoring.ts` (pure scoring math), `src/theme.ts`, `src/types.ts`.
 
 ### Vocabulary → code
 
