@@ -232,9 +232,9 @@ describe('reroll (DB-178 — opening card exchange with the stock)', () => {
     // tops a,b picked; stock ['h','i','j'] evicts h,i off the FRONT.
     const s = opening();
     const next = reducer(s, { type: 'reroll', cols: [0, 1] });
-    // Evicted stock cards take the vacated spots, arriving ORANGE (stock-origin).
-    expect(next.columns[0][0]).toEqual({ letter: 'h', fromStock: true });
-    expect(next.columns[1][0]).toEqual({ letter: 'i', fromStock: true });
+    // Evicted stock cards take the vacated spots, arriving GREEN (native/required).
+    expect(next.columns[0][0]).toEqual({ letter: 'h', fromStock: false });
+    expect(next.columns[1][0]).toEqual({ letter: 'i', fromStock: false });
     // Unselected columns are untouched.
     expect(next.columns.slice(2).map((c) => c[c.length - 1].letter)).toEqual([
       'c',
@@ -250,11 +250,11 @@ describe('reroll (DB-178 — opening card exchange with the stock)', () => {
     expect(next.rerollsUsed).toBe(2); // two cards swapped
   });
 
-  it('lowers the clear-count: rerolled tops are orange and no longer count toward the win', () => {
+  it('is a straight swap: rolled-in cards stay green and required, clear-count unchanged', () => {
     const s = opening(); // 7 native tops → tableauCount 7
     expect(tableauCount(s)).toBe(7);
     const next = reducer(s, { type: 'reroll', cols: [0, 1] });
-    expect(tableauCount(next)).toBe(5); // two natives became orange
+    expect(tableauCount(next)).toBe(7); // still 7 required — a letter swap, not a shed
   });
 
   it('is deterministic: same state + same picks → identical result', () => {
@@ -272,7 +272,10 @@ describe('reroll (DB-178 — opening card exchange with the stock)', () => {
     });
     const next = reducer(wide, { type: 'reroll', cols: [0, 1, 2, 3, 4, 5, 6] });
     expect(next.rerollsUsed).toBe(7);
-    expect(next.columns.every((c) => c[c.length - 1].fromStock)).toBe(true); // all tops orange now
+    expect(next.columns.every((c) => !c[c.length - 1].fromStock)).toBe(true); // rolled-in tops stay green
+    expect(next.columns.map((c) => c[c.length - 1].letter)).toEqual(
+      ['n', 'o', 'p', 'q', 'r', 's', 't'], // the 7 evicted stock cards, in order
+    );
     expect(multiset(next)).toBe(multiset(wide));
   });
 
@@ -280,7 +283,7 @@ describe('reroll (DB-178 — opening card exchange with the stock)', () => {
     const s = opening({ stock: ['h'] });
     const next = reducer(s, { type: 'reroll', cols: [0, 1, 2] });
     expect(next.rerollsUsed).toBe(1); // only one card could be covered
-    expect(next.columns[0][0]).toEqual({ letter: 'h', fromStock: true });
+    expect(next.columns[0][0]).toEqual({ letter: 'h', fromStock: false });
     expect(next.columns[1][0].letter).toBe('b'); // untouched
     expect(next.stock).toEqual(['a']); // swapped-out top to the bottom
   });
@@ -299,7 +302,7 @@ describe('reroll (DB-178 — opening card exchange with the stock)', () => {
     });
     const next = reducer(s, { type: 'reroll', cols: [0, 0, 2, 99, 1] });
     expect(next.columns[0][0]).toEqual({ letter: 'z', fromStock: true }); // orange col untouched
-    expect(next.columns[1][0]).toEqual({ letter: 'h', fromStock: true }); // only col 1 rerolled
+    expect(next.columns[1][0]).toEqual({ letter: 'h', fromStock: false }); // only col 1 rerolled (green)
     expect(next.rerollsUsed).toBe(1);
     expect(multiset(next)).toBe(multiset(s));
   });

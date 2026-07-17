@@ -286,18 +286,18 @@ export function reducer(state: GameState, action: Action): GameState {
       // 48-card multiset is conserved — you relocate letters, never conjure
       // them — and a discarded top can resurface later through the stock.
       //
-      // The rotated-in cards land as STOCK-ORIGIN (fromStock:true → orange):
-      // playable, but like parked cards they never count toward the win
-      // (countNative filters them). So a reroll trades a native card you'd have
-      // to clear for an orange one you don't — that's the strategic upside, and
-      // the swapped-out native card sinks into the stock.
+      // The rotated-in cards land as NATIVE (fromStock:false → green): a
+      // straight letter swap. The rolled-in card must still be cleared to win
+      // and the swapped-out top sinks into the stock, so the clear-count is
+      // unchanged — you're trading a known letter for an unknown one, not
+      // shedding cards.
       //
       // Deliberately a GAMBLE (owner call): the stock is face-down, so you
       // don't know what you'll get, and there's no solver check — a reroll can
       // strand the board. The deal AS DEALT keeps the every-deal-winnable
       // promise; only this voluntary swap is exempt. No cap on how many tops.
       // Pre-play only (nothing drawn, trayed, or played), native tops only
-      // (already-orange tops aren't rerollable). Free: no scoring effect.
+      // (parked/orange tops aren't rerollable). Free: no scoring effect.
       if (state.won) return state;
       if (state.played.length > 0 || state.reserve.length > 0 || state.tray.length > 0) return state;
       const eligible = Array.from(new Set(action.cols)).filter((c) => {
@@ -314,7 +314,7 @@ export function reducer(state: GameState, action: Action): GameState {
         const idx = picks.indexOf(i);
         if (idx === -1) return col;
         const next = col.slice();
-        next[next.length - 1] = { letter: evicted[idx], fromStock: true }; // orange, parked-like
+        next[next.length - 1] = { letter: evicted[idx], fromStock: false }; // green, required
         return next;
       });
       return {

@@ -23,9 +23,10 @@ const CARD_H = 64;
  * column tops fanned out; tapping a card raises it (selected), tapping again
  * lowers it. "Swap" sends the raised tops to the bottom of the stock and rolls
  * the next stock cards up into their spots — one shot, then the panel closes
- * and the new board shows. "Skip" plays the deal as dealt. It's a gamble: the
- * dealt board is winnable, a rerolled one may not be, and the cards you roll in
- * arrive orange (stock-origin — playable, but not required to clear).
+ * and the new board shows. "Skip" plays the deal as dealt. A straight letter
+ * swap: the rolled-in cards are normal required cards, so you're trading known
+ * letters for unknown ones. It's a gamble — the dealt board is winnable, a
+ * rerolled one may not be.
  */
 export default function RerollPanel({
   tops,
