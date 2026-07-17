@@ -52,9 +52,10 @@ import type { Deal, TrayEntry } from '../types';
 export default function GameScreen({
   // Optional with a no-op default so existing usage/tests don't break.
   onOpenSettings = () => {},
-  // Free play uses none of these; passing `deal` switches to daily mode
-  // (DB-174) — a single fixed deal, no redeal, recorded via onComplete/onExit.
-  onOpenDaily,
+  // Free play: back to the home menu (DB-145).
+  onBack,
+  // Free play uses none of the daily props below; passing `deal` switches to
+  // daily mode (DB-174) — a fixed deal, no redeal, recorded via onComplete/onExit.
   deal,
   config,
   statsMode = 'free',
@@ -63,7 +64,8 @@ export default function GameScreen({
   onExit,
 }: {
   onOpenSettings?: () => void;
-  onOpenDaily?: () => void;
+  /** Free play: return to the home menu. */
+  onBack?: () => void;
   /** Daily mode: initialize the reducer from THIS deal instead of a random pool deal. */
   deal?: Deal;
   /** Difficulty knobs for the provided deal (daily uses rampFor(i).config). */
@@ -716,7 +718,19 @@ export default function GameScreen({
           </View>
         ) : (
           <View style={styles.topBar}>
-            <Text style={styles.wordmark}>DECKABET</Text>
+            <View style={styles.topBarLeft}>
+              {onBack ? (
+                <Pressable
+                  onPress={onBack}
+                  hitSlop={8}
+                  accessibilityLabel="Back to menu"
+                  style={({ pressed }) => [styles.redealBtn, pressed && { opacity: 0.6 }]}
+                >
+                  <Text style={styles.backGlyph}>‹</Text>
+                </Pressable>
+              ) : null}
+              <Text style={styles.wordmark}>DECKABET</Text>
+            </View>
             <View style={styles.topBarRight}>
               <View style={styles.statBlock}>
                 <Text style={styles.statValue}>
@@ -728,16 +742,6 @@ export default function GameScreen({
                 <Text style={styles.statValue}>{state.stats.streak}</Text>
                 <Text style={styles.statLabel}>streak</Text>
               </View>
-              {onOpenDaily ? (
-                <Pressable
-                  onPress={onOpenDaily}
-                  hitSlop={8}
-                  accessibilityLabel="Daily challenge"
-                  style={({ pressed }) => [styles.dailyBtn, pressed && { opacity: 0.6 }]}
-                >
-                  <Text style={styles.dailyBtnText}>DAILY</Text>
-                </Pressable>
-              ) : null}
               <Pressable
                 onPress={onRedeal}
                 hitSlop={8}
@@ -1149,6 +1153,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  topBarLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   wordmark: {
     color: C.ink,
     fontSize: 15,
@@ -1197,22 +1206,6 @@ const styles = StyleSheet.create({
     marginTop: -2,
   },
   // DAILY entry pill, sits left of the gear in free play.
-  dailyBtn: {
-    height: 40,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: C.accentDim,
-    backgroundColor: C.accentFaint,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dailyBtnText: {
-    color: C.accent,
-    fontSize: 12,
-    fontWeight: '800',
-    letterSpacing: 1.5,
-  },
   // stock / reserve / foundation row
   pilesRow: {
     flexDirection: 'row',
