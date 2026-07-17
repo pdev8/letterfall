@@ -25,6 +25,7 @@ theme, win/dead-deal overlays, session stats.
 | **M2 — Sticky** | The game remembers | E2, E3 | Stats/streaks survive relaunch; difficulty is player-controlled; game resumes mid-deal |
 | **M3 — Social** | The game competes | E7, E4, E5 | Living deck generates the daily set; Game Center leaderboards live; badges unlock and display |
 | **M4 — Shipped** | The game ships | E6 | App Store approval |
+| **M5 — Alive** | The game evolves (post-launch) | E8, E7 phase 2 | Word ladder with community-driven retirement; server-issued seeds + replay validation |
 
 ---
 
@@ -57,7 +58,7 @@ theme, win/dead-deal overlays, session stats.
 | ID | Ticket | Size | Acceptance criteria |
 |---|---|---|---|
 | LF-120 | Storage layer (AsyncStorage wrapper, schema version, migrations) | S | Typed get/set, versioned, unit-tested with mock storage |
-| LF-121 | Lifetime stats + streaks persisted | S | Wins, played, best streak, total points, words played, best word survive relaunch |
+| LF-121 | Lifetime stats + streaks persisted | M | Per mode (challenge/free): total time played, total games/wins, average time per game, letters constructed, words played, unique words, per-word usage counts (most-played top 10), best word, streaks, total points — all survive relaunch; deal timer plumbing included |
 | LF-122 | Resume in-progress deal | M | Kill app mid-deal → relaunch restores exact state (incl. tray) |
 | LF-123 | Game history (last 50 results, personal bests) | S | Best deal score, best word score, fastest clear recorded per difficulty |
 
@@ -77,8 +78,8 @@ theme, win/dead-deal overlays, session stats.
 | LF-140 | Local leaderboards | S | Top 20 deal scores per difficulty, stored locally, viewable in-app |
 | LF-141 | Daily set leaderboard integration | M | Depends on E7 (LF-174): cumulative daily total submits to the daily board; practice replays unscored |
 | LF-142 | Game Center: config plugin + authentication | M | expo config plugin sets GC entitlement; silent auth on launch; graceful offline fallback |
-| LF-143 | Game Center: submit + fetch leaderboards | M | Boards: All-time points, Best deal (per difficulty), Daily challenge (recurring); scores submit on win |
-| LF-144 | Leaderboard screen | M | Tabs: Daily / Best deals / All-time; shows player rank; local boards when GC unavailable |
+| LF-143 | Game Center: submit + fetch leaderboards | M | Challenge-mode boards only: Daily total (recurring) + All-time challenge points; submit on daily-set completion |
+| LF-144 | Leaderboard + stats screen | M | Tabs: Daily / All-time / My stats (personal dashboard incl. free play); player rank; local fallback when GC unavailable |
 
 ## Epic E5 — Achievements
 
@@ -105,6 +106,22 @@ Retires the static deal pool. Gates the daily-set half of E4.*
 | LF-174 | Daily set mode | M | 5 scored games/day, same for all players, cumulative daily total, reset countdown UX; free play unlimited/unscored |
 | LF-175 | Par estimation + score bands | M | Generator estimates achievable score; deals outside the par band rejected; band documented and tested |
 | LF-176 | Seed service: phase 1 + phase 2 stub | M | Launch: hash(date, gameIndex, salt) on device; documented server-issued-seed + move-log replay validation design for phase 2 |
+
+## Epic E8 — Word Ladder & Living Meta (post-launch, M5)
+
+*Ranked progression where the community's crutch words retire out of the
+game. Climb the ladder via daily-challenge results; at higher tiers the
+most-played words are banned. Over time, retirement is driven by real
+challenge-mode usage across all players — the meta stays alive because
+leaning on a word eventually removes it.*
+
+| ID | Ticket | Size | Acceptance criteria |
+|---|---|---|---|
+| LF-180 | Ladder: tiers, promotion, persisted rank | M | Tiers (e.g. Bronze→Diamond) advanced by daily-challenge results; rank shown in profile; demotion rules decided and documented |
+| LF-181 | Word retirement engine (phase 1: static lists) | M | Per-tier ban lists from static frequency data; retired words rejected with "retired at your rank" feedback; free play unaffected |
+| LF-182 | Effective-lexicon integration with the living deck | M | Solvability checks and openness metric run against base lexicon minus the player's tier bans — deals stay winnable under bans; tested per tier |
+| LF-183 | Retired-words gallery + tier UI | M | Ladder screen: current tier, next promotion, list of words retired at each tier |
+| LF-184 | Phase 2: global usage telemetry + rolling retirement | L | Challenge-mode word usage aggregated server-side; top-K most-played words retire per cycle at high tiers; cycle length + K tuned and documented |
 
 ## Epic E6 — App Store Readiness
 
@@ -214,19 +231,24 @@ parks** (witness solutions draw each needed stock letter exactly once, in
 order), so all presets keep the "every deal winnable" promise. Changing
 difficulty takes effect on the next deal.
 
-## Leaderboards
+## Modes & Leaderboards
 
-- **Local first** (LF-140): top-20 lists per difficulty, no account needed.
-- **Game Center** (LF-142/143): zero-backend, App-Store-native. Boards:
-  1. *All-time points* — Σ banked deal scores
-  2. *Best deal* — one board per difficulty
-  3. *Daily challenge* — daily recurring board
-- **Daily challenge** (LF-141): everyone plays the same deal
-  (`dealIndex = hash(YYYY-MM-DD) % deals.length`), one scored attempt per day.
-  This makes ranks comparable — same board, same letters.
+- **Daily Challenge is the public game.** The 5-game daily set
+  (`docs/GENERATION.md`) is the only mode that feeds global leaderboards.
+  Game Center boards: *Daily total* (recurring) and *All-time challenge
+  points*. Same seed chain for everyone, so ranks compare like-for-like.
+- **Free play is private.** Unlimited deals, player-picked difficulty
+  preset, never on a public board. It feeds the personal stats dashboard
+  and local bests (LF-140: top-20 per difficulty, on device).
+- **Personal stats** (LF-121, shown in LF-144's My Stats tab): total time
+  played, total games and wins, average time per game, letters constructed,
+  words played, unique words, most-played words (top 10), best word, best
+  deal, streaks — tracked per mode.
+- **Ladder** (E8, post-launch): daily-challenge results advance a ranked
+  tier; higher tiers retire the community's most-played words (see epic).
 - Known limitation: scores are client-computed; Game Center offers no server
-  validation. Acceptable at launch; a move-log replay validator is the
-  post-launch hardening path if it matters.
+  validation. Acceptable at launch; server-issued seeds + move-log replay
+  validation is the M5 hardening path.
 
 ## Achievements
 
