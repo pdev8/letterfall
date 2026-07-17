@@ -77,6 +77,13 @@ approach makes it tractable — maintain one known completion; when the player's
 move breaks it, search for a new one; steering only offers letters for which a
 plan exists.
 
+**Effective lexicon.** Every solvability and openness check runs against the
+player's *effective lexicon* — the base word list minus any words retired at
+their ladder tier (roadmap **E8**). A high-tier deal must be winnable
+*without* the banned words; free play always uses the full lexicon. The
+solver, `isValidWord`, and the generator all take the effective lexicon as a
+parameter, never a global.
+
 ## Daily set structure
 
 | Game | Steering generosity | Recycles | Park bays |
@@ -90,6 +97,10 @@ plan exists.
 Daily total = Σ of the five deal scores (scoring spec in `ROADMAP.md`).
 A per-game difficulty multiplier may replace the preset multiplier for the
 daily set — decide in LF-173.
+
+The daily set is the **only publicly ranked mode**; free play is unlimited,
+locally seeded, and feeds personal stats only (see "Modes & Leaderboards" in
+`ROADMAP.md`).
 
 ## Anti-cheat phases
 

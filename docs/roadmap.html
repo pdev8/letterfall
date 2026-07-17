@@ -276,6 +276,11 @@
         <div class="m-name">Shipped</div>
         <div class="m-exit">E6 — approved and live on the App Store.</div>
       </div>
+      <div class="mile">
+        <div class="m-id">M5</div>
+        <div class="m-name">Alive</div>
+        <div class="m-exit">E8 + E7 phase 2 — word ladder with community-driven retirement; server seeds + replay validation.</div>
+      </div>
     </div>
   </section>
 
@@ -313,7 +318,7 @@
     <div class="table-wrap"><table>
       <tr><th>ID</th><th>Ticket</th><th>Size</th><th>Acceptance</th></tr>
       <tr><td class="id">LF-120</td><td>Storage layer (versioned, migratable)</td><td><span class="size s">S</span></td><td class="crit">Typed get/set over AsyncStorage; unit-tested with mock storage</td></tr>
-      <tr><td class="id">LF-121</td><td>Lifetime stats + streaks persisted</td><td><span class="size s">S</span></td><td class="crit">Wins, streaks, points, words, best word survive relaunch</td></tr>
+      <tr><td class="id">LF-121</td><td>Lifetime stats + streaks persisted</td><td><span class="size m">M</span></td><td class="crit">Per mode: time played, games/wins, avg time per game, letters constructed, unique words, most-played top 10, best word, streaks, points; deal timer plumbing</td></tr>
       <tr><td class="id">LF-122</td><td>Resume in-progress deal</td><td><span class="size m">M</span></td><td class="crit">Kill mid-deal → relaunch restores exact state including tray</td></tr>
       <tr><td class="id">LF-123</td><td>Game history + personal bests</td><td><span class="size s">S</span></td><td class="crit">Best deal score, best word, fastest clear per difficulty; last 50 games</td></tr>
     </table></div>
@@ -339,8 +344,8 @@
       <tr><td class="id">LF-140</td><td>Local leaderboards</td><td><span class="size s">S</span></td><td class="crit">Top-20 deal scores per difficulty, offline, in-app</td></tr>
       <tr><td class="id">LF-141</td><td>Daily set leaderboard integration</td><td><span class="size m">M</span></td><td class="crit">Depends on E7 (LF-174): cumulative daily total submits to the daily board; practice unscored</td></tr>
       <tr><td class="id">LF-142</td><td>Game Center: plugin + auth</td><td><span class="size m">M</span></td><td class="crit">Entitlement via config plugin; silent auth; offline fallback</td></tr>
-      <tr><td class="id">LF-143</td><td>Game Center: submit + fetch boards</td><td><span class="size m">M</span></td><td class="crit">All-time points, best deal per difficulty, daily recurring board</td></tr>
-      <tr><td class="id">LF-144</td><td>Leaderboard screen</td><td><span class="size m">M</span></td><td class="crit">Daily / Best deals / All-time tabs; player rank; local fallback</td></tr>
+      <tr><td class="id">LF-143</td><td>Game Center: submit + fetch boards</td><td><span class="size m">M</span></td><td class="crit">Challenge-only boards: daily total (recurring) + all-time challenge points</td></tr>
+      <tr><td class="id">LF-144</td><td>Leaderboard + stats screen</td><td><span class="size m">M</span></td><td class="crit">Daily / All-time / My Stats tabs; player rank; local fallback</td></tr>
     </table></div>
   </section>
 
@@ -488,14 +493,36 @@ dealScore = round( 240 × 1.30 × 1.21 × 1.25 ) = 472</div>
 
   <section>
     <p class="kicker">Spec</p>
-    <h2>Leaderboards</h2>
-    <p><strong>Local first</strong>, then <strong>Game Center</strong> — zero backend, App-Store-native,
-    and it carries achievements too. Three boards: all-time points, best deal per difficulty,
-    and the daily challenge (recurring daily board).</p>
-    <p>The <strong>daily challenge</strong> makes ranks honest: everyone plays the same deal
-    (<span class="mono">dealIndex = hash(YYYY-MM-DD) % deals.length</span>), one scored attempt
-    per day, practice replays unscored. Known limitation: scores are client-computed —
-    acceptable at launch; a move-log replay validator is the post-launch hardening path.</p>
+    <h2>Modes &amp; Leaderboards</h2>
+    <p><strong>Daily Challenge is the public game</strong> — the 5-game daily set is the only
+    mode on global boards (Game Center: daily total + all-time challenge points). Same seed
+    chain for everyone, so ranks compare like-for-like.</p>
+    <p><strong>Free play is private</strong> — unlimited deals, player-picked difficulty, never
+    ranked publicly. It feeds the personal dashboard: total time played, games and wins,
+    average time per game, letters constructed, unique words, most-played words, bests,
+    streaks — tracked per mode.</p>
+    <p>Post-launch, the <strong>word ladder</strong> (E8) turns challenge results into a ranked
+    tier — and the higher the tier, the more of the community's most-played words are retired.
+    Known limitation: scores are client-computed at launch; server seeds + move-log replay
+    validation is the M5 hardening path.</p>
+  </section>
+
+  <section>
+    <p class="kicker">Epic · post-launch</p>
+    <h2><span class="id">E8</span>Word Ladder &amp; Living Meta</h2>
+    <p class="intent">Ranked progression where the community's crutch words retire out of the
+    game: climb via daily-challenge results; at higher tiers the most-played words are banned —
+    over time driven by real usage across all players. Lean on a word and eventually it's gone.
+    The living deck generates against the player's <em>effective lexicon</em>, so every deal
+    stays winnable without the banned words.</p>
+    <div class="table-wrap"><table>
+      <tr><th>ID</th><th>Ticket</th><th>Size</th><th>Acceptance</th></tr>
+      <tr><td class="id">LF-180</td><td>Ladder: tiers, promotion, persisted rank</td><td><span class="size m">M</span></td><td class="crit">Tiers advanced by daily-challenge results; rank in profile; demotion rules documented</td></tr>
+      <tr><td class="id">LF-181</td><td>Word retirement engine (phase 1: static)</td><td><span class="size m">M</span></td><td class="crit">Per-tier ban lists from frequency data; "retired at your rank" feedback; free play unaffected</td></tr>
+      <tr><td class="id">LF-182</td><td>Effective-lexicon integration with living deck</td><td><span class="size m">M</span></td><td class="crit">Solver + openness run on base lexicon minus tier bans; winnable at every tier; tested</td></tr>
+      <tr><td class="id">LF-183</td><td>Retired-words gallery + tier UI</td><td><span class="size m">M</span></td><td class="crit">Ladder screen: tier, promotion progress, words retired per tier</td></tr>
+      <tr><td class="id">LF-184</td><td>Phase 2: usage telemetry + rolling retirement</td><td><span class="size l">L</span></td><td class="crit">Challenge-mode word usage aggregated server-side; top-K retire per cycle at high tiers</td></tr>
+    </table></div>
   </section>
 
   <section>
