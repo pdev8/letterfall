@@ -310,10 +310,20 @@ export function reducer(state: GameState, action: Action): GameState {
       const columns = state.columns.map((c, i) =>
         i === action.col ? [{ letter, fromStock: true }] : c,
       );
+      let reserve = state.reserve.slice(0, -1);
+      let stock = state.stock;
+      // Parking clears the active card; surface the next one so a card is always
+      // ready. If cards are still stacked underneath, the one beneath shows;
+      // otherwise draw the next stock card (drawing is free — DB-179).
+      if (reserve.length === 0 && stock.length > 0) {
+        reserve = [stock[0]];
+        stock = stock.slice(1);
+      }
       return {
         ...state,
         columns,
-        reserve: state.reserve.slice(0, -1),
+        stock,
+        reserve,
         // A trayed reserve entry is always the reserve top — it's the card being parked.
         tray: state.tray.filter((e) => e.source !== 'reserve'),
         movesMade: state.movesMade + 1,

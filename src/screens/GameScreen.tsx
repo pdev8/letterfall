@@ -914,12 +914,13 @@ export default function GameScreen({
                     onPress={() => onParkReserve(i)}
                     style={({ pressed }) => [
                       styles.emptyColSlot,
-                      styles.baySlot,
                       { width: colW, height: cardH },
                       draggingReserve && canPark && styles.emptyColSlotTarget,
                       pressed && canPark && { opacity: 0.6 },
                     ]}
                   >
+                    {/* A cleared bay is marked by the plus alone — no orange
+                        outline. Bright when a card is ready to park, dim otherwise. */}
                     <Text style={canPark ? styles.parkGlyph : styles.bayGlyph}>+</Text>
                   </Pressable>
                 ) : (
@@ -1343,11 +1344,6 @@ const styles = StyleSheet.create({
     backgroundColor: C.surface,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  // A cleared bay reads as a park spot even at rest: faint orange outline.
-  baySlot: {
-    borderColor: C.stockDim,
-    backgroundColor: C.stockFaint,
   },
   emptyColSlotTarget: {
     backgroundColor: C.stockFaint,

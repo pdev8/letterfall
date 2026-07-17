@@ -92,6 +92,8 @@ Two layers, strictly separated:
   DB-179 (supersedes DB-177's "any empty column" rule).
 - The trayed reserve entry is always the current reserve top — `draw` and
   `parkReserve` auto-return it first. Breaking this corrupts `play`.
+- `parkReserve` auto-advances: if parking empties the reserve, the next stock
+  card is drawn in so a card is always ready (DB-179).
 - Deal validity: 7 columns of heights 1–7 (28 cards, bottom→top strings in
   seeds.json), 20-card stock, every deal has a witness solution (verified at
   generation; generator + witnesses currently live outside the repo — DB-105
