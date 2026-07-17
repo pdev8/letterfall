@@ -400,6 +400,10 @@ export default function GameScreen({
   const onTapReserveRef = useRef(onTapReserve);
   onTapReserveRef.current = onTapReserve;
   const [draggingReserve, setDraggingReserve] = useState(false);
+  // Stays true through the spring-home animation so the card returns ON TOP,
+  // matching the drag-out z-order (the pile drops its elevation only once the
+  // card is fully settled).
+  const [returningReserve, setReturningReserve] = useState(false);
   const draggingRef = useRef(false);
   const dragXY = useRef(new Animated.ValueXY()).current;
   const slotRefs = useRef<(View | null)[]>([]);
@@ -412,11 +416,12 @@ export default function GameScreen({
       if (snap) {
         dragXY.setValue({ x: 0, y: 0 });
       } else {
+        setReturningReserve(true);
         Animated.spring(dragXY, {
           toValue: { x: 0, y: 0 },
           friction: 6,
           useNativeDriver: false,
-        }).start();
+        }).start(() => setReturningReserve(false));
       }
     },
     [dragXY],
@@ -748,7 +753,12 @@ export default function GameScreen({
           </View>
         )}
         {/* stock / reserve / foundation */}
-        <View style={[styles.pilesRow, draggingReserve && styles.pilesRowDragging]}>
+        <View
+          style={[
+            styles.pilesRow,
+            (draggingReserve || returningReserve) && styles.pilesRowDragging,
+          ]}
+        >
           <Animated.View style={{ transform: [{ translateX: stockShakeX }] }}>
             <Pressable onPress={onStockTap} style={({ pressed }) => pressed && canDraw ? { opacity: 0.8 } : null}>
               {state.stock.length > 0 ? (
