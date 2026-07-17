@@ -23,6 +23,7 @@ import {
   reducer,
   tableauCount,
 } from './src/game';
+import { wordScore } from './src/scoring';
 import type { TrayEntry } from './src/types';
 
 // ---------------------------------------------------------------- helpers
@@ -744,7 +745,7 @@ export default function App() {
             </Text>
             <Text style={[styles.playSub, wordValid && styles.playSubReady]}>
               {wordValid
-                ? `${word.length} letters`
+                ? `${word.length} letters · +${wordScore(word)} pts`
                 : word.length === 0
                   ? 'tap cards to spell'
                   : word.length < 3
