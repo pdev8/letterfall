@@ -8,6 +8,7 @@ import { dailyDeal, recordDailyGame, type DailySet } from './src/daily';
 import { DAILY_GAME_COUNT, rampFor } from './src/dailyRamp';
 import DailyScreen from './src/screens/DailyScreen';
 import GameScreen from './src/screens/GameScreen';
+import HomeScreen from './src/screens/HomeScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import { C } from './src/theme';
 
@@ -18,10 +19,11 @@ export default function App() {
   // overlay's controls clear the notch / Dynamic Island.
   //
   // Two independent layers:
-  //  - `screen` picks the base surface: free play or the daily lobby.
-  //  - `showSettings` overlays settings above whatever is showing, without
-  //    disturbing the daily context underneath.
-  const [screen, setScreen] = useState<'game' | 'daily'>('game');
+  //  - `screen` picks the base surface: the home menu, free play, or the daily
+  //    lobby. Free play mounts only while chosen, and resumes its saved deal
+  //    (DB-122), so leaving to Home and back is seamless.
+  //  - `showSettings` overlays settings above whatever is showing.
+  const [screen, setScreen] = useState<'home' | 'game' | 'daily'>('home');
   const [showSettings, setShowSettings] = useState(false);
   // Daily mode (DB-174): App owns the set (single source of truth) so a
   // finished game's progress/total show instantly on return — no reload race.
@@ -54,15 +56,24 @@ export default function App() {
     <SafeAreaProvider>
       <View style={styles.root}>
         <StatusBar style="light" />
-        <GameScreen
-          onOpenSettings={() => setShowSettings(true)}
-          onOpenDaily={openDaily}
-        />
+        {screen === 'home' && (
+          <HomeScreen
+            onFreePlay={() => setScreen('game')}
+            onDaily={openDaily}
+            onOpenSettings={() => setShowSettings(true)}
+          />
+        )}
+        {screen === 'game' && (
+          <GameScreen
+            onOpenSettings={() => setShowSettings(true)}
+            onBack={() => setScreen('home')}
+          />
+        )}
         {screen === 'daily' && (
           <View style={StyleSheet.absoluteFill}>
             <DailyScreen
               set={dailySet}
-              onClose={() => setScreen('game')}
+              onClose={() => setScreen('home')}
               onPlayGame={setDailyIndex}
             />
           </View>

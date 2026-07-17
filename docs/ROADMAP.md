@@ -223,6 +223,7 @@ players, it stays leaderboard-fair — good plays literally fund the run.*
 | DB-165 | EAS build + TestFlight pipeline | M | `eas build` profiles; internal TestFlight distribution documented |
 | DB-166 | Privacy policy + App Store metadata | M | Privacy manifest (GC only, no tracking), screenshots, description, keywords |
 | DB-167 | Submit + review fixes | M | App approved on the App Store |
+| DB-168 | Home / mode-select screen | S | Landing screen chooses **Free Play** or **Daily** (Daily moves off the play screen); Free Play gets a back-to-menu affordance. Ambient title animation: a sparse Matrix-style letter rain that occasionally turns a column into a horizontal word which lights up and ghosts away (`LetterRain`; honors reduce-motion with a static scatter). App becomes a small `home`/`game`/`daily` router; Free Play mounts only when chosen and resumes its saved deal (DB-122) |
 
 ---
 

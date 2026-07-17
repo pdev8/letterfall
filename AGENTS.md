@@ -61,11 +61,14 @@ Two layers, strictly separated:
   difficulty knobs on `state.config` (DB-131; bays designated per DB-179).
   `makeDealState(dealIndex, stats, config)`
   builds a game from `assets/seeds.json`.
-- **UI** — `App.tsx` is a thin shell (SafeAreaView + StatusBar) around
-  `src/screens/GameScreen.tsx`, which owns the game UI: hooks, layout math,
-  three PanResponder drag systems, reducer hookup, and screen-level styles.
-  Presentational pieces live in `src/components/` (PopIn, LetterCard,
-  CardBack, WordChip, BigButton, Overlay), each owning its own styles.
+- **UI** — `App.tsx` is a small screen router (SafeAreaProvider + StatusBar)
+  that switches a `home`/`game`/`daily` surface with a settings overlay
+  (DB-168). `src/screens/HomeScreen.tsx` is the landing menu (Free Play / Daily)
+  over the `LetterRain` title animation; `src/screens/GameScreen.tsx` owns the
+  game UI: hooks, layout math, three PanResponder drag systems, reducer hookup,
+  and screen-level styles. Presentational pieces live in `src/components/`
+  (PopIn, LetterCard, CardBack, WordChip, BigButton, Overlay, LetterRain), each
+  owning its own styles.
   `src/dict.ts` (lexicon + anagram-key index for dead-deal detection),
   `src/scoring.ts` (pure scoring math), `src/theme.ts`, `src/types.ts`.
 
