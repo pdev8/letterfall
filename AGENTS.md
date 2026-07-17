@@ -22,6 +22,13 @@ ship a change that can break it.
 
 - **Everything merges via PR. Never commit or push to `main` directly.**
   Open the PR; the user merges.
+- **Tests ship with the work.** Every PR that changes game logic, scoring,
+  generation, or persistence includes tests for the important path AND the
+  edge cases — empty piles, full tray (`MAX_WORD`), last card of a column,
+  max parked, recycle exhaustion, won-state no-ops, out-of-range actions.
+  Bug fixes start with a failing test that reproduces the bug. Never merge a
+  behavior change without a test that would catch its regression. (Until
+  LF-100 lands Jest, attach `npx tsx` test-script evidence to the PR.)
 - Branches: `lf-<ticket>/<slug>` for roadmap tickets, `docs/<slug>` for
   doc-only changes. Ticket ID in the PR title.
 - `docs/ROADMAP.md` is the canonical plan (epics LF-1xx tickets + specs for
