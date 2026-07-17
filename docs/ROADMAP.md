@@ -190,6 +190,7 @@ invariant survives tool use.*
 | DB-192 | Tool: Grab Bag | M | Swap any one visible card (column top or reserve) for a card from the grab bag; replacement letter chosen through steering so the deal stays winnable; animates the exchange |
 | DB-193 | Tool: Scrap | M | Remove one visible letter card outright (native card removal counts toward clearing); solvability re-verified; satisfying destruction animation |
 | DB-194 | Charges + gating persistence | M | Daily charge refresh at play-day rollover; per-mode gating (never in challenge, toggle in free play, default-on in Casual); assisted flag threads into stats/history |
+| DB-195 | Wildcards — earned, banked, played as any letter | M | Earned at career-point milestones (thresholds configurable, e.g. every 500 banked points); balance persists via the storage layer and **accumulates with no daily reset** (unlike tool charges); played from the tray as a distinct ♠ blank that completes any word — counts toward word length, letter value 0 (Scrabble-blank rule), max one per word; validation supports the blank (any completing letter); shown distinctly in the win tally; follows Toolkit gating (never in the daily challenge; assisted marking applies) |
 
 ## Epic E6 — App Store Readiness
 
