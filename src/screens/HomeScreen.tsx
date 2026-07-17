@@ -4,7 +4,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import BigButton from '../components/BigButton';
 import HangingCards from '../components/HangingCards';
-import PopIn from '../components/PopIn';
 import { useSettings } from '../settingsStore';
 import { C } from '../theme';
 
@@ -38,12 +37,9 @@ export default function HomeScreen({
           <Text style={styles.gearGlyph}>{'⚙︎'}</Text>
         </Pressable>
 
-        <View style={styles.hero}>
-          <PopIn reduceMotion={reduceMotion}>
-            <Text style={styles.wordmark}>DECKABET</Text>
-          </PopIn>
-          <Text style={styles.tagline}>Word Klondike</Text>
-        </View>
+        {/* No title text — the hanging cards spell DECKABET. This spacer keeps
+            the menu where it was. */}
+        <View style={styles.hero} />
 
         <View style={styles.menu}>
           <BigButton label="FREE PLAY" onPress={onFreePlay} />
@@ -76,24 +72,6 @@ const styles = StyleSheet.create({
   },
   hero: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 18,
-  },
-  wordmark: {
-    color: C.ink,
-    fontSize: 44,
-    fontWeight: '900',
-    letterSpacing: 4,
-    textShadowColor: C.accentFaint,
-    textShadowRadius: 18,
-  },
-  tagline: {
-    color: C.inkMuted,
-    fontSize: 15,
-    letterSpacing: 1.5,
-    marginTop: 8,
-    textTransform: 'uppercase',
   },
   menu: {
     flex: 1,
