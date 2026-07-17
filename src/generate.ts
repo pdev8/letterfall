@@ -31,10 +31,15 @@ const K_CHOICES = [7, 8, 9, 9, 10]; // solution length, matching the v1 pool
 const LEN_CHOICES = [3, 4, 5, 6, 7, 8];
 const LEN_WEIGHTS = [6, 5, 3, 1.5, 0.7, 0.3];
 
-/** Distribution guard: no single letter may appear more than this many times
- * across the 28 tableau + 20 stock = 48 cards (docs/GENERATION.md "duplicate
- * caps"). Keeps deals from degenerating into "seven E's". */
-const MAX_LETTER_COPIES = 6;
+// Distribution guards (docs/GENERATION.md). The player experiences the column
+// TOPS plus the drawn stock, so those are guarded hardest — no deal should
+// feel like "six o's" or "p s s s". Tuned to match scripts/generate-deals.py.
+const MAX_TOP_COPIES = 2; // ≤2 of any letter among the 7 visible column tops
+const MIN_TOP_VOWELS = 2; // 2..4 vowels among the tops (no all-vowel/all-consonant)
+const MAX_TOP_VOWELS = 4;
+const MAX_STOCK_COPIES = 3; // ≤3 of any letter in the 20-card stock
+const MAX_LETTER_COPIES = 5; // ≤5 of any letter across all 48 cards
+const VOWELS = new Set('aeiou');
 
 /** Hard cap on accept/retry attempts. A winnable deal is found in a handful of
  * tries in practice; exhaustion means something is badly wrong. */
@@ -222,13 +227,24 @@ function makeDeal(rng: Rng, caps: number[], derived: Derived): Candidate | null 
 
 // ---------------------------------------------------------------- verification
 
-/** True if any letter appears more than MAX_LETTER_COPIES across the 48 cards. */
-function exceedsDuplicateCap(candidate: Candidate): boolean {
+function maxCount(letters: string): number {
   const counts: Record<string, number> = {};
-  for (const ch of candidate.columns.join('') + candidate.stock) {
+  let max = 0;
+  for (const ch of letters) {
     counts[ch] = (counts[ch] ?? 0) + 1;
-    if (counts[ch] > MAX_LETTER_COPIES) return true;
+    if (counts[ch] > max) max = counts[ch];
   }
+  return max;
+}
+
+/** True if the candidate is visibly lopsided and should be rejected (DB balance fix). */
+function isUnbalanced(candidate: Candidate): boolean {
+  const tops = candidate.columns.map((c) => c[c.length - 1]).join('');
+  if (maxCount(tops) > MAX_TOP_COPIES) return true;
+  const vowels = [...tops].filter((c) => VOWELS.has(c)).length;
+  if (vowels < MIN_TOP_VOWELS || vowels > MAX_TOP_VOWELS) return true;
+  if (maxCount(candidate.stock) > MAX_STOCK_COPIES) return true;
+  if (maxCount(candidate.columns.join('') + candidate.stock) > MAX_LETTER_COPIES) return true;
   return false;
 }
 
@@ -276,11 +292,17 @@ function witnessWins(candidate: Candidate): boolean {
 
 /** Deterministic per-attempt sub-seed so the accept/retry loop is reproducible. */
 function deriveSeed(seed: number, attempt: number): number {
-  let h = (seed >>> 0) ^ 0x9e3779b9;
-  h = Math.imul(h ^ attempt, 0x85ebca6b);
-  h ^= h >>> 13;
-  h = Math.imul(h, 0xc2b2ae35);
-  h ^= h >>> 16;
+  // Feed seed THEN attempt through an FNV-1a lane so different base seeds get
+  // fully independent streams — XOR-mixing aliased nearby (seed, attempt)
+  // pairs (seed 1 and 2 could land on the same accepted candidate).
+  let h = 0x811c9dc5;
+  h = Math.imul(h ^ (seed >>> 0), 0x01000193);
+  h = Math.imul(h ^ (attempt >>> 0), 0x01000193);
+  h ^= h >>> 15;
+  h = Math.imul(h, 0x2c1b3c6d);
+  h ^= h >>> 12;
+  h = Math.imul(h, 0x297a2d39);
+  h ^= h >>> 15;
   return h >>> 0;
 }
 
@@ -314,7 +336,7 @@ export function generateDeal(seed: number, opts: GenerateOptions = {}): Deal {
     const rng = makeRng(deriveSeed(seed, attempt));
     const candidate = makeDeal(rng, caps, derived);
     if (candidate === null) continue;
-    if (exceedsDuplicateCap(candidate)) continue;
+    if (isUnbalanced(candidate)) continue;
     if (!witnessWins(candidate)) continue;
     const deal: Deal = {
       columns: candidate.columns,

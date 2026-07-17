@@ -82,6 +82,18 @@ must reward skill with discoverable long words:
 Deals failing these gates are rejected and regenerated, same as par-band
 misses.
 
+**Distribution guards (implemented — the balance fix).** Both generators
+(`scripts/generate-deals.py` and `src/generate.ts`) reject visibly-lopsided
+deals, because the player experiences the column TOPS plus the drawn stock:
+- ≤2 of any letter among the 7 visible column tops (no "p s s s");
+- 2–4 vowels among the tops (no all-vowel / all-consonant openings);
+- ≤3 of any letter in the 20-card stock (no "six o's" via the draw pile);
+- ≤5 of any letter across all 48 cards.
+Measured effect on the static pool: deals with ≥3 of a letter among the
+visible tops dropped from 10% to 0%; worst-case single-letter count 11 → 5.
+(Caveat: with a very small effective lexicon — e.g. deep E8 retirement — the
+guard may need to relax to stay generatable.)
+
 **Tableau construction** reuses the solution-first method proven by the v1
 generator (words placed so a completion always exists, one column-cell per
 word per column), ported to TypeScript with a seeded PRNG, plus the new

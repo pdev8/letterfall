@@ -81,12 +81,23 @@ describe('generateDeal — winnable by construction', () => {
 });
 
 describe('generateDeal — distribution guard', () => {
-  it('no letter appears more than 6 times across the 48 cards', () => {
+  it('is balanced: ≤2 of any letter among visible tops, 2-4 top vowels, ≤5 per deal, ≤3 per stock', () => {
+    const VOWELS = new Set('aeiou');
+    const maxCount = (s: string) => {
+      const c: Record<string, number> = {};
+      let m = 0;
+      for (const ch of s) m = Math.max(m, (c[ch] = (c[ch] ?? 0) + 1));
+      return m;
+    };
     for (const seed of [0, 1, 2, 5, 11, 42, 123, 777, 2024, 999999]) {
       const deal = generateDeal(seed);
-      const counts: Record<string, number> = {};
-      for (const ch of deal.columns.join('') + deal.stock) counts[ch] = (counts[ch] ?? 0) + 1;
-      for (const [, n] of Object.entries(counts)) expect(n).toBeLessThanOrEqual(6);
+      const tops = deal.columns.map((c) => c[c.length - 1]).join('');
+      expect(maxCount(tops)).toBeLessThanOrEqual(2);
+      const vowels = [...tops].filter((c) => VOWELS.has(c)).length;
+      expect(vowels).toBeGreaterThanOrEqual(2);
+      expect(vowels).toBeLessThanOrEqual(4);
+      expect(maxCount(deal.stock)).toBeLessThanOrEqual(3);
+      expect(maxCount(deal.columns.join('') + deal.stock)).toBeLessThanOrEqual(5);
     }
   });
 });
@@ -128,11 +139,12 @@ describe('generateDeal — board-shape parameter', () => {
 describe('generateDeal — custom lexicon', () => {
   it('draws witness words only from the supplied pool', () => {
     // A real-lexicon subset (so the reducer's play validation still passes),
-    // sized to cover every word length 3–8 the generator may request.
+    // sized to cover every word length 3–8 with enough letter variety for the
+    // balance guard (visible-tops vowel/dup limits need a broad pool).
     const all = Object.keys((lexiconJson as unknown as { words: Record<string, number> }).words);
     const pool: string[] = [];
     for (let len = 3; len <= 8; len++) {
-      pool.push(...all.filter((w) => w.length === len).slice(0, 120));
+      pool.push(...all.filter((w) => w.length === len).slice(0, 400));
     }
     const poolSet = new Set(pool);
     const deal = generateDeal(3, { lexicon: pool });

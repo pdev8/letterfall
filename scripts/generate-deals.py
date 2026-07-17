@@ -80,6 +80,25 @@ def assign_columns(counts):
     return result
 
 
+
+VOWELS = set('aeiou')
+
+def balanced(columns, stock):
+    """Reject visibly-lopsided deals. The player experiences the column TOPS
+    plus the stock; guard both so no deal feels like 'six o's'."""
+    tops = [c[-1] for c in columns]
+    from collections import Counter as _C
+    if max(_C(tops).values()) > 2:                 # <=2 of any letter among the 7 visible tops
+        return False
+    v = sum(1 for t in tops if t in VOWELS)
+    if v < 2 or v > 4:                             # 2..4 vowels among the tops
+        return False
+    if max(_C(stock).values()) > 3:               # <=3 of any letter in the 20-card stock
+        return False
+    if max(_C(''.join(columns) + stock).values()) > 5:  # <=5 of any letter across all 48 cards
+        return False
+    return True
+
 def make_deal(used_words):
     k = random.choice([7, 8, 9, 9, 10])  # solution length, like existing deals
     ls, stock_flags = pick_lengths(k)
@@ -179,6 +198,8 @@ while len(out_deals) < NUM_DEALS and attempts < 100000:
     deal, witness = res
     if not simulate(deal, witness):
         print('simulation failed for', [w['word'] for w in witness])
+        continue
+    if not balanced(deal['columns'], deal['stock']):
         continue
     out_deals.append(deal)
     out_witnesses.append(witness)

@@ -69,8 +69,8 @@ function replay(deal: Deal): GameState {
 
 // Concrete seeds located by measurement (see the 8-letter-rate report below):
 // deals whose best line reaches a ≥7-letter word, and ones reaching a ≥8.
-const SEVEN_SEEDS = [2, 3, 4, 5, 42];
-const EIGHT_SEEDS = [26, 27, 30, 40];
+const SEVEN_SEEDS = [1, 5, 6, 10, 11, 14];
+const EIGHT_SEEDS = [14, 36, 48, 123];
 
 describe('estimatePar — determinism', () => {
   it('gives the same par when the same deal is estimated twice', () => {
