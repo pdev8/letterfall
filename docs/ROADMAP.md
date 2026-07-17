@@ -244,8 +244,8 @@ The **final word of a winning deal earns 2× its wordScore** (applied inside
 `baseScore`). Simulation showed word lengths structurally fade toward
 3-letter scraps as columns empty; Encore (with dynamic bays, E7) turns the
 ending into a planned climax — hold breadth, stage a long closer — instead
-of a grind. Example: closing with PRIZED (2+1+8+10+1+2 = 24 × 2.0 = 48) banks
-96.
+of a grind. Example: closing with PRIZED (3+1+1+10+1+2 = 18 × 2.0 = 36) banks
+72.
 
 ### 4c. Player-facing presentation — no equations, ever
 
