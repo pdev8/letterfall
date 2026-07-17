@@ -11,11 +11,12 @@
    seed at play time — there is no pool to exhaust and no file of deals to
    memorize. Diversity constraints keep consecutive deals from feeling samey.
 
-2. **Every game is solvable, and score ceilings sit in a narrow band.** A win
-   is always reachable, and a *good* score is always reachable. Deals are
-   generated into a target **par band** (estimated achievable score), so the
-   spread between a lucky deal and an unlucky one stays medium-to-low. Daily
-   totals then compare skill, not deal luck.
+2. **Fair start, honest finish.** Every deal *starts* winnable — a witnessed
+   winning line exists at generation, and CI proves it forever. But the game
+   never rescues lazy play: squander the position and dead is dead, on your
+   line, not the shuffle. Skill and strategy decide the finish. Deals are
+   generated into a target **par band** (estimated achievable score), so
+   daily totals compare skill, not deal luck.
 
 3. **Difficulty rises along the way.** Within a daily set, game 1 is generous
    and game 5 is tight. Difficulty is expressed through *steering generosity*
@@ -29,14 +30,19 @@
 
 5. **The undrawn stock does not exist yet.** Future cards are not pre-written
    anywhere — the next card is computed **at draw time** as a deterministic
-   function of `(seed, move history)`. Steering guards the letter
-   distribution (no more "seven E's"), keeps the solvability invariant, and
-   defeats lookahead tooling: there is nothing stored to peek at.
+   function of `(seed, move history)`. Steering enforces **fairness, not
+   victory**: distribution guards (no "seven E's", vowel lifeline) plus a
+   **warmth curve** — the first draws of a deal are steered kinder to get the
+   game moving, tapering to neutral-within-guards by mid-game. It never
+   resurrects a lost position. And it defeats lookahead tooling: there is
+   nothing stored to peek at.
 
-6. **Guarantee, don't guide.** Solvability means *some* completion path
-   exists — the game never hints toward it, weights UI toward it, or narrows
-   play onto authored words. The possibility space stays open; players find
-   their own words.
+6. **Guarantee the deal, don't guide the play.** The witnessed line proves
+   the deal is fair; the game never hints toward it or narrows play onto
+   authored words. The solver's runtime job is **measurement, not rescue**:
+   par estimation, openness metrics, and the post-game insight
+   "a win was still possible until move N" — which also replaces the
+   dead-deal overlay's "the shuffle got you" copy (no longer true).
 
 ## How a deal is born
 
@@ -63,6 +69,18 @@ seed ──► tableau construction (28 cards, solution-first)
         internal "escape plan" recomputed as the player deviates —
         maintained only to uphold the invariant, never surfaced
 ```
+
+**Deal quality gates (added 2026-07-18).** Beyond solvability, every deal
+must reward skill with discoverable long words:
+
+- a **5-letter word must always be reachable** in ordinary play;
+- **6s and 7s must be discoverable by skilled play** — at least one line of
+  play reaches a 7-letter word (solver-verified at generation, never hinted);
+- **8s are the rarest prize**: possible on a minority of deals (target ≈10%,
+  tuned in DB-175), never guaranteed.
+
+Deals failing these gates are rejected and regenerated, same as par-band
+misses.
 
 **Tableau construction** reuses the solution-first method proven by the v1
 generator (words placed so a completion always exists, one column-cell per
