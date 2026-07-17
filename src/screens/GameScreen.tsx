@@ -32,21 +32,54 @@ import PopIn from '../components/PopIn';
 import WordChip from '../components/WordChip';
 import { existsPlayableWord, isValidWord } from '../dict';
 import { hapticFor, type FeedbackKind } from '../feedback';
-import { MAX_WORD, makeDealState, parkedCount, randomDealIndex, reducer, tableauCount } from '../game';
+import {
+  dealToState,
+  MAX_WORD,
+  makeDealState,
+  parkedCount,
+  randomDealIndex,
+  reducer,
+  tableauCount,
+} from '../game';
 import { makeRecord, recordGame, type GameRecord, type HistoryState } from '../history';
 import { recordMiss, type MissedWords } from '../missedWords';
-import { dealScore, stockEconomyMult, wordEconomyMult, wordScore } from '../scoring';
+import { dealScore, stockEconomyMult, wordEconomyMult, wordScore, type GameConfig } from '../scoring';
 import { useSettings } from '../settingsStore';
-import { recordDeal, type DealRecord, type LifetimeStats } from '../stats';
+import { recordDeal, type DealRecord, type LifetimeStats, type StatsMode } from '../stats';
 import { C } from '../theme';
-import type { TrayEntry } from '../types';
+import type { Deal, TrayEntry } from '../types';
 
 export default function GameScreen({
   // Optional with a no-op default so existing usage/tests don't break.
   onOpenSettings = () => {},
+  // Free play uses none of these; passing `deal` switches to daily mode
+  // (DB-174) — a single fixed deal, no redeal, recorded via onComplete/onExit.
+  onOpenDaily,
+  deal,
+  config,
+  statsMode = 'free',
+  dailyLabel,
+  onComplete,
+  onExit,
 }: {
   onOpenSettings?: () => void;
+  onOpenDaily?: () => void;
+  /** Daily mode: initialize the reducer from THIS deal instead of a random pool deal. */
+  deal?: Deal;
+  /** Difficulty knobs for the provided deal (daily uses rampFor(i).config). */
+  config?: GameConfig;
+  /** Which lifetime/history bucket this game records under. */
+  statsMode?: StatsMode;
+  /** Header label shown only in daily mode (e.g. "DAILY · GAME 3/5"). */
+  dailyLabel?: string;
+  /** Daily mode: fires once when the provided deal ends (win or dead deal). */
+  onComplete?: (result: { won: boolean; score: number }) => void;
+  /** Daily mode: leaves this game back to the daily screen. */
+  onExit?: () => void;
 } = {}) {
+  // Daily mode is "a deal was provided". Free play never passes one, so every
+  // daily-only branch below is dead code for the existing single-arg usage.
+  const dailyMode = deal !== undefined;
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets(); // clears the notch / Dynamic Island / home bar
   const settings = useSettings(); // live: haptics / sound / reduce-motion / config
@@ -54,9 +87,17 @@ export default function GameScreen({
   // Mirror for stable callbacks that fire haptics without re-subscribing.
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
+  // Which stats bucket to record under; read from effects/callbacks via a ref
+  // so their dependency arrays (and free-play behavior) are untouched.
+  const statsModeRef = useRef(statsMode);
+  statsModeRef.current = statsMode;
+  // Fixed at mount: daily games never resume/persist as the free game (DB-122).
+  const isDailyRef = useRef(dailyMode);
 
   const [state, dispatch] = useReducer(reducer, null, () =>
-    makeDealState(randomDealIndex(), { won: 0, played: 0, streak: 0 }),
+    deal !== undefined
+      ? dealToState(deal, config)
+      : makeDealState(randomDealIndex(), { won: 0, played: 0, streak: 0 }),
   );
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
@@ -154,7 +195,7 @@ export default function GameScreen({
       pendingDealsRef.current.push(outcome);
       return;
     }
-    lifetimeRef.current = recordDeal(lifetimeRef.current, 'free', outcome);
+    lifetimeRef.current = recordDeal(lifetimeRef.current, statsModeRef.current, outcome);
     saveStats(lifetimeRef.current).catch(() => {}); // storage never crashes the game
   }, []);
 
@@ -194,7 +235,7 @@ export default function GameScreen({
     dealStartRef.current = Date.now(); // the first deal's clock starts at mount
     loadStats().then((loaded) => {
       let s = loaded;
-      for (const o of pendingDealsRef.current) s = recordDeal(s, 'free', o);
+      for (const o of pendingDealsRef.current) s = recordDeal(s, statsModeRef.current, o);
       lifetimeRef.current = s;
       if (pendingDealsRef.current.length > 0) {
         pendingDealsRef.current = [];
@@ -222,19 +263,24 @@ export default function GameScreen({
     // Resume a killed-mid-deal game (DB-122). The board may swap a few ms
     // after first paint — acceptable. Backdating the deal clock by the saved
     // elapsed time keeps DB-121's time-played honest across the relaunch.
-    loadGame()
-      .then((saved) => {
-        if (saved !== null) {
-          dispatch({ type: 'restore', state: saved.state });
-          dealStartRef.current = Date.now() - saved.elapsedMs;
-        }
-      })
-      .catch(() => {}); // storage never crashes the game
+    // A daily game is never the resumable free game, so it never restores.
+    if (!isDailyRef.current) {
+      loadGame()
+        .then((saved) => {
+          if (saved !== null) {
+            dispatch({ type: 'restore', state: saved.state });
+            dealStartRef.current = Date.now() - saved.elapsedMs;
+          }
+        })
+        .catch(() => {}); // storage never crashes the game
+    }
   }, []);
 
   // Persist the in-progress deal on every change (DB-122). A restore dispatch
-  // re-triggers this and re-saves the same state — harmless.
+  // re-triggers this and re-saves the same state — harmless. Daily games are
+  // never the resumable free game, so they never touch this slot.
   useEffect(() => {
+    if (isDailyRef.current) return;
     if (state.won) {
       clearGame().catch(() => {}); // finished deals are never restored
     } else if (state.movesMade > 0 || state.tray.length > 0) {
@@ -258,7 +304,7 @@ export default function GameScreen({
       });
       recordHistoryGame(
         makeRecord({
-          mode: 'free',
+          mode: statsModeRef.current,
           config: state.config,
           won: true,
           durationMs,
@@ -557,7 +603,7 @@ export default function GameScreen({
       });
       recordHistoryGame(
         makeRecord({
-          mode: 'free',
+          mode: statsModeRef.current,
           config: state.config,
           won: false,
           durationMs,
@@ -570,6 +616,15 @@ export default function GameScreen({
     // The new deal picks up the player's current knobs (DB-131).
     dispatch({ type: 'redeal', config: settingsRef.current.config });
     dealStartRef.current = Date.now(); // the new deal's clock starts now
+  };
+
+  // Daily mode (DB-174): a game ends by banking its result and leaving to the
+  // daily screen. No redeal — the seed is fixed. The lifetime/history layers
+  // already recorded on the win transition (under 'challenge'); this hands the
+  // outcome to the daily set so its progress/total advance.
+  const onDailyContinue = (won: boolean, score: number) => {
+    onComplete?.({ won, score });
+    onExit?.();
   };
 
   const onShare = async () => {
@@ -593,28 +648,19 @@ export default function GameScreen({
           { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 10 },
         ]}
       >
-        {/* top bar */}
-        <View style={styles.topBar}>
-          <Text style={styles.wordmark}>DECKABET</Text>
-          <View style={styles.topBarRight}>
-            <View style={styles.statBlock}>
-              <Text style={styles.statValue}>
-                {state.stats.won}/{state.stats.played}
-              </Text>
-              <Text style={styles.statLabel}>won</Text>
-            </View>
-            <View style={styles.statBlock}>
-              <Text style={styles.statValue}>{state.stats.streak}</Text>
-              <Text style={styles.statLabel}>streak</Text>
-            </View>
+        {/* top bar — daily mode swaps the session stats + redeal for a back
+            affordance and the game label (no reshuffling a fixed daily deal) */}
+        {dailyMode ? (
+          <View style={styles.topBar}>
             <Pressable
-              onPress={onRedeal}
+              onPress={() => onExit?.()}
               hitSlop={8}
-              accessibilityLabel="Redeal"
+              accessibilityLabel="Back to daily"
               style={({ pressed }) => [styles.redealBtn, pressed && { opacity: 0.6 }]}
             >
-              <Text style={styles.redealGlyph}>↻</Text>
+              <Text style={styles.backGlyph}>‹</Text>
             </Pressable>
+            <Text style={styles.wordmark}>{dailyLabel ?? 'DAILY'}</Text>
             <Pressable
               onPress={onOpenSettings}
               hitSlop={8}
@@ -625,7 +671,50 @@ export default function GameScreen({
               <Text style={styles.redealGlyph}>{'⚙︎'}</Text>
             </Pressable>
           </View>
-        </View>
+        ) : (
+          <View style={styles.topBar}>
+            <Text style={styles.wordmark}>DECKABET</Text>
+            <View style={styles.topBarRight}>
+              <View style={styles.statBlock}>
+                <Text style={styles.statValue}>
+                  {state.stats.won}/{state.stats.played}
+                </Text>
+                <Text style={styles.statLabel}>won</Text>
+              </View>
+              <View style={styles.statBlock}>
+                <Text style={styles.statValue}>{state.stats.streak}</Text>
+                <Text style={styles.statLabel}>streak</Text>
+              </View>
+              {onOpenDaily ? (
+                <Pressable
+                  onPress={onOpenDaily}
+                  hitSlop={8}
+                  accessibilityLabel="Daily challenge"
+                  style={({ pressed }) => [styles.dailyBtn, pressed && { opacity: 0.6 }]}
+                >
+                  <Text style={styles.dailyBtnText}>DAILY</Text>
+                </Pressable>
+              ) : null}
+              <Pressable
+                onPress={onRedeal}
+                hitSlop={8}
+                accessibilityLabel="Redeal"
+                style={({ pressed }) => [styles.redealBtn, pressed && { opacity: 0.6 }]}
+              >
+                <Text style={styles.redealGlyph}>↻</Text>
+              </Pressable>
+              <Pressable
+                onPress={onOpenSettings}
+                hitSlop={8}
+                accessibilityLabel="Settings"
+                style={({ pressed }) => [styles.redealBtn, pressed && { opacity: 0.6 }]}
+              >
+                {/* U+FE0E keeps the gear a text glyph, not an emoji */}
+                <Text style={styles.redealGlyph}>{'⚙︎'}</Text>
+              </Pressable>
+            </View>
+          </View>
+        )}
         {/* stock / reserve / foundation */}
         <View style={[styles.pilesRow, draggingReserve && styles.pilesRowDragging]}>
           <Animated.View style={{ transform: [{ translateX: stockShakeX }] }}>
@@ -927,8 +1016,17 @@ export default function GameScreen({
           <Text style={styles.overlayStat}>
             {state.played.length} words · best {bestWord.toUpperCase()}
           </Text>
-          <BigButton label="SHARE" onPress={onShare} />
-          <BigButton label="NEXT DEAL" kind="ghost" onPress={onRedeal} />
+          {dailyMode ? (
+            <>
+              <BigButton label="CONTINUE" onPress={() => onDailyContinue(true, wonScore)} />
+              <BigButton label="SHARE" kind="ghost" onPress={onShare} />
+            </>
+          ) : (
+            <>
+              <BigButton label="SHARE" onPress={onShare} />
+              <BigButton label="NEXT DEAL" kind="ghost" onPress={onRedeal} />
+            </>
+          )}
         </Overlay>
       )}
 
@@ -938,10 +1036,15 @@ export default function GameScreen({
           <Text style={styles.overlayTitle}>DEAD DEAL</Text>
           <View style={styles.overlayRule} />
           <Text style={styles.overlayBody}>
-            The shuffle got you — no word left in these letters. This line ran out; the next deal is
-            a fresh one, and every deal has a winning path.
+            {dailyMode
+              ? 'The line ran out — no word left in these letters. This daily game is done; your other games are still waiting.'
+              : 'The shuffle got you — no word left in these letters. This line ran out; the next deal is a fresh one, and every deal has a winning path.'}
           </Text>
-          <BigButton label="REDEAL" onPress={onRedeal} />
+          {dailyMode ? (
+            <BigButton label="CONTINUE" onPress={() => onDailyContinue(false, 0)} />
+          ) : (
+            <BigButton label="REDEAL" onPress={onRedeal} />
+          )}
         </Overlay>
       )}
     </View>
@@ -1002,6 +1105,30 @@ const styles = StyleSheet.create({
     color: C.ink,
     fontSize: 18,
     lineHeight: 22,
+  },
+  // Back chevron for the daily-mode top bar (mirrors SettingsScreen).
+  backGlyph: {
+    color: C.ink,
+    fontSize: 24,
+    lineHeight: 26,
+    marginTop: -2,
+  },
+  // DAILY entry pill, sits left of the gear in free play.
+  dailyBtn: {
+    height: 40,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: C.accentDim,
+    backgroundColor: C.accentFaint,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dailyBtnText: {
+    color: C.accent,
+    fontSize: 12,
+    fontWeight: '800',
+    letterSpacing: 1.5,
   },
   // stock / reserve / foundation row
   pilesRow: {

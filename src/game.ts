@@ -1,8 +1,47 @@
 import { deals, isValidWord } from './dict';
 import { DEFAULT_CONFIG, sanitizeConfig, type GameConfig } from './scoring';
-import type { Action, ColumnCard, GameState, SessionStats } from './types';
+import type { Action, ColumnCard, Deal, GameState, SessionStats } from './types';
 
 export const MAX_WORD = 8;
+
+const FRESH_STATS: SessionStats = { won: 0, played: 0, streak: 0 };
+
+/**
+ * Builds a fresh GameState from a concrete `Deal` (DB-174 daily mode), instead
+ * of an index into the static pool. Mirrors makeDealState's column/stock
+ * construction — columns are native (fromStock:false), the stock is the deal's
+ * draw order, `config` fixes the difficulty knobs, all counters start at zero.
+ * `dealIndex` is -1: a provided deal has no place in the pool (redeal never
+ * runs in daily mode, so the index is only a render key here).
+ */
+export function dealToState(
+  deal: Deal,
+  config: GameConfig = DEFAULT_CONFIG,
+  stats: SessionStats = FRESH_STATS,
+): GameState {
+  const cfg = sanitizeConfig(config);
+  return {
+    dealIndex: -1,
+    config: cfg,
+    columns: deal.columns.map((c) =>
+      c
+        .toLowerCase()
+        .split('')
+        .map((letter) => ({ letter, fromStock: false })),
+    ),
+    stock: deal.stock.toLowerCase().split(''),
+    reserve: [],
+    recyclesLeft: cfg.recycles,
+    tray: [],
+    played: [],
+    movesMade: 0,
+    reserveLettersPlayed: 0,
+    parksUsed: 0,
+    recyclesUsed: 0,
+    won: false,
+    stats,
+  };
+}
 
 /**
  * Builds a fresh deal. `config` (DB-131) fixes this deal's difficulty knobs:
