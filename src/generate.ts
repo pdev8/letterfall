@@ -19,6 +19,7 @@
 
 import lexiconJson from '../assets/lexicon.json';
 import { reducer } from './game';
+import { estimatePar, inParBand, meetsWordLengthGate } from './par';
 import { makeRng, type Rng } from './rng';
 import { DEFAULT_CONFIG } from './scoring';
 import type { Deal, GameState } from './types';
@@ -44,6 +45,13 @@ export interface GenerateOptions {
   lexicon?: string[];
   /** Board shape: 7 column heights (each ≥1) summing to 28. Defaults to the [1..7] staircase. */
   heights?: number[];
+  /** DB-175: also reject candidates whose estimated par falls outside PAR_BAND
+   * (keeps daily totals about skill, not deal luck). Default false — off by
+   * default so existing generation behaviour and tests are unchanged. */
+  requireParBand?: boolean;
+  /** DB-175: also reject candidates whose best line reaches no ≥7-letter word
+   * (the "a 7 discoverable by skill" quality gate). Default false. */
+  requireSevenGate?: boolean;
 }
 
 interface Derived {
@@ -308,13 +316,19 @@ export function generateDeal(seed: number, opts: GenerateOptions = {}): Deal {
     if (candidate === null) continue;
     if (exceedsDuplicateCap(candidate)) continue;
     if (!witnessWins(candidate)) continue;
-    return {
+    const deal: Deal = {
       columns: candidate.columns,
       stock: candidate.stock,
       label: candidate.label,
       solverWords: candidate.solverWords,
       witness: candidate.witness,
     };
+    // DB-175 quality gates (opt-in; both default off so baseline generation is
+    // untouched). The par search is deterministic, so the accept loop stays
+    // reproducible: same seed ⇒ same accepted deal.
+    if (opts.requireParBand && !inParBand(estimatePar(deal).par)) continue;
+    if (opts.requireSevenGate && !meetsWordLengthGate(deal)) continue;
+    return deal;
   }
   throw new Error(`generateDeal: exhausted ${MAX_ATTEMPTS} attempts for seed ${seed}`);
 }
