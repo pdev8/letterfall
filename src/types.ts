@@ -7,6 +7,8 @@ export interface Deal {
   stock: string;
   label: string; // "smooth" | "tight"
   solverWords: number;
+  /** Generation-time winning line: for each word, per-letter sources (column index or reserve). */
+  witness: { word: string; sources: (number | 'reserve')[] }[];
 }
 
 export interface Seeds {
