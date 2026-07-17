@@ -25,19 +25,46 @@ function sortKey(word: string): string {
 }
 
 /**
- * sorted-letters -> true for every lexicon word (3-8 letters).
- * Built once at module scope; used for dead-deal detection.
+ * sorted-letters -> the lexicon words (3-8 letters) with exactly those letters.
+ * Built once at module scope. Powers dead-deal detection (`existsPlayableWord`),
+ * the DB-171 solver's play enumeration (`isWordFromLetters`), and openness
+ * counting (`wordsFromLetters`).
  */
-const anagramKeys: Map<string, true> = (() => {
-  const m = new Map<string, true>();
+const wordsByKey: Map<string, string[]> = (() => {
+  const m = new Map<string, string[]>();
   for (const w of lexiconSet) {
-    if (w.length >= 3 && w.length <= 8) m.set(sortKey(w), true);
+    if (w.length >= 3 && w.length <= 8) {
+      const key = sortKey(w);
+      const bucket = m.get(key);
+      if (bucket) bucket.push(w);
+      else m.set(key, [w]);
+    }
   }
   return m;
 })();
 
 export function isValidWord(word: string): boolean {
   return word.length >= 3 && word.length <= 8 && lexiconSet.has(word.toLowerCase());
+}
+
+/**
+ * True if the EXACT multiset `letters` (3-8) is an anagram of some lexicon word.
+ * Used by the solver to test whether a chosen set of source cards forms a word.
+ */
+export function isWordFromLetters(letters: string[]): boolean {
+  const n = letters.length;
+  if (n < 3 || n > 8) return false;
+  return wordsByKey.has([...letters].sort().join(''));
+}
+
+/**
+ * Every lexicon word that is an exact anagram of `letters` (empty if none, or if
+ * the length is outside 3-8). Used by `openness` to count distinct playable words.
+ */
+export function wordsFromLetters(letters: string[]): string[] {
+  const n = letters.length;
+  if (n < 3 || n > 8) return [];
+  return wordsByKey.get([...letters].sort().join('')) ?? [];
 }
 
 /**
@@ -57,7 +84,7 @@ export function existsPlayableWord(letters: string[]): boolean {
       if (mask & (1 << i)) picked.push(letters[i]);
     }
     picked.sort();
-    if (anagramKeys.has(picked.join(''))) return true;
+    if (wordsByKey.has(picked.join(''))) return true;
   }
   return false;
 }
