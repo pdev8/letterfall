@@ -30,7 +30,13 @@ ship a change that can break it.
   behavior change without a test that would catch its regression. (Until
   LF-100 lands Jest, attach `npx tsx` test-script evidence to the PR.)
 - Branches: `lf-<ticket>/<slug>` for roadmap tickets, `docs/<slug>` for
-  doc-only changes. Ticket ID in the PR title.
+  doc-only changes.
+- **PR titles encode merge order:** `[<n>. <scope>] <title>`, where `n` is a
+  global, monotonically increasing merge-order number (merge PRs in ascending
+  `n`; never reuse a number) and scope is the epic (`E0`…`E9`) or `docs`.
+  Ticket PRs include the ticket ID after the prefix
+  (`[5. E0] LF-100: Jest test suite`). Stacked PRs append `(after #N)` and
+  set their GitHub base to the PR they depend on.
 - `docs/ROADMAP.md` is the canonical plan (epics LF-1xx tickets + specs for
   scoring, difficulty, leaderboards, achievements). `docs/GENERATION.md` is
   the canonical core-game design ("Living Deck"). If code and docs disagree,
