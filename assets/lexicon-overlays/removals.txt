@@ -3,3 +3,18 @@
 # Case-by-case removals decided by us, distinct from the vendored
 # exclusions.txt (LDNOOBW) list. Words listed here are dropped from the
 # built lexicon by scripts/build-lexicon.py.
+# Slurs present in ENABLE but missed by the LDNOOBW overlay (found in DB-202 review)
+lez
+lezzes
+yid
+yids
+kike
+kikes
+spic
+spics
+wop
+wops
+dago
+dagos
+gyp
+gypped

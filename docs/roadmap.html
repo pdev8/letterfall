@@ -173,9 +173,9 @@
     <div class="statrow">
       <div class="stat"><div class="v green">✓</div><div class="k">core loop playable</div></div>
       <div class="stat"><div class="v green">✓</div><div class="k">design specced</div></div>
-      <div class="stat"><div class="v">17 / 52</div><div class="k">tickets shipped</div></div>
-      <div class="stat"><div class="v orange">DB-201</div><div class="k">in review</div></div>
-      <div class="stat"><div class="v">27 + 2</div><div class="k">PRs merged + open</div></div>
+      <div class="stat"><div class="v">19 / 52</div><div class="k">tickets shipped</div></div>
+      <div class="stat"><div class="v orange">DB-202</div><div class="k">in review</div></div>
+      <div class="stat"><div class="v">31 + 1</div><div class="k">PRs merged + open</div></div>
     </div>
   </header>
 
@@ -322,20 +322,20 @@
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-201</span><span class="t-name">Lexicon build pipeline <span class="t-note">(PR #29 — 80,157 words, tiered)</span></span><span class="t-size">M</span><span class="st open">in review</span></summary>
+        <summary class="trow"><span class="t-id">DB-201</span><span class="t-name">Lexicon build pipeline <span class="t-note">(PR #29 — 80,157 words, tiered)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>A repeatable build script that turns the raw dictionary into the game's word list: 3–8 letter words, an offensive-word policy applied, and each word tagged with how common it is (that commonality data later feeds difficulty steering and word retirement). Result: 80,157 words — about 7× today's list.</p>
           <p><a href="https://github.com/pdev8/deckabet/pull/29">PR #29</a></p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-202</span><span class="t-name">Regenerate deals + witnesses on the new lexicon</span><span class="t-size">S</span><span class="st next">next</span></summary>
+        <summary class="trow"><span class="t-id">DB-202</span><span class="t-name">Regenerate deals + witnesses on the new lexicon <span class="t-note">(PR #32 — 80k live)</span></span><span class="t-size">S</span><span class="st open">in review</span></summary>
         <div class="t-body">
           <p>Rebuild the shipped deals and their witness solutions against the new, much bigger dictionary, and re-verify every deal still starts winnable. This is the moment players actually feel the dictionary upgrade: far fewer "that's a real word!" rejections.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-203</span><span class="t-name">Missed-word feedback loop</span><span class="t-size">S</span><span class="st todo">todo</span></summary>
+        <summary class="trow"><span class="t-id">DB-203</span><span class="t-name">Missed-word feedback loop</span><span class="t-size">S</span><span class="st next">next</span></summary>
         <div class="t-body">
           <p>When you try a legitimate-looking word the game rejects, it gets logged on the device so we can spot dictionary gaps and add missing words over time — instead of silently frustrating players.</p>
         </div>

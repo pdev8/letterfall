@@ -12,7 +12,6 @@ export interface Deal {
 }
 
 export interface Seeds {
-  lexicon: string[];
   deals: Deal[];
 }
 

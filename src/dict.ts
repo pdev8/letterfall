@@ -1,13 +1,24 @@
+import lexiconJson from '../assets/lexicon.json';
 import seedsJson from '../assets/seeds.json';
 import type { Deal, Seeds } from './types';
 
 // Cast through unknown so we depend on the schema, not the literal JSON type.
 const seeds = seedsJson as unknown as Seeds;
+const lexicon = lexiconJson as unknown as { words: Record<string, number> };
 
 export const deals: Deal[] = seeds.deals;
 
-/** Exact-word lookup for PLAY validation. */
-export const lexiconSet: Set<string> = new Set(seeds.lexicon.map((w) => w.toLowerCase()));
+/** Exact-word lookup for PLAY validation. Lexicon words are lowercase 3-8 letters. */
+export const lexiconSet: Set<string> = new Set(Object.keys(lexicon.words));
+
+/**
+ * Frequency tier for a lexicon word: 1 (top-5k) .. 4 (in count list),
+ * 5 = rare (absent from the count list) — also returned for non-words.
+ * Consumed by E7 steering/openness and the E8 retirement ladder.
+ */
+export function wordTier(word: string): number {
+  return lexicon.words[word.toLowerCase()] ?? 5;
+}
 
 function sortKey(word: string): string {
   return word.split('').sort().join('');
@@ -19,8 +30,7 @@ function sortKey(word: string): string {
  */
 const anagramKeys: Map<string, true> = (() => {
   const m = new Map<string, true>();
-  for (const raw of seeds.lexicon) {
-    const w = raw.toLowerCase();
+  for (const w of lexiconSet) {
     if (w.length >= 3 && w.length <= 8) m.set(sortKey(w), true);
   }
   return m;

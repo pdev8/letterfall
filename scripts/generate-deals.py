@@ -16,8 +16,8 @@ import json
 import random
 from collections import Counter
 
-SEEDS = 'assets/seeds.json'
-OUT = SEEDS
+LEXICON = 'assets/lexicon.json'
+OUT = 'assets/seeds.json'
 
 COL_CAPS = [1, 2, 3, 4, 5, 6, 7]  # column c holds exactly c+1 cards, 28 total
 STOCK_LEN = 20
@@ -30,8 +30,9 @@ NUM_DEALS = _args.count
 
 random.seed(_args.seed)
 
-data = json.load(open(SEEDS))
-lexicon = [w.lower() for w in data['lexicon']]
+# Lexicon words are the keys of lexicon.json's words map (word -> tier),
+# already lowercase 3-8 letters (built by scripts/build-lexicon.py, DB-201).
+lexicon = list(json.load(open(LEXICON))['words'].keys())
 lexset = set(lexicon)
 by_len = {}
 for w in lexicon:
@@ -189,5 +190,5 @@ for i, (d, wit) in enumerate(zip(out_deals, out_witnesses)):
           f"stock-used={sum(1 for s in wit if 'reserve' in s['sources'])} "
           f"words={'/'.join(s['word'] for s in wit)}")
 
-json.dump({'lexicon': data['lexicon'], 'deals': out_deals}, open(OUT, 'w'), separators=(',', ':'))
+json.dump({'deals': out_deals}, open(OUT, 'w'), separators=(',', ':'))
 print('wrote', OUT, 'with', len(out_deals), 'witnessed deals')

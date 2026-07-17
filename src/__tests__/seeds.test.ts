@@ -1,20 +1,14 @@
 import seedsJson from '../../assets/seeds.json';
+import { isValidWord, wordTier } from '../dict';
 import { reducer } from '../game';
-import type { GameState , Seeds } from '../types';
-import { isValidWord } from '../dict';
+import type { GameState, Seeds } from '../types';
 
 const seeds = seedsJson as unknown as Seeds;
 
 describe('seeds.json schema', () => {
-  it('has a substantial lexicon of lowercase words', () => {
-    expect(seeds.lexicon.length).toBeGreaterThan(10000);
-    for (const w of seeds.lexicon) {
-      expect(w).toMatch(/^[a-z]+$/);
-    }
-  });
-
-  it('has deals', () => {
+  it('has deals and nothing else (lexicon moved to assets/lexicon.json in DB-202)', () => {
     expect(seeds.deals.length).toBeGreaterThan(0);
+    expect(Object.keys(seedsJson as object)).toEqual(['deals']);
   });
 
   it('every deal has the klondike shape: 7 columns, heights 1..7, 28 cards, 20 stock', () => {
@@ -28,14 +22,35 @@ describe('seeds.json schema', () => {
       expect(deal.solverWords).toBeLessThanOrEqual(12);
     }
   });
+
+  it('every witness word is a valid lexicon word', () => {
+    for (const deal of seeds.deals) {
+      for (const step of deal.witness) {
+        expect(isValidWord(step.word)).toBe(true);
+      }
+    }
+  });
 });
 
 describe('lexicon lookups', () => {
   it('validates only 3-8 letter lexicon words', () => {
-    expect(isValidWord(seeds.lexicon.find((w) => w.length === 3)!)).toBe(true);
+    expect(isValidWord('quiz')).toBe(true);
+    expect(isValidWord('cat')).toBe(true);
+    expect(isValidWord('QUIZ')).toBe(true); // case-insensitive
     expect(isValidWord('zzzzz')).toBe(false);
     expect(isValidWord('at')).toBe(false); // too short even if a word
     expect(isValidWord('')).toBe(false);
+  });
+
+  it('wordTier returns the frequency tier, 5 for rare or absent words', () => {
+    expect(wordTier('the')).toBe(1);
+    expect(wordTier('cat')).toBeLessThanOrEqual(2);
+    expect(wordTier('CAT')).toBe(wordTier('cat')); // case-insensitive
+    expect(wordTier('zzzzz')).toBe(5); // not a word -> rare fallback
+    for (const w of ['the', 'quiz', 'aaliis']) {
+      expect(wordTier(w)).toBeGreaterThanOrEqual(1);
+      expect(wordTier(w)).toBeLessThanOrEqual(5);
+    }
   });
 });
 

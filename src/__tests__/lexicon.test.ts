@@ -2,8 +2,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import lexiconJson from '../../assets/lexicon.json';
-import seedsJson from '../../assets/seeds.json';
-import type { Seeds } from '../types';
 
 // Cast through unknown so we depend on the schema, not the literal JSON type.
 const lexicon = lexiconJson as unknown as {
@@ -12,7 +10,6 @@ const lexicon = lexiconJson as unknown as {
   tiers: Record<string, string>;
   words: Record<string, number>;
 };
-const seeds = seedsJson as unknown as Seeds;
 
 const words = lexicon.words;
 const entries = Object.entries(words);
@@ -73,18 +70,5 @@ describe('lexicon.json contents', () => {
   it('common words are common', () => {
     expect(words['the']).toBe(1);
     expect(words['cat']).toBeLessThanOrEqual(2);
-  });
-
-  it('reports the old-lexicon coverage gap (dropped at DB-202)', () => {
-    // Not asserted: these are the old seed-lexicon words absent from the new
-    // lexicon (profanity our exclusion overlay removes, plus any ENABLE
-    // misses). Witnesses get regenerated on the new lexicon in DB-202.
-    const missing = seeds.lexicon.filter((w) => words[w.toLowerCase()] === undefined);
-    console.log(
-      `old seed lexicon: ${seeds.lexicon.length} words, ` +
-        `${missing.length} missing from the new lexicon:`,
-      missing.join(' '),
-    );
-    expect(missing.length).toBeLessThan(seeds.lexicon.length); // trivially true; gap is reported, not gated
   });
 });
