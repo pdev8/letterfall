@@ -1,6 +1,7 @@
 import seedsJson from '../../assets/seeds.json';
+import { reducer } from '../game';
+import type { GameState , Seeds } from '../types';
 import { isValidWord } from '../dict';
-import type { Seeds } from '../types';
 
 const seeds = seedsJson as unknown as Seeds;
 
@@ -35,5 +36,41 @@ describe('lexicon lookups', () => {
     expect(isValidWord('zzzzz')).toBe(false);
     expect(isValidWord('at')).toBe(false); // too short even if a word
     expect(isValidWord('')).toBe(false);
+  });
+});
+
+describe('witness replay — every deal winnable promise', () => {
+  it('replays every stored witness through the real reducer to a win', () => {
+    seeds.deals.forEach((deal, di) => {
+      let s: GameState = {
+        dealIndex: di,
+        columns: deal.columns.map((c) => c.split('').map((letter) => ({ letter, fromStock: false }))),
+        stock: deal.stock.split(''),
+        reserve: [],
+        recyclesLeft: 2,
+        tray: [],
+        played: [],
+        movesMade: 0,
+        reserveLettersPlayed: 0,
+        parksUsed: 0,
+        recyclesUsed: 0,
+        won: false,
+        stats: { won: 0, played: 0, streak: 0 },
+      };
+      expect(deal.witness.length).toBeGreaterThan(0);
+      for (const step of deal.witness) {
+        if (step.sources.includes('reserve')) s = reducer(s, { type: 'draw' });
+        for (const src of step.sources) {
+          s =
+            src === 'reserve'
+              ? reducer(s, { type: 'tapReserve' })
+              : reducer(s, { type: 'tapColumn', col: src });
+        }
+        const before = s.played.length;
+        s = reducer(s, { type: 'play' });
+        expect(s.played.length).toBe(before + 1);
+      }
+      expect(s.won).toBe(true);
+    });
   });
 });
