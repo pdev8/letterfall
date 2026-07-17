@@ -7,7 +7,8 @@ export const RECYCLES_PER_DEAL = 2;
 export const PARK_COLS = 3;
 
 export function makeDealState(dealIndex: number, stats: SessionStats): GameState {
-  const safeIndex = deals.length > 0 ? ((dealIndex % deals.length) + deals.length) % deals.length : 0;
+  const safeIndex =
+    deals.length > 0 ? ((dealIndex % deals.length) + deals.length) % deals.length : 0;
   const deal = deals[safeIndex];
   return {
     dealIndex: safeIndex,

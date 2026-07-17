@@ -7,9 +7,7 @@ const seeds = seedsJson as unknown as Seeds;
 export const deals: Deal[] = seeds.deals;
 
 /** Exact-word lookup for PLAY validation. */
-export const lexiconSet: Set<string> = new Set(
-  seeds.lexicon.map((w) => w.toLowerCase()),
-);
+export const lexiconSet: Set<string> = new Set(seeds.lexicon.map((w) => w.toLowerCase()));
 
 function sortKey(word: string): string {
   return word.split('').sort().join('');
