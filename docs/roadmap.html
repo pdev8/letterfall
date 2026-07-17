@@ -173,9 +173,9 @@
     <div class="statrow">
       <div class="stat"><div class="v green">✓</div><div class="k">core loop playable</div></div>
       <div class="stat"><div class="v green">✓</div><div class="k">design specced</div></div>
-      <div class="stat"><div class="v">31 / 57</div><div class="k">tickets shipped</div></div>
-      <div class="stat"><div class="v">0</div><div class="k">in review</div></div>
-      <div class="stat"><div class="v">53 + 0</div><div class="k">PRs merged + open</div></div>
+      <div class="stat"><div class="v">31 / 58</div><div class="k">tickets shipped</div></div>
+      <div class="stat"><div class="v orange">DB-179</div><div class="k">in review</div></div>
+      <div class="stat"><div class="v">56 + 1</div><div class="k">PRs merged + open</div></div>
     </div>
   </header>
 
@@ -379,9 +379,15 @@
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-177</span><span class="t-name">Dynamic bays — park on any empty column, max 3 parked <span class="t-note">(PR #40 — cap = parkBays knob)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">DB-177</span><span class="t-name">Dynamic bays — park on any empty column, max 3 parked <span class="t-note">(PR #40 — superseded by DB-179)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
         <div class="t-body">
-          <p>A rule change proven in simulation: park the reserve card on any empty column (with at most 3 parked cards on the board) instead of only the left three bays. It kills the trap where clearing the left side first felt smart but quietly wrecked your endgame, and it lets you stage a long closing word by parking into emptied columns.</p>
+          <p>A rule change proven in simulation: park the reserve card on any empty column (with at most 3 parked cards on the board) instead of only the left three bays. It kills the trap where clearing the left side first felt smart but quietly wrecked your endgame, and it lets you stage a long closing word by parking into emptied columns. <em>Superseded by DB-179 (designated random bays).</em></p>
+        </div>
+      </details>
+      <details class="trow-d">
+        <summary class="trow"><span class="t-id">DB-179</span><span class="t-name">Designated park bays — 3 random marked columns, cleared to unlock <span class="t-note">(supersedes DB-177)</span></span><span class="t-size">S</span><span class="st open">in review</span></summary>
+        <div class="t-body">
+          <p>Not every empty column is a park spot anymore. Each deal designates a few random columns as park bays, marked with an indicator on the board. You can only park the reserve card onto one of those columns, and only after you've cleared it — so the marks tell you which columns to prioritize clearing to open up parking space. The number of bays is the difficulty knob (fewer on harder deals). Every deal is still winnable without parking at all, so this never strands a deal.</p>
         </div>
       </details>
       <details class="trow-d">
@@ -694,6 +700,10 @@
       <div class="pr"><span class="p-id">#51</span><span>[51. E7] DB-178: opening reroll</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
       <div class="pr"><span class="p-id">#52</span><span>[52. E7] DB-178: reroll cards come in green (required)</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
       <div class="pr"><span class="p-id">#53</span><span>[53. fix] face-down cards render as full card backs</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#54</span><span>[54. docs] tracker reconcile (#52 + #53)</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#55</span><span>[55. fix] reserve card stays on top through its snap-back</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#56</span><span>[56. fix] no park-flash of the consumed reserve card</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#57</span><span>[57. E7] DB-179: designated park bays</span><span style="margin-left:auto"><span class="st open">in review</span></span></div>
       </div>
   </section>
 

@@ -54,6 +54,14 @@ describe('dealToState', () => {
     expect(s.recyclesLeft).toBe(DEFAULT_CONFIG.recycles);
   });
 
+  it('designates parkBays distinct in-range bays, deterministically per deal (DB-179)', () => {
+    const s = dealToState(DEAL);
+    expect(s.bays).toHaveLength(DEFAULT_CONFIG.parkBays);
+    expect(new Set(s.bays).size).toBe(s.bays.length);
+    expect(s.bays.every((b) => Number.isInteger(b) && b >= 0 && b < 7)).toBe(true);
+    expect(dealToState(DEAL).bays).toEqual(s.bays); // same deal → same bays
+  });
+
   it('honors a provided config and sanitizes out-of-range knobs', () => {
     const s = dealToState(DEAL, { recycles: 0, parkBays: 1 });
     expect(s.config).toEqual({ recycles: 0, parkBays: 1 });

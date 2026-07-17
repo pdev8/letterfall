@@ -60,6 +60,7 @@ describe('witness replay — every deal winnable promise', () => {
       let s: GameState = {
         dealIndex: di,
         config: { recycles: 2, parkBays: 3 },
+        bays: [],
         columns: deal.columns.map((c) => c.split('').map((letter) => ({ letter, fromStock: false }))),
         stock: deal.stock.split(''),
         reserve: [],

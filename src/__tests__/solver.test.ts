@@ -22,6 +22,7 @@ function state(opts: {
   return {
     dealIndex: 0,
     config: { recycles: 2, parkBays: opts.parkBays ?? 3 },
+    bays: [],
     columns,
     stock: opts.stock ?? [],
     reserve: opts.reserve ?? [],
@@ -43,6 +44,7 @@ function stateFromDeal(deal: Deal): GameState {
   return {
     dealIndex: 0,
     config: { recycles: 2, parkBays: 3 },
+    bays: [],
     columns: deal.columns.map((c) => c.split('').map((letter) => ({ letter, fromStock: false }))),
     stock: deal.stock.split(''),
     reserve: [],

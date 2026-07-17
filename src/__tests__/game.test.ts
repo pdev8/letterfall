@@ -2,6 +2,7 @@ import {
   MAX_WORD,
   makeDealState,
   parkedCount,
+  pickBays,
   randomDealIndex,
   reducer,
   sanitizeGameState,
@@ -15,11 +16,13 @@ const RECYCLES_PER_DEAL = DEFAULT_CONFIG.recycles; // 2 — default knob value
 
 const card = (letter: string, fromStock = false): ColumnCard => ({ letter, fromStock });
 
-/** Hand-built state: "cat" spellable on cols 4-6, park bays (0-2) empty,
- *  col 3 empty but NOT a bay, reserve holds two cards ('q' on top). */
+/** Hand-built state: "cat" spellable on cols 4-6; cols 0-3 empty; designated
+ *  park bays are cols 0,1,3 (col 2 is empty but NOT a bay, DB-179); reserve
+ *  holds two cards ('q' on top). */
 function base(overrides: Partial<GameState> = {}): GameState {
   return {
     ...makeDealState(0, { won: 0, played: 0, streak: 0 }),
+    bays: [0, 1, 3],
     columns: [[], [], [], [], [card('c')], [card('a')], [card('t')]],
     stock: [],
     reserve: ['x', 'q'],
@@ -53,31 +56,49 @@ describe('makeDealState', () => {
   });
 });
 
-describe('dynamic park bays — parkBays is a max-parked cap (DB-177)', () => {
-  it('a 1-bay deal parks onto any empty column but refuses a second park (cap)', () => {
-    const oneBay = base({ config: { recycles: 2, parkBays: 1 }, reserve: ['y', 'x', 'q'] });
-    const parked = reducer(oneBay, { type: 'parkReserve', col: 2 }); // any empty column
-    expect(parked.columns[2]).toEqual([{ letter: 'q', fromStock: true }]);
-    // Cap reached: a second park is refused on any empty column.
-    expect(reducer(parked, { type: 'parkReserve', col: 0 })).toBe(parked);
+describe('designated park bays (DB-179)', () => {
+  it('makeDealState marks config.parkBays distinct in-range columns, sorted', () => {
+    for (const parkBays of [1, 2, 3]) {
+      const s = makeDealState(0, { won: 0, played: 0, streak: 0 }, { recycles: 2, parkBays });
+      expect(s.bays).toHaveLength(parkBays);
+      expect(new Set(s.bays).size).toBe(parkBays); // distinct
+      expect(s.bays.every((b) => Number.isInteger(b) && b >= 0 && b < 7)).toBe(true);
+      expect([...s.bays].sort((a, b) => a - b)).toEqual(s.bays); // sorted
+    }
   });
 
-  it('a 3-bay deal allows up to three parked cards across any empty columns', () => {
-    let s = base({ config: { recycles: 2, parkBays: 3 }, reserve: ['w', 'z', 'y', 'q'] });
-    s = reducer(s, { type: 'parkReserve', col: 0 });
-    s = reducer(s, { type: 'parkReserve', col: 1 });
-    s = reducer(s, { type: 'parkReserve', col: 3 });
-    expect(parkedCount(s.columns)).toBe(3);
-    // Fourth park refused at the cap even though col 2 is still empty.
+  it('picks the same bays every time for a given deal (deterministic)', () => {
+    const a = makeDealState(5, { won: 0, played: 0, streak: 0 });
+    const b = makeDealState(5, { won: 0, played: 0, streak: 0 });
+    expect(a.bays).toEqual(b.bays);
+  });
+
+  it('parks only onto an emptied bay, not just any empty column', () => {
+    const s = base(); // bays [0,1,3]; cols 0-3 empty, col 2 empty but not a bay
+    const onBay = reducer(s, { type: 'parkReserve', col: 1 });
+    expect(onBay.columns[1]).toEqual([{ letter: 'q', fromStock: true }]);
+    // col 2 is empty but NOT a designated bay — refused.
     expect(reducer(s, { type: 'parkReserve', col: 2 })).toBe(s);
+  });
+
+  it('fills one bay per empty bay — occupied bays and native columns are refused', () => {
+    let s = base({ reserve: ['w', 'z', 'q'] }); // bays [0,1,3]
+    s = reducer(s, { type: 'parkReserve', col: 0 });
+    s = reducer(s, { type: 'parkReserve', col: 3 });
+    expect(parkedCount(s.columns)).toBe(2);
+    // Bay 0 now occupied — refused; a native column (4) is never a bay.
+    expect(reducer(s, { type: 'parkReserve', col: 0 })).toBe(s);
+    expect(reducer(s, { type: 'parkReserve', col: 4 })).toBe(s);
+    // Bay 1 still open.
+    const s2 = reducer(s, { type: 'parkReserve', col: 1 });
+    expect(parkedCount(s2.columns)).toBe(3);
   });
 
   it('redeal carries the action config forward, falling back to the deal config', () => {
     const s = base({ movesMade: 1 });
-    expect(reducer(s, { type: 'redeal', config: { recycles: 0, parkBays: 1 } }).config).toEqual({
-      recycles: 0,
-      parkBays: 1,
-    });
+    const hard = reducer(s, { type: 'redeal', config: { recycles: 0, parkBays: 1 } });
+    expect(hard.config).toEqual({ recycles: 0, parkBays: 1 });
+    expect(hard.bays).toHaveLength(1); // new deal re-designates bays for the knob
     expect(reducer(s, { type: 'redeal' }).config).toEqual(s.config); // fallback
   });
 });
@@ -176,15 +197,16 @@ describe('parkReserve', () => {
     expect(next.movesMade).toBe(base().movesMade + 1);
   });
 
-  it('parks onto ANY empty column, not just the first few (DB-177)', () => {
-    const s = base(); // cols 0-3 empty, 4-6 native
+  it('parks onto any designated bay, not just the first (DB-179)', () => {
+    const s = base(); // bays [0,1,3]
     const next = reducer(s, { type: 'parkReserve', col: 3 });
     expect(next.columns[3]).toEqual([{ letter: 'q', fromStock: true }]);
   });
 
-  it('refuses occupied columns and empty reserve', () => {
+  it('refuses non-bay columns, occupied bays, and empty reserve', () => {
     const s = base();
     expect(reducer(s, { type: 'parkReserve', col: 4 })).toBe(s); // native card there
+    expect(reducer(s, { type: 'parkReserve', col: 2 })).toBe(s); // empty but not a bay
     const parked = reducer(s, { type: 'parkReserve', col: 0 });
     expect(reducer(parked, { type: 'parkReserve', col: 0 })).toBe(parked); // now occupied
     const dry = base({ reserve: [] });
@@ -561,6 +583,20 @@ describe('sanitizeGameState (DB-122 resume guard)', () => {
     const out = sanitizeGameState(legacy);
     expect(out).not.toBeNull();
     expect(out?.rerollsUsed).toBe(0);
+  });
+
+  it('derives missing bays for pre-DB-179 snapshots (from the deal index)', () => {
+    const { bays: _drop, ...legacy } = base();
+    const out = sanitizeGameState(legacy);
+    expect(out).not.toBeNull();
+    expect(out?.bays).toEqual(pickBays(legacy.dealIndex, legacy.config.parkBays));
+  });
+
+  it('rejects malformed bays (out of range, dupes, wrong count, non-integer)', () => {
+    expect(sanitizeGameState({ ...base(), bays: [0, 1, 7] })).toBeNull(); // out of range
+    expect(sanitizeGameState({ ...base(), bays: [0, 0, 1] })).toBeNull(); // dupes
+    expect(sanitizeGameState({ ...base(), bays: [0, 1] })).toBeNull(); // wrong count (parkBays 3)
+    expect(sanitizeGameState({ ...base(), bays: [0, 1, 2.5] })).toBeNull(); // non-integer
   });
 
   it('rejects recyclesLeft above RECYCLES_PER_DEAL', () => {

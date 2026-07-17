@@ -1,4 +1,5 @@
 import { deals, isValidWord } from './dict';
+import { makeRng } from './rng';
 import { DEFAULT_CONFIG, sanitizeConfig, type GameConfig } from './scoring';
 import type { Action, ColumnCard, Deal, GameState, SessionStats } from './types';
 
@@ -23,6 +24,7 @@ export function dealToState(
   return {
     dealIndex: -1,
     config: cfg,
+    bays: pickBays(hashDeal(deal), cfg.parkBays),
     columns: deal.columns.map((c) =>
       c
         .toLowerCase()
@@ -61,6 +63,7 @@ export function makeDealState(
   return {
     dealIndex: safeIndex,
     config: cfg,
+    bays: pickBays(safeIndex, cfg.parkBays),
     columns: deal
       ? deal.columns.map((c) =>
           c
@@ -104,6 +107,29 @@ function countNative(columns: GameState['columns']): number {
 /** Parked stock cards currently on the board (DB-177 bay cap). */
 export function parkedCount(columns: GameState['columns']): number {
   return columns.reduce((n, c) => n + c.filter((card) => card.fromStock).length, 0);
+}
+
+/**
+ * The designated park bays for a deal (DB-179): `count` distinct column indices
+ * (0–6), chosen deterministically from `seed` so the same deal always marks the
+ * same columns (stable across replays and resume). Sorted for stable rendering.
+ */
+export function pickBays(seed: number, count: number): number[] {
+  const n = Math.min(Math.max(0, count), COLUMN_COUNT);
+  return makeRng(seed >>> 0)
+    .sample([0, 1, 2, 3, 4, 5, 6], n)
+    .sort((a, b) => a - b);
+}
+
+/** Stable 32-bit hash of a concrete deal — seeds bay selection in daily mode. */
+function hashDeal(deal: Deal): number {
+  const s = deal.columns.join('|') + '#' + deal.stock;
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
 }
 
 // ---------------------------------------------------------------- resume (DB-122)
@@ -171,6 +197,23 @@ export function sanitizeGameState(x: unknown): GameState | null {
   else if (!isCount(s.rerollsUsed)) return null;
   if (!Array.isArray(s.played) || !s.played.every((w) => typeof w === 'string')) return null;
   if (!isCount(s.dealIndex) || !Number.isInteger(s.dealIndex)) return null;
+  // bays (DB-179) post-date the snapshot format: a pre-DB-179 save simply lacks
+  // them — derive from the deal index rather than discard the resume; reject a
+  // present-but-malformed set (bad index, dupes, wrong count).
+  if (s.bays === undefined) {
+    s.bays = pickBays(s.dealIndex, s.config.parkBays);
+  } else {
+    const okBay = (b: unknown): b is number =>
+      typeof b === 'number' && Number.isInteger(b) && b >= 0 && b < COLUMN_COUNT;
+    if (
+      !Array.isArray(s.bays) ||
+      s.bays.length !== s.config.parkBays ||
+      !s.bays.every(okBay) ||
+      new Set(s.bays).size !== s.bays.length
+    ) {
+      return null;
+    }
+  }
   const stats: unknown = s.stats;
   if (typeof stats !== 'object' || stats === null) return null;
   const { won, played, streak } = stats as SessionStats;
@@ -256,12 +299,13 @@ export function reducer(state: GameState, action: Action): GameState {
     case 'parkReserve': {
       if (state.won) return state;
       if (state.reserve.length === 0) return state;
+      // Designated bays (DB-179): park only onto one of this deal's marked
+      // columns, and only once it's been cleared. There are exactly
+      // `config.parkBays` bays, so how many can be parked at once is bounded by
+      // how many bays you've emptied — clear a marked column to open a spot.
+      if (!state.bays.includes(action.col)) return state;
       const column = state.columns[action.col];
-      if (!column || column.length > 0) return state; // only onto an empty column (any of them)
-      // Dynamic bays (DB-177): park onto ANY empty column, capped at
-      // `config.parkBays` parked stock cards on the board at once. Removes the
-      // positional pull of the old first-N-columns rule (sim-proven trap).
-      if (parkedCount(state.columns) >= state.config.parkBays) return state;
+      if (!column || column.length > 0) return state; // must be an emptied bay
       const letter = state.reserve[state.reserve.length - 1];
       const columns = state.columns.map((c, i) =>
         i === action.col ? [{ letter, fromStock: true }] : c,

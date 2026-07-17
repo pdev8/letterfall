@@ -48,6 +48,13 @@ export interface GameState {
    * changes only apply from the NEXT deal, never mid-deal.
    */
   config: GameConfig;
+  /**
+   * Designated park bays (DB-179): the `config.parkBays` column indices (chosen
+   * randomly at deal time) that accept a parked reserve card once cleared. Only
+   * these columns are park targets — marked with an indicator so the player
+   * knows which columns to prioritize clearing.
+   */
+  bays: number[];
   /** Each column bottom -> top. */
   columns: ColumnCard[][];
   /** Index 0 is drawn next. */

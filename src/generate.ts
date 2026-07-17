@@ -252,6 +252,7 @@ function buildState(candidate: Candidate): GameState {
   return {
     dealIndex: 0,
     config: DEFAULT_CONFIG,
+    bays: [],
     columns: candidate.columns.map((c) =>
       c.split('').map((letter) => ({ letter, fromStock: false })),
     ),

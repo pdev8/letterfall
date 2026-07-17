@@ -57,8 +57,9 @@ Two layers, strictly separated:
 
 - **`src/game.ts`** — the entire rule set as a pure reducer
   `(GameState, Action) => GameState`. No React, no I/O. `MAX_WORD = 8` is the
-  one hard constant; recycles-allowed and the park cap are per-deal difficulty
-  knobs on `state.config` (DB-131). `makeDealState(dealIndex, stats, config)`
+  one hard constant; recycles-allowed and the park-bay count are per-deal
+  difficulty knobs on `state.config` (DB-131; bays designated per DB-179).
+  `makeDealState(dealIndex, stats, config)`
   builds a game from `assets/seeds.json`.
 - **UI** — `App.tsx` is a thin shell (SafeAreaView + StatusBar) around
   `src/screens/GameScreen.tsx`, which owns the game UI: hooks, layout math,
@@ -75,7 +76,7 @@ Two layers, strictly separated:
 | stock | face-down draw pile | `state.stock` |
 | reserve | face-up drawn card (waste in classic solitaire) | `state.reserve`, `tapReserve` |
 | tray | slots where the current word is built | `state.tray`, `TrayEntry` |
-| park / bay | placing the reserve card on any empty column; `config.parkBays` caps how many parked at once | `parkReserve`, `parkedCount` |
+| park / bay | placing the reserve card on a **designated** cleared column; `config.parkBays` sets how many bays a deal has (`state.bays`, chosen at deal time) | `parkReserve`, `pickBays`, `parkedCount` |
 | stock-origin | any card that came through stock (orange outline in UI) | `fromStock: true` |
 
 ### Rule invariants (tests must protect these)
@@ -84,8 +85,11 @@ Two layers, strictly separated:
 - Tapping a card whose source is already trayed *withdraws* it (toggle).
 - Parked cards are playable but **never count toward the win**:
   win = `countNative(columns) === 0`, which filters `fromStock`. Parking is
-  allowed on ANY empty column, capped at `config.parkBays` parked cards
-  (`parkedCount`) — DB-177.
+  allowed **only onto this deal's designated bays** — `state.bays`, the
+  `config.parkBays` column indices chosen randomly at deal time (`pickBays`) and
+  marked in the UI — and only once that bay column has been cleared. One card
+  per bay, so the number parked at once is bounded by the bays you've emptied —
+  DB-179 (supersedes DB-177's "any empty column" rule).
 - The trayed reserve entry is always the current reserve top — `draw` and
   `parkReserve` auto-return it first. Breaking this corrupts `play`.
 - Deal validity: 7 columns of heights 1–7 (28 cards, bottom→top strings in

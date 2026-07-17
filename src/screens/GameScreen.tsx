@@ -37,7 +37,6 @@ import {
   dealToState,
   MAX_WORD,
   makeDealState,
-  parkedCount,
   randomDealIndex,
   reducer,
   tableauCount,
@@ -160,13 +159,12 @@ export default function GameScreen({
   const canRecycle = state.stock.length === 0 && state.reserve.length > 0 && state.recyclesLeft > 0;
   const canDraw = state.stock.length > 0 || canRecycle;
   const reserveTop = state.reserve.length > 0 ? state.reserve[state.reserve.length - 1] : null;
-  // Dynamic bays (DB-177): any empty column accepts a park while under the cap.
-  const canParkMore = parkedCount(state.columns) < state.config.parkBays;
-  const canPark = reserveTop !== null && !state.won && canParkMore;
-  // Parking with more reserve underneath exposes a fresh letter, so it can
-  // rescue an otherwise-stuck position.
-  const parkRescue =
-    state.reserve.length >= 2 && canParkMore && state.columns.some((c) => c.length === 0);
+  // Designated bays (DB-179): park only onto a marked column that's been cleared.
+  const emptyBayOpen = state.bays.some((b) => state.columns[b]?.length === 0);
+  const canPark = reserveTop !== null && !state.won && emptyBayOpen;
+  // Parking with more reserve underneath exposes a fresh letter, so an open bay
+  // can rescue an otherwise-stuck position.
+  const parkRescue = state.reserve.length >= 2 && emptyBayOpen;
   const isDead = !state.won && tableauLeft > 0 && !anyPlay && !canDraw && !parkRescue;
   const showNoPlayHint = !state.won && !isDead && !anyPlay && tableauLeft > 0;
   const reserveInTray = state.tray.some((e) => e.source === 'reserve');
@@ -841,6 +839,16 @@ export default function GameScreen({
           </View>
         </View>
 
+        {/* park-bay indicators (DB-179): these columns accept a parked reserve
+            card once cleared — clear them first to open parking space */}
+        <View style={styles.bayRow}>
+          {state.columns.map((_, i) => (
+            <View key={i} style={{ width: colW, alignItems: 'center' }}>
+              {state.bays.includes(i) ? <Text style={styles.bayMark}>▾</Text> : null}
+            </View>
+          ))}
+        </View>
+
         {/* tableau columns */}
         <View style={styles.columnsRow}>
           {state.columns.map((col, i) => {
@@ -852,6 +860,7 @@ export default function GameScreen({
             // cascaded so only its top edge (cascadeReveal) peeks out.
             const liftShift = Math.round(cardH * 0.2);
             const cascade = { marginTop: cascadeReveal - cardH };
+            const isBay = state.bays.includes(i); // DB-179: park target column
             return (
               <View key={i} style={{ width: colW }}>
                 {Array.from({ length: faceDown }, (_, j) => (
@@ -895,7 +904,8 @@ export default function GameScreen({
                       />
                     </Pressable>
                   </PopIn>
-                ) : (
+                ) : isBay ? (
+                  // Cleared bay: the only kind of empty column you can park on.
                   <Pressable
                     ref={(r) => {
                       slotRefs.current[i] = r;
@@ -904,13 +914,17 @@ export default function GameScreen({
                     onPress={() => onParkReserve(i)}
                     style={({ pressed }) => [
                       styles.emptyColSlot,
+                      styles.baySlot,
                       { width: colW, height: cardH },
                       draggingReserve && canPark && styles.emptyColSlotTarget,
                       pressed && canPark && { opacity: 0.6 },
                     ]}
                   >
-                    {canPark ? <Text style={styles.parkGlyph}>+</Text> : null}
+                    <Text style={canPark ? styles.parkGlyph : styles.bayGlyph}>+</Text>
                   </Pressable>
+                ) : (
+                  // Non-bay empty column: inert — never a park target.
+                  <View style={[styles.emptyColSlot, { width: colW, height: cardH }]} />
                 )}
               </View>
             );
@@ -1303,6 +1317,19 @@ const styles = StyleSheet.create({
   },
 
   // tableau
+  // Park-bay markers (DB-179), aligned to the columns below them.
+  bayRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+    marginBottom: -6,
+  },
+  bayMark: {
+    color: C.stock,
+    fontSize: 13,
+    lineHeight: 13,
+    fontWeight: '900',
+  },
   columnsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -1317,11 +1344,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // A cleared bay reads as a park spot even at rest: faint orange outline.
+  baySlot: {
+    borderColor: C.stockDim,
+    backgroundColor: C.stockFaint,
+  },
   emptyColSlotTarget: {
     backgroundColor: C.stockFaint,
   },
   parkGlyph: {
     color: C.stock,
+    fontSize: 20,
+    fontWeight: '300',
+  },
+  bayGlyph: {
+    color: C.stockDim,
     fontSize: 20,
     fontWeight: '300',
   },
