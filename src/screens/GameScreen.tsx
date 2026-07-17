@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useReducer, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import {
   Animated,
   PanResponder,
@@ -11,6 +11,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 
+import { loadStats, saveStats } from '../appStorage';
 import BigButton from '../components/BigButton';
 import CardBack from '../components/CardBack';
 import LetterCard from '../components/LetterCard';
@@ -27,6 +28,7 @@ import {
   tableauCount,
 } from '../game';
 import { dealScore, stockEconomyMult, wordEconomyMult, wordScore } from '../scoring';
+import { recordDeal, type DealRecord, type LifetimeStats } from '../stats';
 import { C } from '../theme';
 import type { TrayEntry } from '../types';
 
@@ -91,6 +93,53 @@ export default function GameScreen() {
         difficulty: 'casual',
       })
     : 0;
+
+  // ---------------- lifetime stats (DB-121)
+  // Separate persisted layer over the reducer's session stats; surfaced in
+  // DB-144's My Stats tab. Everything records under 'free' until challenge
+  // mode (E5) exists.
+  // When the current deal started; stamped on mount and on every redeal.
+  const dealStartRef = useRef(0);
+  // null until loadStats resolves; outcomes finishing before then (never in
+  // practice — a deal takes minutes) queue up and fold in on load.
+  const lifetimeRef = useRef<LifetimeStats | null>(null);
+  const pendingDealsRef = useRef<DealRecord[]>([]);
+
+  const recordLifetimeDeal = useCallback((outcome: DealRecord) => {
+    if (lifetimeRef.current === null) {
+      pendingDealsRef.current.push(outcome);
+      return;
+    }
+    lifetimeRef.current = recordDeal(lifetimeRef.current, 'free', outcome);
+    saveStats(lifetimeRef.current).catch(() => {}); // storage never crashes the game
+  }, []);
+
+  useEffect(() => {
+    dealStartRef.current = Date.now(); // the first deal's clock starts at mount
+    loadStats().then((loaded) => {
+      let s = loaded;
+      for (const o of pendingDealsRef.current) s = recordDeal(s, 'free', o);
+      lifetimeRef.current = s;
+      if (pendingDealsRef.current.length > 0) {
+        pendingDealsRef.current = [];
+        saveStats(s).catch(() => {});
+      }
+    });
+  }, []);
+
+  // Record each win exactly once, on the false -> true transition.
+  const prevWonRef = useRef(state.won);
+  useEffect(() => {
+    if (state.won && !prevWonRef.current) {
+      recordLifetimeDeal({
+        won: true,
+        durationMs: Date.now() - dealStartRef.current,
+        words: state.played,
+        dealScore: wonScore,
+      });
+    }
+    prevWonRef.current = state.won;
+  }, [state.won, state.played, wonScore, recordLifetimeDeal]);
 
   // ---------------- layout metrics
   const pad = 12;
@@ -347,7 +396,19 @@ export default function GameScreen() {
 
   const onRedeal = () => {
     if (busyRef.current) return;
+    // Abandoned deal: a lifetime loss, mirroring the reducer's own
+    // counts-as-played rule. Words played so far still count (spec §5);
+    // losses bank no points. Wins were already recorded by the win effect.
+    if (!state.won && state.movesMade > 0) {
+      recordLifetimeDeal({
+        won: false,
+        durationMs: Date.now() - dealStartRef.current,
+        words: state.played,
+        dealScore: 0,
+      });
+    }
     dispatch({ type: 'redeal' });
+    dealStartRef.current = Date.now(); // the new deal's clock starts now
   };
 
   const onShare = async () => {
