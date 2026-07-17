@@ -78,11 +78,13 @@ move breaks it, search for a new one; steering only offers letters for which a
 plan exists.
 
 **Effective lexicon.** Every solvability and openness check runs against the
-player's *effective lexicon* — the base word list minus any words retired at
-their ladder tier (roadmap **E8**). A high-tier deal must be winnable
-*without* the banned words; free play always uses the full lexicon. The
-solver, `isValidWord`, and the generator all take the effective lexicon as a
-parameter, never a global.
+player's *effective lexicon* — the base word list minus the words retired
+**today** at their ladder tier (roadmap **E8**). Retirement resets each play
+day: the day's list is recomputed from the trailing week's most-used words
+and ships with the daily set, so bans never accumulate across days. A
+high-tier deal must be winnable *without* that day's banned words; free play
+always uses the full lexicon. The solver, `isValidWord`, and the generator
+all take the effective lexicon as a parameter, never a global.
 
 ## Daily set structure
 

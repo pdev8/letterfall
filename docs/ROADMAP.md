@@ -111,9 +111,10 @@ Retires the static deal pool. Gates the daily-set half of E4.*
 
 *Ranked progression where the community's crutch words retire out of the
 game. Climb the ladder via daily-challenge results; at higher tiers the
-most-played words are banned. Over time, retirement is driven by real
-challenge-mode usage across all players — the meta stays alive because
-leaning on a word eventually removes it.*
+most-played words are banned. Retirement is driven by real challenge-mode
+usage across all players and **resets each play day** — every day's ban
+list is recomputed from the trailing week's most-used words and applies for
+that day only, so the meta breathes daily instead of accumulating forever.*
 
 | ID | Ticket | Size | Acceptance criteria |
 |---|---|---|---|
@@ -121,7 +122,8 @@ leaning on a word eventually removes it.*
 | LF-181 | Word retirement engine (phase 1: static lists) | M | Per-tier ban lists from static frequency data; retired words rejected with "retired at your rank" feedback; free play unaffected |
 | LF-182 | Effective-lexicon integration with the living deck | M | Solvability checks and openness metric run against base lexicon minus the player's tier bans — deals stay winnable under bans; tested per tier |
 | LF-183 | Retired-words gallery + tier UI | M | Ladder screen: current tier, next promotion, list of words retired at each tier |
-| LF-184 | Phase 2: global usage telemetry + rolling retirement | L | Challenge-mode word usage aggregated server-side; top-K most-played words retire per cycle at high tiers; cycle length + K tuned and documented |
+| LF-184 | Phase 2: usage telemetry + daily-reset retirement | L | Challenge-mode word usage aggregated server-side over a trailing 7-day window; each play day publishes that day's retired list with the daily set (top-K, sliced per tier); yesterday's bans lift automatically — no permanent accumulation; K tuned and documented |
+| LF-185 | Weekly meta surfaces | M | Community *most-used words of the week* displayed in-app (also the source pool for daily retirement); *best word of the week* — weekly recurring GC board + personal stat; both reset weekly |
 
 ## Epic E6 — App Store Readiness
 
@@ -235,8 +237,14 @@ difficulty takes effect on the next deal.
 
 - **Daily Challenge is the public game.** The 5-game daily set
   (`docs/GENERATION.md`) is the only mode that feeds global leaderboards.
-  Game Center boards: *Daily total* (recurring) and *All-time challenge
-  points*. Same seed chain for everyone, so ranks compare like-for-like.
+  Game Center boards: *Daily total* (daily recurring), *Best word of the
+  week* (weekly recurring, highest single word score), and *All-time
+  challenge points*. Same seed chain for everyone, so ranks compare
+  like-for-like.
+- **Weekly meta.** Challenge mode surfaces the community's *most-used words
+  of the week* (top-K, also the source pool for the ladder's daily-reset
+  retirement) and *best word of the week*. Weekly aggregates roll over
+  weekly; retired-word lists reset every play day (E8).
 - **Free play is private.** Unlimited deals, player-picked difficulty
   preset, never on a public board. It feeds the personal stats dashboard
   and local bests (LF-140: top-20 per difficulty, on device).

@@ -495,8 +495,10 @@ dealScore = round( 240 × 1.30 × 1.21 × 1.25 ) = 472</div>
     <p class="kicker">Spec</p>
     <h2>Modes &amp; Leaderboards</h2>
     <p><strong>Daily Challenge is the public game</strong> — the 5-game daily set is the only
-    mode on global boards (Game Center: daily total + all-time challenge points). Same seed
-    chain for everyone, so ranks compare like-for-like.</p>
+    mode on global boards (Game Center: daily total, best word of the week, all-time challenge
+    points). Same seed chain for everyone, so ranks compare like-for-like. The community's
+    most-used words of the week are surfaced in-app — and feed the ladder's daily-reset
+    retirement.</p>
     <p><strong>Free play is private</strong> — unlimited deals, player-picked difficulty, never
     ranked publicly. It feeds the personal dashboard: total time played, games and wins,
     average time per game, letters constructed, unique words, most-played words, bests,
@@ -511,17 +513,19 @@ dealScore = round( 240 × 1.30 × 1.21 × 1.25 ) = 472</div>
     <p class="kicker">Epic · post-launch</p>
     <h2><span class="id">E8</span>Word Ladder &amp; Living Meta</h2>
     <p class="intent">Ranked progression where the community's crutch words retire out of the
-    game: climb via daily-challenge results; at higher tiers the most-played words are banned —
-    over time driven by real usage across all players. Lean on a word and eventually it's gone.
-    The living deck generates against the player's <em>effective lexicon</em>, so every deal
-    stays winnable without the banned words.</p>
+    game: climb via daily-challenge results; at higher tiers the most-played words are banned,
+    driven by real usage across all players. <strong>Retirement resets each play day</strong> —
+    the day's ban list is recomputed from the trailing week's most-used words and applies for
+    that day only. The living deck generates against the player's <em>effective lexicon</em>,
+    so every deal stays winnable without that day's banned words.</p>
     <div class="table-wrap"><table>
       <tr><th>ID</th><th>Ticket</th><th>Size</th><th>Acceptance</th></tr>
       <tr><td class="id">LF-180</td><td>Ladder: tiers, promotion, persisted rank</td><td><span class="size m">M</span></td><td class="crit">Tiers advanced by daily-challenge results; rank in profile; demotion rules documented</td></tr>
       <tr><td class="id">LF-181</td><td>Word retirement engine (phase 1: static)</td><td><span class="size m">M</span></td><td class="crit">Per-tier ban lists from frequency data; "retired at your rank" feedback; free play unaffected</td></tr>
       <tr><td class="id">LF-182</td><td>Effective-lexicon integration with living deck</td><td><span class="size m">M</span></td><td class="crit">Solver + openness run on base lexicon minus tier bans; winnable at every tier; tested</td></tr>
       <tr><td class="id">LF-183</td><td>Retired-words gallery + tier UI</td><td><span class="size m">M</span></td><td class="crit">Ladder screen: tier, promotion progress, words retired per tier</td></tr>
-      <tr><td class="id">LF-184</td><td>Phase 2: usage telemetry + rolling retirement</td><td><span class="size l">L</span></td><td class="crit">Challenge-mode word usage aggregated server-side; top-K retire per cycle at high tiers</td></tr>
+      <tr><td class="id">LF-184</td><td>Phase 2: usage telemetry + daily-reset retirement</td><td><span class="size l">L</span></td><td class="crit">Trailing 7-day usage window; each play day publishes that day's retired list (per tier); yesterday's bans lift automatically</td></tr>
+      <tr><td class="id">LF-185</td><td>Weekly meta surfaces</td><td><span class="size m">M</span></td><td class="crit">Most-used words of the week displayed in-app (feeds daily retirement); best word of the week: weekly GC board + personal stat</td></tr>
     </table></div>
   </section>
 
