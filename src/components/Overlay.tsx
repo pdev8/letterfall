@@ -4,10 +4,18 @@ import { StyleSheet, View } from 'react-native';
 import PopIn from './PopIn';
 import { C } from '../theme';
 
-export default function Overlay({ children }: { children: React.ReactNode }) {
+export default function Overlay({
+  children,
+  reduceMotion = false,
+}: {
+  children: React.ReactNode;
+  reduceMotion?: boolean;
+}) {
   return (
     <View style={styles.overlayScrim}>
-      <PopIn style={styles.overlayCard}>{children}</PopIn>
+      <PopIn style={styles.overlayCard} reduceMotion={reduceMotion}>
+        {children}
+      </PopIn>
     </View>
   );
 }

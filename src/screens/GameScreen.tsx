@@ -1,3 +1,4 @@
+import * as Haptics from 'expo-haptics';
 import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import {
   Animated,
@@ -16,7 +17,6 @@ import {
   loadGame,
   loadHistory,
   loadMissedWords,
-  loadSettings,
   loadStats,
   saveGame,
   saveHistory,
@@ -30,17 +30,12 @@ import Overlay from '../components/Overlay';
 import PopIn from '../components/PopIn';
 import WordChip from '../components/WordChip';
 import { existsPlayableWord, isValidWord } from '../dict';
+import { hapticFor, type FeedbackKind } from '../feedback';
 import { MAX_WORD, makeDealState, randomDealIndex, reducer, tableauCount } from '../game';
 import { makeRecord, recordGame, type GameRecord, type HistoryState } from '../history';
 import { recordMiss, topMisses, type MissedWords } from '../missedWords';
-import {
-  DEFAULT_CONFIG,
-  dealScore,
-  stockEconomyMult,
-  wordEconomyMult,
-  wordScore,
-  type GameConfig,
-} from '../scoring';
+import { dealScore, stockEconomyMult, wordEconomyMult, wordScore } from '../scoring';
+import { useSettings } from '../settingsStore';
 import { recordDeal, type DealRecord, type LifetimeStats } from '../stats';
 import { C } from '../theme';
 import type { TrayEntry } from '../types';
@@ -52,11 +47,33 @@ export default function GameScreen({
   onOpenSettings?: () => void;
 } = {}) {
   const { width } = useWindowDimensions();
+  const settings = useSettings(); // live: haptics / sound / reduce-motion / config
+  const reduceMotion = settings.reduceMotion;
+  // Mirror for stable callbacks that fire haptics without re-subscribing.
+  const settingsRef = useRef(settings);
+  settingsRef.current = settings;
+
   const [state, dispatch] = useReducer(reducer, null, () =>
     makeDealState(randomDealIndex(), { won: 0, played: 0, streak: 0 }),
   );
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
+
+  // Fire a haptic for a game event, honoring the toggle (DB-132). Sound joins
+  // at DB-163. Wrapped in try/catch — haptics can throw on unsupported devices.
+  const fire = useCallback((kind: FeedbackKind) => {
+    const signal = hapticFor(kind, settingsRef.current.haptics);
+    if (signal === null) return;
+    try {
+      if (signal === 'selection') void Haptics.selectionAsync();
+      else if (signal === 'impact') void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      else if (signal === 'success')
+        void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      else void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    } catch {
+      // haptics unsupported on this device — ignore
+    }
+  }, []);
 
   // Animated values (transform/opacity only, native driver).
   const trayY = useRef(new Animated.Value(0)).current;
@@ -65,15 +82,19 @@ export default function GameScreen({
   const trayShakeX = useRef(new Animated.Value(0)).current;
   const foundationRef = useRef<ScrollView>(null);
 
-  const runShake = useCallback((v: Animated.Value) => {
-    v.setValue(0);
-    Animated.sequence([
-      Animated.timing(v, { toValue: 5, duration: 45, useNativeDriver: true }),
-      Animated.timing(v, { toValue: -5, duration: 65, useNativeDriver: true }),
-      Animated.timing(v, { toValue: 3, duration: 55, useNativeDriver: true }),
-      Animated.timing(v, { toValue: 0, duration: 45, useNativeDriver: true }),
-    ]).start();
-  }, []);
+  const runShake = useCallback(
+    (v: Animated.Value) => {
+      if (settingsRef.current.reduceMotion) return; // reduce motion: no shake
+      v.setValue(0);
+      Animated.sequence([
+        Animated.timing(v, { toValue: 5, duration: 45, useNativeDriver: true }),
+        Animated.timing(v, { toValue: -5, duration: 65, useNativeDriver: true }),
+        Animated.timing(v, { toValue: 3, duration: 55, useNativeDriver: true }),
+        Animated.timing(v, { toValue: 0, duration: 45, useNativeDriver: true }),
+      ]).start();
+    },
+    [],
+  );
 
   // ---------------- derived state
   const word = state.tray.map((e) => e.letter).join('');
@@ -118,9 +139,8 @@ export default function GameScreen({
   // mode (E5) exists.
   // When the current deal started; stamped on mount and on every redeal.
   const dealStartRef = useRef(0);
-  // The player's chosen difficulty knobs (DB-131), loaded once from settings;
-  // applied to each NEW deal on redeal (never mid-deal).
-  const configRef = useRef<GameConfig>(DEFAULT_CONFIG);
+  // Difficulty knobs (DB-131) come from the live settings store; the next
+  // deal reads settingsRef.current.config on redeal (never mid-deal).
   // null until loadStats resolves; outcomes finishing before then (never in
   // practice — a deal takes minutes) queue up and fold in on load.
   const lifetimeRef = useRef<LifetimeStats | null>(null);
@@ -169,9 +189,6 @@ export default function GameScreen({
 
   useEffect(() => {
     dealStartRef.current = Date.now(); // the first deal's clock starts at mount
-    loadSettings().then((s) => {
-      configRef.current = s.config; // used by the next redeal, not this deal
-    });
     loadStats().then((loaded) => {
       let s = loaded;
       for (const o of pendingDealsRef.current) s = recordDeal(s, 'free', o);
@@ -229,6 +246,7 @@ export default function GameScreen({
   const prevWonRef = useRef(state.won);
   useEffect(() => {
     if (state.won && !prevWonRef.current) {
+      fire('win'); // success haptic on the deal clearing
       const durationMs = Date.now() - dealStartRef.current;
       recordLifetimeDeal({
         won: true,
@@ -249,7 +267,7 @@ export default function GameScreen({
       );
     }
     prevWonRef.current = state.won;
-  }, [state.won, state.played, state.config, wonScore, recordLifetimeDeal, recordHistoryGame]);
+  }, [state.won, state.played, state.config, wonScore, fire, recordLifetimeDeal, recordHistoryGame]);
 
   // ---------------- layout metrics
   const pad = 12;
@@ -269,6 +287,7 @@ export default function GameScreen({
       runShake(stockShakeX); // inert stock: tiny shake
       return;
     }
+    fire('tap');
     dispatch({ type: 'draw' });
   };
 
@@ -279,6 +298,7 @@ export default function GameScreen({
       runShake(trayShakeX); // tray full
       return;
     }
+    fire('tap');
     dispatch({ type: 'tapColumn', col });
   };
 
@@ -289,6 +309,7 @@ export default function GameScreen({
       runShake(trayShakeX);
       return;
     }
+    fire('tap');
     dispatch({ type: 'tapReserve' });
   };
 
@@ -374,6 +395,7 @@ export default function GameScreen({
 
   const onParkReserve = (col: number) => {
     if (busyRef.current) return;
+    fire('tap');
     dispatch({ type: 'parkReserve', col });
   };
 
@@ -493,7 +515,14 @@ export default function GameScreen({
       // Rejected attempt: log playable-looking words so dictionary gaps
       // become data (DB-203), shake the tray as feedback, and stay put.
       if (state.tray.length >= 3) recordMissedWord(word);
+      fire('invalid');
       runShake(trayShakeX);
+      return;
+    }
+    fire('play');
+    if (reduceMotion) {
+      // Reduce motion: commit the play immediately, no fly-up.
+      dispatch({ type: 'play' });
       return;
     }
     busyRef.current = true;
@@ -537,7 +566,7 @@ export default function GameScreen({
       );
     }
     // The new deal picks up the player's current knobs (DB-131).
-    dispatch({ type: 'redeal', config: configRef.current });
+    dispatch({ type: 'redeal', config: settingsRef.current.config });
     dealStartRef.current = Date.now(); // the new deal's clock starts now
   };
 
@@ -618,7 +647,7 @@ export default function GameScreen({
             <View style={{ width: pileW, height: pileH }}>
               <View style={[styles.emptyPile, StyleSheet.absoluteFill]} />
               {reserveTop !== null && (
-                <PopIn key={`${state.dealIndex}-r-${state.reserve.length}`}>
+                <PopIn key={`${state.dealIndex}-r-${state.reserve.length}`} reduceMotion={reduceMotion}>
                   <Animated.View
                     {...reservePan.panHandlers}
                     style={{
@@ -844,12 +873,12 @@ export default function GameScreen({
 
       {/* win overlay */}
       {state.won && (
-        <Overlay>
+        <Overlay reduceMotion={reduceMotion}>
           <Text style={styles.overlayTitle}>TABLEAU CLEARED</Text>
           <View style={styles.overlayRule} />
           <View style={styles.wonWordsWrap}>
             {state.played.map((w, i) => (
-              <PopIn key={i} delay={i * 80}>
+              <PopIn key={i} delay={i * 80} reduceMotion={reduceMotion}>
                 <WordChip word={w} pts={wordScore(w)} />
               </PopIn>
             ))}
@@ -874,14 +903,14 @@ export default function GameScreen({
               <>
                 <View style={styles.bonusWrap}>
                   {chips.map((label, i) => (
-                    <PopIn key={label} delay={baseDelay + i * 140}>
+                    <PopIn key={label} delay={baseDelay + i * 140} reduceMotion={reduceMotion}>
                       <View style={styles.bonusChip}>
                         <Text style={styles.bonusChipText}>{label}</Text>
                       </View>
                     </PopIn>
                   ))}
                 </View>
-                <PopIn delay={baseDelay + chips.length * 140 + 120}>
+                <PopIn delay={baseDelay + chips.length * 140 + 120} reduceMotion={reduceMotion}>
                   <Text style={styles.scoreTotal}>{wonScore}</Text>
                   <Text style={styles.scoreTotalLabel}>points</Text>
                 </PopIn>
@@ -898,7 +927,7 @@ export default function GameScreen({
 
       {/* dead deal overlay */}
       {isDead && (
-        <Overlay>
+        <Overlay reduceMotion={reduceMotion}>
           <Text style={styles.overlayTitle}>DEAD DEAL</Text>
           <View style={styles.overlayRule} />
           <Text style={styles.overlayBody}>

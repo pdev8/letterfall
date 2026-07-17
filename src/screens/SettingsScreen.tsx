@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
-import { loadSettings, saveSettings } from '../appStorage';
 import { configMult, type GameConfig } from '../scoring';
 import type { Settings } from '../settings';
+import { updateSettings, useSettings } from '../settingsStore';
 import { C } from '../theme';
 
 // Placeholder until a real version source (expo-constants) lands with release
@@ -24,35 +24,12 @@ function bonusLabel(config: GameConfig): string {
  * consumed by DB-132; the rulebook row activates with DB-133.
  */
 export default function SettingsScreen({ onClose }: { onClose: () => void }) {
-  // null until loadSettings resolves — rows render once real values exist so
-  // the controls never flash defaults over a different saved state.
-  const [settings, setSettings] = useState<Settings | null>(null);
+  // Live from the shared store — changes take effect in the game immediately.
+  const settings: Settings = useSettings();
 
-  useEffect(() => {
-    let alive = true;
-    loadSettings().then((s) => {
-      if (alive) setSettings(s);
-    });
-    return () => {
-      alive = false;
-    };
-  }, []);
+  const update = (patch: Partial<Settings>) => updateSettings({ ...settings, ...patch });
 
-  const update = (patch: Partial<Settings>) => {
-    setSettings((prev) => {
-      if (prev === null) return prev;
-      const next = { ...prev, ...patch };
-      saveSettings(next).catch(() => {}); // storage never crashes the game
-      return next;
-    });
-  };
-
-  const knobRow = (
-    label: string,
-    key: 'recycles' | 'parkBays',
-    options: number[],
-  ) =>
-    settings === null ? null : (
+  const knobRow = (label: string, key: 'recycles' | 'parkBays', options: number[]) => (
       <View style={styles.segmentRow}>
         {options.map((v) => {
           const selected = settings.config[key] === v;
@@ -74,19 +51,18 @@ export default function SettingsScreen({ onClose }: { onClose: () => void }) {
       </View>
     );
 
-  const toggleRow = (label: string, key: 'haptics' | 'sound' | 'reduceMotion') =>
-    settings === null ? null : (
-      <View style={styles.row}>
-        <Text style={styles.rowLabel}>{label}</Text>
-        <Switch
-          value={settings[key]}
-          onValueChange={(v) => update({ [key]: v })}
-          trackColor={{ false: C.border, true: C.accentDim }}
-          thumbColor={settings[key] ? C.accent : C.inkMuted}
-          ios_backgroundColor={C.border}
-        />
-      </View>
-    );
+  const toggleRow = (label: string, key: 'haptics' | 'sound' | 'reduceMotion') => (
+    <View style={styles.row}>
+      <Text style={styles.rowLabel}>{label}</Text>
+      <Switch
+        value={settings[key]}
+        onValueChange={(v) => update({ [key]: v })}
+        trackColor={{ false: C.border, true: C.accentDim }}
+        thumbColor={settings[key] ? C.accent : C.inkMuted}
+        ios_backgroundColor={C.border}
+      />
+    </View>
+  );
 
   return (
     <View style={styles.root}>
@@ -104,28 +80,24 @@ export default function SettingsScreen({ onClose }: { onClose: () => void }) {
         <View style={styles.backBtnBalance} />
       </View>
 
-      {settings !== null && (
-        <>
-          {/* difficulty knobs (DB-131): harder config → bigger score bonus */}
-          <View style={styles.knobHead}>
-            <Text style={styles.sectionLabel}>DIFFICULTY</Text>
-            <Text style={styles.bonusTag}>{bonusLabel(settings.config)}</Text>
-          </View>
-          <Text style={styles.knobLabel}>Recycles</Text>
-          {knobRow('Recycles', 'recycles', [0, 1, 2])}
-          <Text style={styles.knobLabel}>Park bays</Text>
-          {knobRow('Park bays', 'parkBays', [1, 2, 3])}
-          <Text style={styles.caption}>
-            fewer recycles and bays = harder, worth more — applies from your next deal
-          </Text>
+      {/* difficulty knobs (DB-131): harder config → bigger score bonus */}
+      <View style={styles.knobHead}>
+        <Text style={styles.sectionLabel}>DIFFICULTY</Text>
+        <Text style={styles.bonusTag}>{bonusLabel(settings.config)}</Text>
+      </View>
+      <Text style={styles.knobLabel}>Recycles</Text>
+      {knobRow('Recycles', 'recycles', [0, 1, 2])}
+      <Text style={styles.knobLabel}>Park bays</Text>
+      {knobRow('Park bays', 'parkBays', [1, 2, 3])}
+      <Text style={styles.caption}>
+        fewer recycles and bays = harder, worth more — applies from your next deal
+      </Text>
 
-          {/* toggles (persisted now; consumed by DB-132) */}
-          <Text style={styles.sectionLabel}>FEEDBACK</Text>
-          {toggleRow('Haptics', 'haptics')}
-          {toggleRow('Sound', 'sound')}
-          {toggleRow('Reduce motion', 'reduceMotion')}
-        </>
-      )}
+      {/* feedback toggles (DB-132) */}
+      <Text style={styles.sectionLabel}>FEEDBACK</Text>
+      {toggleRow('Haptics', 'haptics')}
+      {toggleRow('Sound', 'sound')}
+      {toggleRow('Reduce motion', 'reduceMotion')}
 
       {/* footer */}
       <View style={styles.footer}>
