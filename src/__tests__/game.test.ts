@@ -224,6 +224,28 @@ describe('parkReserve', () => {
     const next = reducer(base(), { type: 'parkReserve', col: 0 });
     expect(tableauCount(next)).toBe(3); // c, a, t only
   });
+
+  it('surfaces the next stock card when parking empties the reserve (DB-179)', () => {
+    const s = base({ reserve: ['q'], stock: ['a', 'b'] }); // one card in hand
+    const next = reducer(s, { type: 'parkReserve', col: 0 });
+    expect(next.columns[0]).toEqual([{ letter: 'q', fromStock: true }]);
+    expect(next.reserve).toEqual(['a']); // next stock card drawn into the reserve
+    expect(next.stock).toEqual(['b']);
+  });
+
+  it('shows the card underneath rather than drawing when the reserve still has cards', () => {
+    const s = base({ reserve: ['x', 'q'], stock: ['a'] });
+    const next = reducer(s, { type: 'parkReserve', col: 0 });
+    expect(next.reserve).toEqual(['x']); // the beneath card, no draw
+    expect(next.stock).toEqual(['a']); // stock untouched
+  });
+
+  it('leaves the reserve empty when parking the last card with an empty stock', () => {
+    const s = base({ reserve: ['q'], stock: [] });
+    const next = reducer(s, { type: 'parkReserve', col: 0 });
+    expect(next.reserve).toEqual([]);
+    expect(next.stock).toEqual([]);
+  });
 });
 
 describe('reroll (DB-178 — opening card exchange with the stock)', () => {
