@@ -2,9 +2,11 @@
 // storage.ts so the pure core stays importable in node tests.
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { dailySetForDay, type DailySet } from './daily';
 import { parseSavedGame, type SavedGame } from './game';
 import { emptyHistory, type HistoryState } from './history';
 import type { MissedWords } from './missedWords';
+import { playDayOf } from './seedService';
 import { sanitizeSettings, type Settings } from './settings';
 import { emptyStats, type LifetimeStats } from './stats';
 import { createStore } from './storage';
@@ -93,4 +95,17 @@ export function loadHistory(): Promise<HistoryState> {
 
 export function saveHistory(h: HistoryState): Promise<void> {
   return store.set(HISTORY_KEY, h);
+}
+
+// ---- daily set (DB-174)
+export const DAILY_KEY = 'dailySet';
+
+/** Loads the daily set for today (UTC), resetting/rebuilding on a new play day. */
+export async function loadDailySet(nowMs: number): Promise<DailySet> {
+  const raw = await store.get<DailySet | null>(DAILY_KEY, null);
+  return dailySetForDay(raw, playDayOf(nowMs));
+}
+
+export function saveDailySet(set: DailySet): Promise<void> {
+  return store.set(DAILY_KEY, set);
 }
