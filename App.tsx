@@ -23,17 +23,25 @@ import {
   reducer,
   tableauCount,
 } from './src/game';
-import { wordScore } from './src/scoring';
+import { dealScore, stockEconomyMult, wordEconomyMult, wordScore } from './src/scoring';
 import type { TrayEntry } from './src/types';
 
 // ---------------------------------------------------------------- helpers
 
 /** Pops its children in on mount (scale + fade). Re-key to replay. */
-function PopIn({ children, style }: { children: React.ReactNode; style?: StyleProp<ViewStyle> }) {
+function PopIn({
+  children,
+  style,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+  delay?: number;
+}) {
   const anim = useRef(new Animated.Value(0)).current;
   useEffect(() => {
-    Animated.timing(anim, { toValue: 1, duration: 190, useNativeDriver: true }).start();
-  }, [anim]);
+    Animated.timing(anim, { toValue: 1, duration: 190, delay, useNativeDriver: true }).start();
+  }, [anim, delay]);
   const scale = anim.interpolate({ inputRange: [0, 1], outputRange: [0.72, 1] });
   return (
     <Animated.View style={[style, { opacity: anim, transform: [{ scale }] }]}>
@@ -111,10 +119,11 @@ function CardBack({
   );
 }
 
-function WordChip({ word }: { word: string }) {
+function WordChip({ word, pts }: { word: string; pts?: number }) {
   return (
     <View style={styles.chip}>
       <Text style={styles.chipText}>{word.toUpperCase()}</Text>
+      {pts !== undefined ? <Text style={styles.chipPts}>+{pts}</Text> : null}
     </View>
   );
 }
@@ -205,6 +214,16 @@ export default function App() {
   const showNoPlayHint = !state.won && !isDead && !anyPlay && tableauLeft > 0;
   const reserveInTray = state.tray.some((e) => e.source === 'reserve');
   const bestWord = state.played.reduce((a, b) => (b.length > a.length ? b : a), '');
+  // Difficulty presets land in E3 (LF-131); until then score at casual ×1.0.
+  const wonScore = state.won
+    ? dealScore({
+        words: state.played,
+        reserveLettersPlayed: state.reserveLettersPlayed,
+        parksUsed: state.parksUsed,
+        recyclesUsed: state.recyclesUsed,
+        difficulty: 'casual',
+      })
+    : 0;
 
   // ---------------- layout metrics
   const pad = 12;
@@ -467,7 +486,7 @@ export default function App() {
   const onShare = async () => {
     const message =
       `DECKABET ♠\n` +
-      `cleared in ${state.played.length} words · best: ${bestWord.toUpperCase()}\n` +
+      `${wonScore} pts · ${state.played.length} words · best: ${bestWord.toUpperCase()}\n` +
       `word klondike — every deal winnable`;
     try {
       await Share.share({ message });
@@ -763,9 +782,45 @@ export default function App() {
           <View style={styles.overlayRule} />
           <View style={styles.wonWordsWrap}>
             {state.played.map((w, i) => (
-              <WordChip key={i} word={w} />
+              <PopIn key={i} delay={i * 80}>
+                <WordChip word={w} pts={wordScore(w)} />
+              </PopIn>
             ))}
           </View>
+          {(() => {
+            // Presented as named bonuses only — players never see the math (spec 4c).
+            const econ = wordEconomyMult(state.played.length);
+            const stock = stockEconomyMult(
+              state.reserveLettersPlayed,
+              state.parksUsed,
+              state.recyclesUsed,
+            );
+            const pct = (m: number) => `+${Math.round((m - 1) * 100)}%`;
+            const chips: string[] = [];
+            const closer = state.played[state.played.length - 1] ?? '';
+            chips.push(`ENCORE ×2 · ${closer.toUpperCase()}`);
+            if (econ > 1) chips.push(`WORD ECONOMY ${pct(econ)}`);
+            if (stock === 1.5) chips.push('PURIST ★ +50%');
+            else if (stock > 1) chips.push(`STOCK DISCIPLINE ${pct(stock)}`);
+            const baseDelay = state.played.length * 80 + 120;
+            return (
+              <>
+                <View style={styles.bonusWrap}>
+                  {chips.map((label, i) => (
+                    <PopIn key={label} delay={baseDelay + i * 140}>
+                      <View style={styles.bonusChip}>
+                        <Text style={styles.bonusChipText}>{label}</Text>
+                      </View>
+                    </PopIn>
+                  ))}
+                </View>
+                <PopIn delay={baseDelay + chips.length * 140 + 120}>
+                  <Text style={styles.scoreTotal}>{wonScore}</Text>
+                  <Text style={styles.scoreTotalLabel}>points</Text>
+                </PopIn>
+              </>
+            );
+          })()}
           <Text style={styles.overlayStat}>
             {state.played.length} words · best {bestWord.toUpperCase()}
           </Text>
@@ -956,12 +1011,20 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   chip: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 4,
     borderRadius: 999,
     borderWidth: 1,
     borderColor: C.border,
     backgroundColor: C.surfaceHi,
     paddingHorizontal: 9,
     paddingVertical: 4,
+  },
+  chipPts: {
+    color: C.accent,
+    fontSize: 10,
+    fontWeight: '800',
   },
   chipText: {
     color: C.ink,
@@ -1214,6 +1277,40 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     marginBottom: 12,
+  },
+  bonusWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 6,
+    marginBottom: 12,
+  },
+  bonusChip: {
+    borderRadius: 999,
+    backgroundColor: C.accentFaint,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  bonusChipText: {
+    color: C.accent,
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1,
+  },
+  scoreTotal: {
+    color: C.ink,
+    fontSize: 40,
+    fontWeight: '800',
+    textAlign: 'center',
+    fontVariant: ['tabular-nums'],
+  },
+  scoreTotalLabel: {
+    color: C.inkFaint,
+    fontSize: 10,
+    letterSpacing: 2,
+    textAlign: 'center',
+    marginBottom: 8,
+    textTransform: 'uppercase',
   },
   overlayStat: {
     color: C.inkMuted,
