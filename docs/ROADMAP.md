@@ -10,6 +10,11 @@
 `lf-110/scoring-module`). Every PR: typecheck + tests green, ticket ID in the
 PR title. Tickets are sized S (≤half day), M (~1 day), L (multi-day).
 
+**Progress tracking:** `docs/roadmap.html` (the published artifact) is the
+live tracker — journey stepper, per-ticket status, shipped log. Update ticket
+status there **in the same PR that completes the work**. Current position:
+0/41 tickets shipped; next up LF-100; LF-177 is flagged ready-early.
+
 **Where we are (v0, done):** core loop — 7-column tableau, stock → reserve
 draw, 2 recycles, word tray (drag-to-swap, tap-to-return), park bays (first 3
 columns), tap-to-withdraw toggles, 290 solver-verified deals, dark card-room

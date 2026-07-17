@@ -1,4 +1,4 @@
-<title>DECKABET — Roadmap to the App Store</title>
+<title>DECKABET — Project Tracker</title>
 <style>
   :root {
     --bg: #f4f0e5;
@@ -19,559 +19,355 @@
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #0f1216;
-      --surface: #151a20;
-      --surface-hi: #1b2129;
-      --border: #2a2f36;
-      --ink: #e9e5db;
-      --muted: #8b93a0;
-      --faint: #5c6470;
-      --green: #3ddc84;
-      --green-soft: rgba(61, 220, 132, 0.14);
-      --orange: #f0883e;
-      --orange-soft: rgba(240, 136, 62, 0.14);
-      --card: #f2ead9;
-      --card-edge: #d9cfb8;
-      --card-ink: #26241e;
+      --bg: #0f1216; --surface: #151a20; --surface-hi: #1b2129; --border: #2a2f36;
+      --ink: #e9e5db; --muted: #8b93a0; --faint: #5c6470;
+      --green: #3ddc84; --green-soft: rgba(61, 220, 132, 0.14);
+      --orange: #f0883e; --orange-soft: rgba(240, 136, 62, 0.14);
+      --card: #f2ead9; --card-edge: #d9cfb8; --card-ink: #26241e;
       --shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
     }
   }
   :root[data-theme="dark"] {
-    --bg: #0f1216;
-    --surface: #151a20;
-    --surface-hi: #1b2129;
-    --border: #2a2f36;
-    --ink: #e9e5db;
-    --muted: #8b93a0;
-    --faint: #5c6470;
-    --green: #3ddc84;
-    --green-soft: rgba(61, 220, 132, 0.14);
-    --orange: #f0883e;
-    --orange-soft: rgba(240, 136, 62, 0.14);
-    --card: #f2ead9;
-    --card-edge: #d9cfb8;
-    --card-ink: #26241e;
+    --bg: #0f1216; --surface: #151a20; --surface-hi: #1b2129; --border: #2a2f36;
+    --ink: #e9e5db; --muted: #8b93a0; --faint: #5c6470;
+    --green: #3ddc84; --green-soft: rgba(61, 220, 132, 0.14);
+    --orange: #f0883e; --orange-soft: rgba(240, 136, 62, 0.14);
+    --card: #f2ead9; --card-edge: #d9cfb8; --card-ink: #26241e;
     --shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
   }
   :root[data-theme="light"] {
-    --bg: #f4f0e5;
-    --surface: #fbf9f2;
-    --surface-hi: #ffffff;
-    --border: #ddd6c4;
-    --ink: #26241e;
-    --muted: #6d6b5e;
-    --faint: #9a9789;
-    --green: #157f47;
-    --green-soft: rgba(21, 127, 71, 0.12);
-    --orange: #b25a1b;
-    --orange-soft: rgba(178, 90, 27, 0.12);
-    --card: #fffef8;
-    --card-edge: #d9cfb8;
-    --card-ink: #26241e;
+    --bg: #f4f0e5; --surface: #fbf9f2; --surface-hi: #ffffff; --border: #ddd6c4;
+    --ink: #26241e; --muted: #6d6b5e; --faint: #9a9789;
+    --green: #157f47; --green-soft: rgba(21, 127, 71, 0.12);
+    --orange: #b25a1b; --orange-soft: rgba(178, 90, 27, 0.12);
+    --card: #fffef8; --card-edge: #d9cfb8; --card-ink: #26241e;
     --shadow: 0 1px 3px rgba(38, 36, 30, 0.12);
   }
 
   * { box-sizing: border-box; }
   body {
-    background: var(--bg);
-    color: var(--ink);
-    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-    margin: 0;
-    padding: 48px 20px 80px;
+    background: var(--bg); color: var(--ink);
+    font: 15.5px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    margin: 0; padding: 44px 20px 80px;
   }
-  .page { max-width: 860px; margin: 0 auto; }
-  code, .mono {
-    font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: 0.86em;
-  }
+  .page { max-width: 880px; margin: 0 auto; }
+  .mono, code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.87em; }
 
-  /* ---------- header ---------- */
-  .wordmark {
-    font-size: 15px;
-    font-weight: 800;
-    letter-spacing: 4px;
-    color: var(--ink);
-  }
+  /* header */
+  .wordmark { font-size: 15px; font-weight: 800; letter-spacing: 4px; }
   .wordmark .spade { color: var(--green); }
-  .tilerow { display: flex; gap: 7px; margin: 22px 0 14px; flex-wrap: wrap; }
-  .tile {
-    width: 44px; height: 58px;
-    background: var(--card);
-    border: 1px solid var(--card-edge);
-    border-radius: 7px;
-    box-shadow: var(--shadow);
-    color: var(--card-ink);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px; font-weight: 800;
-    position: relative;
+  h1 { font-size: 27px; font-weight: 800; margin: 10px 0 6px; letter-spacing: 0.4px; }
+  .lede { color: var(--muted); max-width: 64ch; margin: 0; }
+  .statrow { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+  .stat {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 10px 16px; min-width: 110px;
   }
-  .tile::before {
-    content: attr(data-l);
-    position: absolute; top: 3px; left: 5px;
-    font-size: 9px; font-weight: 700; opacity: 0.45;
+  .stat .v { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .stat .v.green { color: var(--green); }
+  .stat .v.orange { color: var(--orange); }
+  .stat .k { font-size: 10.5px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--faint); font-weight: 700; }
+
+  /* journey stepper */
+  section { margin-top: 46px; }
+  .kicker { font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--faint); margin: 0 0 12px; }
+  .journey { display: flex; flex-wrap: wrap; gap: 0; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); overflow: hidden; }
+  .step { flex: 1 1 110px; padding: 14px 14px 12px; border-right: 1px solid var(--border); position: relative; min-width: 104px; }
+  .step:last-child { border-right: none; }
+  .step .s-mark { font-size: 13px; font-weight: 800; }
+  .step.done .s-mark { color: var(--green); }
+  .step.now .s-mark { color: var(--orange); }
+  .step.future .s-mark { color: var(--faint); }
+  .step .s-name { font-weight: 700; font-size: 13.5px; margin-top: 2px; }
+  .step .s-sub { font-size: 11.5px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
+  .step.now { background: var(--orange-soft); }
+  .step.future { opacity: 0.75; }
+
+  /* board */
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; margin: 0 0 14px; font-size: 12px; color: var(--muted); align-items: center; }
+  .st {
+    display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: 0.8px;
+    padding: 2px 8px; border-radius: 999px; text-transform: uppercase; white-space: nowrap;
   }
-  .tile.orange { border-color: var(--orange); border-width: 1.5px; }
-  h1 {
-    font-size: 30px; font-weight: 800; letter-spacing: 0.5px;
-    margin: 0 0 8px; text-wrap: balance;
+  .st.done { background: var(--green-soft); color: var(--green); }
+  .st.next { background: var(--green); color: var(--bg); }
+  .st.ready { background: var(--orange-soft); color: var(--orange); }
+  .st.todo { background: var(--surface-hi); color: var(--muted); border: 1px solid var(--border); }
+  .st.post { background: transparent; color: var(--faint); border: 1px dashed var(--border); }
+  .st.open { background: var(--orange); color: var(--bg); }
+
+  .epic { border: 1px solid var(--border); border-radius: 14px; background: var(--surface); margin-bottom: 14px; overflow: hidden; }
+  .epic-head {
+    display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+    padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--surface-hi);
   }
-  .lede { color: var(--muted); max-width: 62ch; margin: 0 0 10px; }
-  .meta-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+  .epic-head .e-id { font-weight: 800; color: var(--orange); font-size: 12.5px; font-family: ui-monospace, Menlo, monospace; }
+  .epic-head .e-name { font-weight: 800; font-size: 15px; }
+  .epic-head .e-mile { margin-left: auto; font-size: 11px; color: var(--faint); font-weight: 700; letter-spacing: 1px; }
+  .epic-head .e-count { font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .trow { display: flex; gap: 12px; align-items: baseline; padding: 9px 16px; border-bottom: 1px solid var(--border); }
+  .trow:last-child { border-bottom: none; }
+  .trow .t-id { font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; color: var(--faint); min-width: 52px; }
+  .trow .t-name { flex: 1; font-size: 14px; }
+  .trow .t-name .t-note { color: var(--muted); font-size: 12.5px; }
+  .trow .t-size { font-size: 10.5px; font-weight: 800; color: var(--faint); min-width: 14px; text-align: center; }
+
+  /* shipped */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
   .chip {
-    font-size: 12px; font-weight: 600; letter-spacing: 0.4px;
-    padding: 4px 10px; border-radius: 999px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--muted);
+    font-size: 12px; font-weight: 600; padding: 4px 11px; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--surface); color: var(--muted);
   }
-  .chip.green { color: var(--green); border-color: transparent; background: var(--green-soft); }
-  .chip.orange { color: var(--orange); border-color: transparent; background: var(--orange-soft); }
+  .chip.done::before { content: "✓ "; color: var(--green); font-weight: 800; }
+  .prlist { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); margin-top: 14px; }
+  .pr { display: flex; gap: 10px; align-items: baseline; padding: 8px 14px; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+  .pr:last-child { border-bottom: none; }
+  .pr .p-id { font-family: ui-monospace, Menlo, monospace; color: var(--faint); font-size: 12px; min-width: 28px; }
 
-  /* ---------- sections ---------- */
-  section { margin-top: 52px; }
-  .kicker {
-    font-size: 11px; font-weight: 700; letter-spacing: 2.5px;
-    text-transform: uppercase; color: var(--faint); margin: 0 0 6px;
+  /* reference accordions */
+  details { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); margin-bottom: 10px; }
+  summary {
+    cursor: pointer; padding: 12px 16px; font-weight: 700; font-size: 14.5px;
+    list-style: none; display: flex; align-items: baseline; gap: 10px;
   }
-  h2 {
-    font-size: 21px; font-weight: 800; letter-spacing: 0.3px;
-    margin: 0 0 14px; text-wrap: balance;
-  }
-  h2 .id { color: var(--faint); font-weight: 700; margin-right: 8px; }
-  .intent { color: var(--muted); font-style: italic; margin: -6px 0 14px; max-width: 62ch; }
-  p { max-width: 68ch; }
-
-  /* ---------- milestones ---------- */
-  .miles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
-  .mile {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 14px 16px;
-  }
-  .mile .m-id { font-weight: 800; color: var(--green); font-size: 13px; letter-spacing: 1px; }
-  .mile .m-name { font-weight: 700; margin: 2px 0 6px; }
-  .mile .m-exit { font-size: 13px; color: var(--muted); line-height: 1.45; }
-
-  /* ---------- tables ---------- */
-  .table-wrap {
-    overflow-x: auto;
-    border: 1px solid var(--border); border-radius: 12px;
-    background: var(--surface);
-  }
-  table { border-collapse: collapse; width: 100%; font-size: 14px; }
-  th {
-    text-align: left; font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase;
-    color: var(--faint); font-weight: 700;
-    padding: 10px 14px; border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-  td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
-  tr:last-child td { border-bottom: none; }
-  td.id { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; color: var(--orange); white-space: nowrap; font-weight: 600; }
-  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
-  .size {
-    display: inline-block; min-width: 22px; text-align: center;
-    font-size: 11px; font-weight: 800; border-radius: 6px; padding: 2px 5px;
-  }
-  .size.s { background: var(--green-soft); color: var(--green); }
-  .size.m { background: var(--orange-soft); color: var(--orange); }
-  .size.l { background: var(--surface-hi); color: var(--muted); border: 1px solid var(--border); }
-  .crit { color: var(--muted); }
-
-  /* ---------- scoring ---------- */
-  .valgroups { display: flex; flex-wrap: wrap; gap: 14px; margin: 18px 0; }
-  .valgroup { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
-  .valgroup .pts {
-    font-size: 11px; font-weight: 800; letter-spacing: 1px; color: var(--faint);
-    text-transform: uppercase;
-  }
-  .minirow { display: flex; gap: 5px; flex-wrap: wrap; max-width: 250px; }
-  .mini {
-    width: 26px; height: 34px; border-radius: 5px;
-    background: var(--card); border: 1px solid var(--card-edge);
-    color: var(--card-ink); font-weight: 800; font-size: 14px;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: var(--shadow);
-  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: "▸"; color: var(--orange); transition: transform 0.15s; }
+  details[open] summary::before { transform: rotate(90deg); }
+  @media (prefers-reduced-motion: reduce) { summary::before { transition: none; } }
+  summary .sum-note { font-weight: 400; font-size: 12.5px; color: var(--faint); }
+  summary:focus-visible { outline: 2px solid var(--green); outline-offset: -2px; border-radius: 12px; }
+  .ref-body { padding: 4px 16px 16px; color: var(--muted); font-size: 14px; }
+  .ref-body p { max-width: 68ch; }
   .formula {
-    background: var(--surface-hi); border: 1px solid var(--border);
-    border-radius: 10px; padding: 14px 16px; margin: 14px 0;
-    font-family: ui-monospace, Menlo, monospace; font-size: 13.5px;
-    overflow-x: auto; white-space: pre; line-height: 1.7;
+    background: var(--surface-hi); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; margin: 10px 0; overflow-x: auto; white-space: pre; line-height: 1.65;
+    font-family: ui-monospace, Menlo, monospace; font-size: 13px; color: var(--ink);
   }
-  .callout {
-    border: 1px solid var(--border); background: var(--surface);
-    border-radius: 12px; padding: 16px 18px; margin: 16px 0;
-  }
-  .callout .c-title { font-weight: 800; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: var(--green); margin-bottom: 6px; }
-  .callout p { margin: 0; font-size: 14.5px; color: var(--muted); }
-  .callout .formula { margin-bottom: 0; }
+  .ref-body ul { padding-left: 20px; margin: 8px 0; }
+  .ref-body li { margin-bottom: 5px; }
+  .ref-body strong { color: var(--ink); }
 
-  /* ---------- achievements ---------- */
-  .badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
-  .badge {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 12px 14px;
-  }
-  .badge .b-name { font-weight: 700; font-size: 14.5px; }
-  .badge .b-name::before { content: "♠ "; color: var(--green); }
-  .badge .b-crit { font-size: 13px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
-
-  /* ---------- footer ---------- */
-  .foot {
-    margin-top: 60px; padding-top: 18px; border-top: 1px solid var(--border);
-    color: var(--faint); font-size: 13px; max-width: 68ch;
-  }
-  .foot .mono { color: var(--muted); }
-  ol { padding-left: 22px; max-width: 66ch; }
-  li { margin-bottom: 6px; }
-  a { color: var(--green); }
-  a:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; border-radius: 3px; }
+  .foot { margin-top: 52px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--faint); font-size: 13px; max-width: 70ch; }
 </style>
 
 <div class="page">
   <header>
     <div class="wordmark">DECKABET <span class="spade">♠</span></div>
-    <div class="tilerow" aria-hidden="true">
-      <div class="tile" data-l="R">R</div>
-      <div class="tile" data-l="O">O</div>
-      <div class="tile" data-l="A">A</div>
-      <div class="tile" data-l="D">D</div>
-      <div class="tile orange" data-l="M">M</div>
-      <div class="tile" data-l="A">A</div>
-      <div class="tile" data-l="P">P</div>
-    </div>
-    <h1>Roadmap to the App Store</h1>
-    <p class="lede">Word Klondike — every deal winnable. Seven epics take the finished core loop
-    to a scored, persistent, competitive game that passes App Store review.
-    One PR per ticket; this page mirrors <span class="mono">docs/ROADMAP.md</span>, which is canonical.</p>
-    <div class="meta-chips">
-      <span class="chip green">core loop done</span>
-      <span class="chip">290 verified deals</span>
-      <span class="chip orange">next: LF-100</span>
-      <span class="chip">branch: lf-&lt;ticket&gt;/&lt;slug&gt;</span>
+    <h1>Project Tracker</h1>
+    <p class="lede">Word Klondike, App Store bound. The playable core and the full design are done —
+    the implementation train starts at LF-100. Canonical specs: <span class="mono">docs/ROADMAP.md</span> ·
+    <span class="mono">docs/GENERATION.md</span>.</p>
+    <div class="statrow">
+      <div class="stat"><div class="v green">✓</div><div class="k">core loop playable</div></div>
+      <div class="stat"><div class="v green">✓</div><div class="k">design specced</div></div>
+      <div class="stat"><div class="v">0 / 41</div><div class="k">tickets shipped</div></div>
+      <div class="stat"><div class="v orange">LF-100</div><div class="k">up next</div></div>
+      <div class="stat"><div class="v">5 + 1</div><div class="k">PRs merged + open</div></div>
     </div>
   </header>
 
   <section>
-    <p class="kicker">Sequence</p>
-    <h2>Milestones</h2>
-    <div class="miles">
-      <div class="mile">
-        <div class="m-id">M1</div>
-        <div class="m-name">Scored</div>
-        <div class="m-exit">E0 + E1 — every win produces a defensible score with a breakdown; CI green on every PR.</div>
-      </div>
-      <div class="mile">
-        <div class="m-id">M2</div>
-        <div class="m-name">Sticky</div>
-        <div class="m-exit">E2 + E3 — stats survive relaunch, games resume mid-deal, difficulty is player-controlled.</div>
-      </div>
-      <div class="mile">
-        <div class="m-id">M3</div>
-        <div class="m-name">Social</div>
-        <div class="m-exit">E7 + E4 + E5 — the living deck generates the daily set; Game Center boards live; badges unlock.</div>
-      </div>
-      <div class="mile">
-        <div class="m-id">M4</div>
-        <div class="m-name">Shipped</div>
-        <div class="m-exit">E6 — approved and live on the App Store.</div>
-      </div>
-      <div class="mile">
-        <div class="m-id">M5</div>
-        <div class="m-name">Alive</div>
-        <div class="m-exit">E8 + E7 phase 2 — word ladder with community-driven retirement; server seeds + replay validation.</div>
-      </div>
+    <p class="kicker">Where we are</p>
+    <div class="journey">
+      <div class="step done"><div class="s-mark">✓ DONE</div><div class="s-name">Core loop</div><div class="s-sub">Playable game, 290 verified deals, drag &amp; park UX</div></div>
+      <div class="step done"><div class="s-mark">✓ DONE</div><div class="s-name">Design</div><div class="s-sub">Scoring, Living Deck, modes, ladder, endgame fix — all specced</div></div>
+      <div class="step now"><div class="s-mark">● NOW</div><div class="s-name">Build M1</div><div class="s-sub">Tests + CI, then the scoring engine</div></div>
+      <div class="step future"><div class="s-mark">M2</div><div class="s-name">Sticky</div><div class="s-sub">Persistence, settings, difficulty</div></div>
+      <div class="step future"><div class="s-mark">M3</div><div class="s-name">Social</div><div class="s-sub">Living Deck, daily set, leaderboards, badges</div></div>
+      <div class="step future"><div class="s-mark">M4</div><div class="s-name">Shipped</div><div class="s-sub">Polish, review, App Store</div></div>
+      <div class="step future"><div class="s-mark">M5</div><div class="s-name">Alive</div><div class="s-sub">Word ladder, server validation</div></div>
     </div>
   </section>
 
   <section>
-    <p class="kicker">Epic</p>
-    <h2><span class="id">E0</span>Engineering Foundation</h2>
-    <p class="intent">The repo becomes a codebase: tests, CI, structure. Everything later depends on this.</p>
-    <div class="table-wrap"><table>
-      <tr><th>ID</th><th>Ticket</th><th>Size</th><th>Acceptance</th></tr>
-      <tr><td class="id">LF-100</td><td>Port reducer tests into repo with Jest</td><td><span class="size s">S</span></td><td class="crit"><code>npm test</code> runs park/swap/withdraw/win suite + deal schema validation; scratchpad scripts retired</td></tr>
-      <tr><td class="id">LF-101</td><td>GitHub Actions CI</td><td><span class="size s">S</span></td><td class="crit">Typecheck + tests on every PR; red PRs can't merge</td></tr>
-      <tr><td class="id">LF-102</td><td>ESLint + Prettier</td><td><span class="size s">S</span></td><td class="crit">Config committed, codebase clean, CI enforces</td></tr>
-      <tr><td class="id">LF-103</td><td>Split App.tsx into components + screens</td><td><span class="size m">M</span></td><td class="crit">Card / Tray / Tableau / Piles components; App.tsx &lt; 150 lines; no behavior change</td></tr>
-      <tr><td class="id">LF-104</td><td>PR template + CONTRIBUTING.md</td><td><span class="size s">S</span></td><td class="crit">Template asks for ticket ID, test evidence, screenshots on UI changes</td></tr>
-      <tr><td class="id">LF-105</td><td>Deal generator as repo script, witnesses stored</td><td><span class="size m">M</span></td><td class="crit">Generator checked in; every deal carries its witness; Jest replays all witnesses through the reducer</td></tr>
-    </table></div>
-  </section>
+    <p class="kicker">The board — every ticket, in build order</p>
+    <div class="legend">
+      <span class="st next">next</span> queued now
+      <span class="st ready">ready early</span> can ship ahead of its epic
+      <span class="st todo">todo</span> specced, not started
+      <span class="st post">post-launch</span> M5
+      <span class="st done">done</span> merged
+    </div>
 
-  <section>
-    <p class="kicker">Epic</p>
-    <h2><span class="id">E1</span>Scoring Engine</h2>
-    <p class="intent">Implements the scoring spec below — pure functions, heavily tested, then wired into the UI.</p>
-    <div class="table-wrap"><table>
-      <tr><th>ID</th><th>Ticket</th><th>Size</th><th>Acceptance</th></tr>
-      <tr><td class="id">LF-110</td><td><span class="mono">src/scoring.ts</span>: letter values + word score</td><td><span class="size s">S</span></td><td class="crit">Matches spec tables exactly; unit tests incl. QUIZ = 28</td></tr>
-      <tr><td class="id">LF-111</td><td>Deal score: multipliers; reducer tracks counters</td><td><span class="size m">M</span></td><td class="crit">State carries reserve letters / parks / recycles used; matches worked example</td></tr>
-      <tr><td class="id">LF-112</td><td>Live word score preview in tray</td><td><span class="size s">S</span></td><td class="crit">Valid word shows its score on the PLAY button</td></tr>
-      <tr><td class="id">LF-113</td><td>Win screen score breakdown</td><td><span class="size m">M</span></td><td class="crit">Animated tally: word scores → multipliers → total; matches scoring module</td></tr>
-    </table></div>
-  </section>
+    <div class="epic">
+      <div class="epic-head"><span class="e-id">E0</span><span class="e-name">Engineering Foundation</span><span class="e-count">0/6</span><span class="e-mile">M1</span></div>
+      <div class="trow"><span class="t-id">LF-100</span><span class="t-name">Jest + reducer test suite in repo</span><span class="t-size">S</span><span class="st next">next</span></div>
+      <div class="trow"><span class="t-id">LF-101</span><span class="t-name">GitHub Actions CI on every PR</span><span class="t-size">S</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-102</span><span class="t-name">ESLint + Prettier</span><span class="t-size">S</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-103</span><span class="t-name">Split App.tsx into components + screens</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-104</span><span class="t-name">PR template + CONTRIBUTING</span><span class="t-size">S</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-105</span><span class="t-name">Deal generator in repo, witnesses stored + replayed in tests</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+    </div>
 
-  <section>
-    <p class="kicker">Epic</p>
-    <h2><span class="id">E2</span>Persistence &amp; Stats</h2>
-    <div class="table-wrap"><table>
-      <tr><th>ID</th><th>Ticket</th><th>Size</th><th>Acceptance</th></tr>
-      <tr><td class="id">LF-120</td><td>Storage layer (versioned, migratable)</td><td><span class="size s">S</span></td><td class="crit">Typed get/set over AsyncStorage; unit-tested with mock storage</td></tr>
-      <tr><td class="id">LF-121</td><td>Lifetime stats + streaks persisted</td><td><span class="size m">M</span></td><td class="crit">Per mode: time played, games/wins, avg time per game, letters constructed, unique words, most-played top 10, best word, streaks, points; deal timer plumbing</td></tr>
-      <tr><td class="id">LF-122</td><td>Resume in-progress deal</td><td><span class="size m">M</span></td><td class="crit">Kill mid-deal → relaunch restores exact state including tray</td></tr>
-      <tr><td class="id">LF-123</td><td>Game history + personal bests</td><td><span class="size s">S</span></td><td class="crit">Best deal score, best word, fastest clear per difficulty; last 50 games</td></tr>
-    </table></div>
-  </section>
+    <div class="epic">
+      <div class="epic-head"><span class="e-id">E1</span><span class="e-name">Scoring Engine</span><span class="e-count">0/4</span><span class="e-mile">M1</span></div>
+      <div class="trow"><span class="t-id">LF-110</span><span class="t-name">Letter values + word score <span class="t-note">(QUIZ = 28)</span></span><span class="t-size">S</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-111</span><span class="t-name">Deal score: economy / stock / difficulty multipliers + Encore; reducer counters</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-112</span><span class="t-name">Live word-score preview on PLAY button</span><span class="t-size">S</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-113</span><span class="t-name">Win-screen score breakdown (animated tally)</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+    </div>
 
-  <section>
-    <p class="kicker">Epic</p>
-    <h2><span class="id">E3</span>Settings &amp; Difficulty</h2>
-    <div class="table-wrap"><table>
-      <tr><th>ID</th><th>Ticket</th><th>Size</th><th>Acceptance</th></tr>
-      <tr><td class="id">LF-130</td><td>Settings screen + persisted store</td><td><span class="size s">S</span></td><td class="crit">Gear in top bar; values persist</td></tr>
-      <tr><td class="id">LF-131</td><td>Difficulty presets wired to game config</td><td><span class="size m">M</span></td><td class="crit">Presets change recycles + park bays per spec; apply to next deal only; score multiplier applied</td></tr>
-      <tr><td class="id">LF-132</td><td>Sound, haptics, reduce-motion toggles</td><td><span class="size m">M</span></td><td class="crit">Haptics on taps/plays/wins; toggles respected everywhere</td></tr>
-      <tr><td class="id">LF-133</td><td>How-to-play screen</td><td><span class="size m">M</span></td><td class="crit">Rules, park bays, scoring summary; linked from settings + first launch</td></tr>
-    </table></div>
-  </section>
+    <div class="epic">
+      <div class="epic-head"><span class="e-id">E2</span><span class="e-name">Persistence &amp; Stats</span><span class="e-count">0/4</span><span class="e-mile">M2</span></div>
+      <div class="trow"><span class="t-id">LF-120</span><span class="t-name">Versioned storage layer</span><span class="t-size">S</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-121</span><span class="t-name">Lifetime stats per mode <span class="t-note">(time played, avg time/game, letters, unique words, most-played top 10, bests, streaks)</span></span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-122</span><span class="t-name">Resume in-progress deal after relaunch</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-123</span><span class="t-name">Game history + personal bests</span><span class="t-size">S</span><span class="st todo">todo</span></div>
+    </div>
 
-  <section>
-    <p class="kicker">Epic</p>
-    <h2><span class="id">E4</span>Leaderboards</h2>
-    <div class="table-wrap"><table>
-      <tr><th>ID</th><th>Ticket</th><th>Size</th><th>Acceptance</th></tr>
-      <tr><td class="id">LF-140</td><td>Local leaderboards</td><td><span class="size s">S</span></td><td class="crit">Top-20 deal scores per difficulty, offline, in-app</td></tr>
-      <tr><td class="id">LF-141</td><td>Daily set leaderboard integration</td><td><span class="size m">M</span></td><td class="crit">Depends on E7 (LF-174): cumulative daily total submits to the daily board; practice unscored</td></tr>
-      <tr><td class="id">LF-142</td><td>Game Center: plugin + auth</td><td><span class="size m">M</span></td><td class="crit">Entitlement via config plugin; silent auth; offline fallback</td></tr>
-      <tr><td class="id">LF-143</td><td>Game Center: submit + fetch boards</td><td><span class="size m">M</span></td><td class="crit">Challenge-only boards: daily total (recurring) + all-time challenge points</td></tr>
-      <tr><td class="id">LF-144</td><td>Leaderboard + stats screen</td><td><span class="size m">M</span></td><td class="crit">Daily / All-time / My Stats tabs; player rank; local fallback</td></tr>
-    </table></div>
-  </section>
+    <div class="epic">
+      <div class="epic-head"><span class="e-id">E3</span><span class="e-name">Settings &amp; Difficulty</span><span class="e-count">0/4</span><span class="e-mile">M2</span></div>
+      <div class="trow"><span class="t-id">LF-130</span><span class="t-name">Settings screen + persisted store</span><span class="t-size">S</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-131</span><span class="t-name">Difficulty presets (Casual ×1.0 / Standard ×1.25 / Expert ×1.6)</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-132</span><span class="t-name">Sound, haptics, reduce-motion toggles</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-133</span><span class="t-name">How-to-play screen</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+    </div>
 
-  <section>
-    <p class="kicker">Epic</p>
-    <h2><span class="id">E5</span>Achievements</h2>
-    <div class="table-wrap"><table>
-      <tr><th>ID</th><th>Ticket</th><th>Size</th><th>Acceptance</th></tr>
-      <tr><td class="id">LF-150</td><td>Achievement engine</td><td><span class="size m">M</span></td><td class="crit">Declarative rules over game events; persisted; decoupled from game logic</td></tr>
-      <tr><td class="id">LF-151</td><td>Badge definitions</td><td><span class="size s">S</span></td><td class="crit">All badges defined: id, name, tiers, criteria, artwork slot</td></tr>
-      <tr><td class="id">LF-152</td><td>Badge gallery + unlock toast</td><td><span class="size m">M</span></td><td class="crit">Locked/unlocked/tier states; toast + haptic on unlock</td></tr>
-      <tr><td class="id">LF-153</td><td>Game Center achievements sync</td><td><span class="size s">S</span></td><td class="crit">Unlocks mirror to GC; idempotent</td></tr>
-    </table></div>
-  </section>
+    <div class="epic">
+      <div class="epic-head"><span class="e-id">E7</span><span class="e-name">The Living Deck ★ core</span><span class="e-count">0/8</span><span class="e-mile">M3</span></div>
+      <div class="trow"><span class="t-id">LF-177</span><span class="t-name">Dynamic bays — park on any empty column, max 3 parked <span class="t-note">(sim-proven fix for the left-first trap; rule change, no generator needed)</span></span><span class="t-size">M</span><span class="st ready">ready early</span></div>
+      <div class="trow"><span class="t-id">LF-170</span><span class="t-name">On-device seeded generator: board shapes, distribution + altitude guards, openness</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-171</span><span class="t-name">Solvability checker (escape-plan solver)</span><span class="t-size">L</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-172</span><span class="t-name">Draw-time stock steering — f(seed, move history), vowel lifeline</span><span class="t-size">L</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-173</span><span class="t-name">Difficulty ramp: shape + generosity + recycles + max-parked per game 1–5</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-174</span><span class="t-name">Daily set mode — 5 scored games, shared seeds, daily total, countdown</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-175</span><span class="t-name">Par estimation + score bands</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-176</span><span class="t-name">Seed service: local hash now, server-issued + replay validation designed</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+    </div>
 
-  <section>
-    <p class="kicker">Epic · core</p>
-    <h2><span class="id">E7</span>The Living Deck <span style="color: var(--orange);">★</span></h2>
-    <p class="intent">THE core of the game — full spec in <span class="mono">docs/GENERATION.md</span>.
-    Infinite seeded deals, solvability as a maintained invariant, draw-time stock steering,
-    5-game daily sets with rising difficulty, anti-lookahead by construction. Retires the
-    static deal pool; gates the daily half of E4.</p>
-    <div class="table-wrap"><table>
-      <tr><th>ID</th><th>Ticket</th><th>Size</th><th>Acceptance</th></tr>
-      <tr><td class="id">LF-170</td><td>On-device deal generator (TS, seeded PRNG)</td><td><span class="size m">M</span></td><td class="crit">Solution-first tableau from a seed; distribution guards; openness threshold; same seed ⇒ same deal</td></tr>
-      <tr><td class="id">LF-171</td><td>Solvability checker</td><td><span class="size l">L</span></td><td class="crit">Bounded memoized "still completable?" solver, draw-time fast; escape-plan maintenance; property-tested</td></tr>
-      <tr><td class="id">LF-172</td><td>Draw-time stock steering</td><td><span class="size l">L</span></td><td class="crit">Next card = f(seed, move history); invariant never broken; generosity knob; deterministic replay tested</td></tr>
-      <tr><td class="id">LF-173</td><td>Difficulty ramp parameters</td><td><span class="size m">M</span></td><td class="crit">Per-game steering generosity + recycles + bays; daily-set score multiplier decided</td></tr>
-      <tr><td class="id">LF-174</td><td>Daily set mode</td><td><span class="size m">M</span></td><td class="crit">5 scored games/day, same for everyone, cumulative total, reset countdown; free play unlimited/unscored</td></tr>
-      <tr><td class="id">LF-175</td><td>Par estimation + score bands</td><td><span class="size m">M</span></td><td class="crit">Achievable-score estimate at generation; out-of-band deals rejected</td></tr>
-      <tr><td class="id">LF-176</td><td>Seed service (phase 1 + phase 2 stub)</td><td><span class="size m">M</span></td><td class="crit">Launch: hash(date, game, salt) on device; server-issued seeds + move-log replay validation designed</td></tr>
-      <tr><td class="id">LF-177</td><td>Dynamic bays (rule change, ships early)</td><td><span class="size m">M</span></td><td class="crit">Park onto ANY empty column, max 3 parked at once; kills the clear-the-left-first trap (sim-proven: 61%→87% win gap); endgame breadth repair</td></tr>
-    </table></div>
-  </section>
+    <div class="epic">
+      <div class="epic-head"><span class="e-id">E4</span><span class="e-name">Leaderboards</span><span class="e-count">0/5</span><span class="e-mile">M3</span></div>
+      <div class="trow"><span class="t-id">LF-140</span><span class="t-name">Local leaderboards (free-play bests)</span><span class="t-size">S</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-141</span><span class="t-name">Daily-set leaderboard integration <span class="t-note">(needs LF-174)</span></span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-142</span><span class="t-name">Game Center: config plugin + auth</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-143</span><span class="t-name">GC boards: daily total, best word of the week, all-time points</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-144</span><span class="t-name">Leaderboard + My Stats screen</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+    </div>
 
-  <section>
-    <p class="kicker">Spec · core</p>
-    <h2>The Living Deck</h2>
-    <p>Six pillars, from <span class="mono">docs/GENERATION.md</span>:</p>
-    <div class="badges">
-      <div class="badge"><div class="b-name">Infinite, low-repeat</div><div class="b-crit">Deals generated from seeds at play time — no pool to exhaust, no file to memorize</div></div>
-      <div class="badge"><div class="b-name">Solvable, in a par band</div><div class="b-crit">A win and a good score always reachable; deal-to-deal score ceilings kept in a narrow band so totals compare skill, not luck</div></div>
-      <div class="badge"><div class="b-name">Difficulty ramps</div><div class="b-crit">Daily game 1 is generous, game 5 is tight — via steering generosity + rule tightening, never by breaking solvability</div></div>
-      <div class="badge"><div class="b-name">5 games, one daily total</div><div class="b-crit">Scored mode is a shared daily set; scarcity makes the total mean something; free play unlimited, unscored</div></div>
-      <div class="badge"><div class="b-name">The undrawn stock doesn't exist yet</div><div class="b-crit">Next card computed at draw time = f(seed, move history): kills letter floods ("seven E's"), kills lookahead tools — there's nothing stored to peek at</div></div>
-      <div class="badge"><div class="b-name">Guarantee, don't guide</div><div class="b-crit">Steering keeps <em>some</em> path alive but never hints toward it — the possibility space stays the player's</div></div>
+    <div class="epic">
+      <div class="epic-head"><span class="e-id">E5</span><span class="e-name">Achievements</span><span class="e-count">0/4</span><span class="e-mile">M3</span></div>
+      <div class="trow"><span class="t-id">LF-150</span><span class="t-name">Declarative achievement engine</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-151</span><span class="t-name">Badge definitions (15 families, tiered)</span><span class="t-size">S</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-152</span><span class="t-name">Badge gallery + unlock toasts</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-153</span><span class="t-name">Game Center achievements sync</span><span class="t-size">S</span><span class="st todo">todo</span></div>
+    </div>
+
+    <div class="epic">
+      <div class="epic-head"><span class="e-id">E6</span><span class="e-name">App Store Readiness</span><span class="e-count">0/8</span><span class="e-mile">M4</span></div>
+      <div class="trow"><span class="t-id">LF-160</span><span class="t-name">Branding: icon, splash, wordmark</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-161</span><span class="t-name">Onboarding tutorial (guided first deal)</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-162</span><span class="t-name">Accessibility: VoiceOver, dynamic type, reduce motion</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-163</span><span class="t-name">Sound design</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-164</span><span class="t-name">Crash reporting + error boundary</span><span class="t-size">S</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-165</span><span class="t-name">EAS build + TestFlight pipeline</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-166</span><span class="t-name">Privacy policy + store metadata + screenshots</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+      <div class="trow"><span class="t-id">LF-167</span><span class="t-name">Submit + review fixes → approved</span><span class="t-size">M</span><span class="st todo">todo</span></div>
+    </div>
+
+    <div class="epic">
+      <div class="epic-head"><span class="e-id">E8</span><span class="e-name">Word Ladder &amp; Living Meta</span><span class="e-count">0/6</span><span class="e-mile">M5 · post-launch</span></div>
+      <div class="trow"><span class="t-id">LF-180</span><span class="t-name">Ladder tiers + promotion from daily results</span><span class="t-size">M</span><span class="st post">post-launch</span></div>
+      <div class="trow"><span class="t-id">LF-181</span><span class="t-name">Word retirement engine (phase 1: static lists)</span><span class="t-size">M</span><span class="st post">post-launch</span></div>
+      <div class="trow"><span class="t-id">LF-182</span><span class="t-name">Effective-lexicon integration — deals winnable under bans</span><span class="t-size">M</span><span class="st post">post-launch</span></div>
+      <div class="trow"><span class="t-id">LF-183</span><span class="t-name">Retired-words gallery + tier UI</span><span class="t-size">M</span><span class="st post">post-launch</span></div>
+      <div class="trow"><span class="t-id">LF-184</span><span class="t-name">Usage telemetry + daily-reset retirement (trailing 7-day window)</span><span class="t-size">L</span><span class="st post">post-launch</span></div>
+      <div class="trow"><span class="t-id">LF-185</span><span class="t-name">Weekly meta: most-used words + best word of the week</span><span class="t-size">M</span><span class="st post">post-launch</span></div>
     </div>
   </section>
 
   <section>
-    <p class="kicker">Epic</p>
-    <h2><span class="id">E6</span>App Store Readiness</h2>
-    <div class="table-wrap"><table>
-      <tr><th>ID</th><th>Ticket</th><th>Size</th><th>Acceptance</th></tr>
-      <tr><td class="id">LF-160</td><td>Branding: icon, splash, wordmark</td><td><span class="size m">M</span></td><td class="crit">Final art; dark splash matches theme</td></tr>
-      <tr><td class="id">LF-161</td><td>Onboarding tutorial</td><td><span class="size m">M</span></td><td class="crit">Guided first deal teaching tap/drag/park; skippable; replayable</td></tr>
-      <tr><td class="id">LF-162</td><td>Accessibility pass</td><td><span class="size m">M</span></td><td class="crit">VoiceOver labels, dynamic type, reduce-motion honored</td></tr>
-      <tr><td class="id">LF-163</td><td>Sound design</td><td><span class="size m">M</span></td><td class="crit">Card slide/flip/play/win; honors silent switch</td></tr>
-      <tr><td class="id">LF-164</td><td>Crash reporting + error boundary</td><td><span class="size s">S</span></td><td class="crit">Sentry via EAS; boundary recovers to fresh deal</td></tr>
-      <tr><td class="id">LF-165</td><td>EAS build + TestFlight pipeline</td><td><span class="size m">M</span></td><td class="crit">Build profiles; internal distribution documented</td></tr>
-      <tr><td class="id">LF-166</td><td>Privacy policy + store metadata</td><td><span class="size m">M</span></td><td class="crit">Privacy manifest (GC only, no tracking); screenshots; listing copy</td></tr>
-      <tr><td class="id">LF-167</td><td>Submit + review fixes</td><td><span class="size m">M</span></td><td class="crit">Approved on the App Store</td></tr>
-    </table></div>
-  </section>
-
-  <section>
-    <p class="kicker">Spec</p>
-    <h2>Scoring</h2>
-    <p>Scoring rewards <strong>hard letters, long words, word economy, and stock discipline</strong>.
-    Everything is a pure function of the finished deal — no hidden state, fully unit-testable.</p>
-
-    <h3>Letter values</h3>
-    <div class="valgroups">
-      <div class="valgroup"><span class="pts">1 pt</span>
-        <div class="minirow"><div class="mini">A</div><div class="mini">E</div><div class="mini">I</div><div class="mini">O</div><div class="mini">U</div><div class="mini">L</div><div class="mini">N</div><div class="mini">S</div><div class="mini">T</div><div class="mini">R</div></div>
-      </div>
-      <div class="valgroup"><span class="pts">2 pts</span>
-        <div class="minirow"><div class="mini">D</div><div class="mini">G</div></div>
-      </div>
-      <div class="valgroup"><span class="pts">3 pts</span>
-        <div class="minirow"><div class="mini">B</div><div class="mini">C</div><div class="mini">M</div><div class="mini">P</div></div>
-      </div>
-      <div class="valgroup"><span class="pts">4 pts</span>
-        <div class="minirow"><div class="mini">F</div><div class="mini">H</div><div class="mini">V</div><div class="mini">W</div><div class="mini">Y</div></div>
-      </div>
-      <div class="valgroup"><span class="pts">5 pts</span>
-        <div class="minirow"><div class="mini">K</div></div>
-      </div>
-      <div class="valgroup"><span class="pts">8 pts</span>
-        <div class="minirow"><div class="mini">J</div><div class="mini">X</div></div>
-      </div>
-      <div class="valgroup"><span class="pts">10 pts</span>
-        <div class="minirow"><div class="mini">Q</div><div class="mini">Z</div></div>
-      </div>
+    <p class="kicker">Shipped so far</p>
+    <div class="chips">
+      <span class="chip done">Core loop: tableau · stock · reserve · tray</span>
+      <span class="chip done">Drag to park / drag to swap / tap to return</span>
+      <span class="chip done">Park bays + stock-origin (orange) cards</span>
+      <span class="chip done">290 solver-verified deals</span>
+      <span class="chip done">Dark card-room theme + ghost spots</span>
+      <span class="chip done">Win / dead-deal detection</span>
+      <span class="chip done">DECKABET name (availability-checked)</span>
+      <span class="chip done">Full design: scoring · Living Deck · modes · ladder</span>
     </div>
-
-    <h3>Word score</h3>
-    <div class="formula">wordScore = round( Σ letterValue × lengthMult )
-
-length      3      4      5      6      7      8
-lengthMult  1.00   1.25   1.60   2.00   2.50   3.20</div>
-    <p>Deliberately super-linear: one six-letter word beats two threes made of the
-    same letters. <span class="mono">QUIZ = (10+1+1+10) × 1.25 = 28</span>; <span class="mono">CAT = 5</span>.</p>
-
-    <h3>Deal score — awarded only on a win</h3>
-    <div class="formula">dealScore = round( baseScore × wordEconomyMult × stockEconomyMult × difficultyMult )
-
-baseScore = Σ wordScore over the winning deal
-
-words used         ≤4     5      6      7      8      9      10     11+
-wordEconomyMult    1.75   1.60   1.45   1.30   1.20   1.10   1.05   1.00
-
-stockEconomyMult = clamp( 1.5 − 0.08·reserveLettersPlayed
-                              − 0.05·parksUsed
-                              − 0.08·recyclesUsed,  1.0, 1.5 )</div>
-    <p>Drawing is free — browsing the stock costs nothing; <em>consuming</em> it does.
-    A clear with zero stock letters, zero parks, and zero recycles keeps the full
-    1.5 — the <strong>Purist bonus</strong>. Difficulty multiplies last: Casual ×1.00,
-    Standard ×1.25, Expert ×1.60.</p>
-
-    <div class="callout">
-      <div class="c-title">Worked example</div>
-      <p>Standard difficulty, cleared in 7 words, word scores summing to 240,
-      using 3 reserve letters, 1 park, 0 recycles:</p>
-      <div class="formula">stockEconomyMult = 1.5 − 0.24 − 0.05 = 1.21
-dealScore = round( 240 × 1.30 × 1.21 × 1.25 ) = 472</div>
-    </div>
-
-    <div class="callout">
-      <div class="c-title">Encore — the closer scores double</div>
-      <p>The final word of a winning deal earns 2× its wordScore. Word lengths structurally
-      fade as columns empty (sim-proven); Encore plus dynamic bays turns the ending into a
-      planned climax — hold breadth, stage a long closer — instead of a 3-letter grind.</p>
-    </div>
-    <p class="crit">Dead or abandoned deals bank no points (their words still count toward
-    achievements). Total points — the leaderboard currency — is the sum of banked deal scores.</p>
-  </section>
-
-  <section>
-    <p class="kicker">Spec</p>
-    <h2>Difficulty presets</h2>
-    <div class="table-wrap"><table>
-      <tr><th>Preset</th><th class="num">Recycles</th><th class="num">Park bays</th><th class="num">Score multiplier</th></tr>
-      <tr><td>Casual</td><td class="num">2</td><td class="num">3</td><td class="num">×1.00</td></tr>
-      <tr><td>Standard</td><td class="num">1</td><td class="num">2</td><td class="num">×1.25</td></tr>
-      <tr><td>Expert</td><td class="num">0</td><td class="num">1</td><td class="num">×1.60</td></tr>
-    </table></div>
-    <p>Every shipped deal is solver-verified winnable <em>without any recycles or parks</em>
-    (witnesses draw each needed stock letter exactly once, in order), so all three presets
-    keep the "every deal winnable" promise. Difficulty changes apply from the next deal.</p>
-  </section>
-
-  <section>
-    <p class="kicker">Spec</p>
-    <h2>Modes &amp; Leaderboards</h2>
-    <p><strong>Daily Challenge is the public game</strong> — the 5-game daily set is the only
-    mode on global boards (Game Center: daily total, best word of the week, all-time challenge
-    points). Same seed chain for everyone, so ranks compare like-for-like. The community's
-    most-used words of the week are surfaced in-app — and feed the ladder's daily-reset
-    retirement.</p>
-    <p><strong>Free play is private</strong> — unlimited deals, player-picked difficulty, never
-    ranked publicly. It feeds the personal dashboard: total time played, games and wins,
-    average time per game, letters constructed, unique words, most-played words, bests,
-    streaks — tracked per mode.</p>
-    <p>Post-launch, the <strong>word ladder</strong> (E8) turns challenge results into a ranked
-    tier — and the higher the tier, the more of the community's most-played words are retired.
-    Known limitation: scores are client-computed at launch; server seeds + move-log replay
-    validation is the M5 hardening path.</p>
-  </section>
-
-  <section>
-    <p class="kicker">Epic · post-launch</p>
-    <h2><span class="id">E8</span>Word Ladder &amp; Living Meta</h2>
-    <p class="intent">Ranked progression where the community's crutch words retire out of the
-    game: climb via daily-challenge results; at higher tiers the most-played words are banned,
-    driven by real usage across all players. <strong>Retirement resets each play day</strong> —
-    the day's ban list is recomputed from the trailing week's most-used words and applies for
-    that day only. The living deck generates against the player's <em>effective lexicon</em>,
-    so every deal stays winnable without that day's banned words.</p>
-    <div class="table-wrap"><table>
-      <tr><th>ID</th><th>Ticket</th><th>Size</th><th>Acceptance</th></tr>
-      <tr><td class="id">LF-180</td><td>Ladder: tiers, promotion, persisted rank</td><td><span class="size m">M</span></td><td class="crit">Tiers advanced by daily-challenge results; rank in profile; demotion rules documented</td></tr>
-      <tr><td class="id">LF-181</td><td>Word retirement engine (phase 1: static)</td><td><span class="size m">M</span></td><td class="crit">Per-tier ban lists from frequency data; "retired at your rank" feedback; free play unaffected</td></tr>
-      <tr><td class="id">LF-182</td><td>Effective-lexicon integration with living deck</td><td><span class="size m">M</span></td><td class="crit">Solver + openness run on base lexicon minus tier bans; winnable at every tier; tested</td></tr>
-      <tr><td class="id">LF-183</td><td>Retired-words gallery + tier UI</td><td><span class="size m">M</span></td><td class="crit">Ladder screen: tier, promotion progress, words retired per tier</td></tr>
-      <tr><td class="id">LF-184</td><td>Phase 2: usage telemetry + daily-reset retirement</td><td><span class="size l">L</span></td><td class="crit">Trailing 7-day usage window; each play day publishes that day's retired list (per tier); yesterday's bans lift automatically</td></tr>
-      <tr><td class="id">LF-185</td><td>Weekly meta surfaces</td><td><span class="size m">M</span></td><td class="crit">Most-used words of the week displayed in-app (feeds daily retirement); best word of the week: weekly GC board + personal stat</td></tr>
-    </table></div>
-  </section>
-
-  <section>
-    <p class="kicker">Spec</p>
-    <h2>Achievements</h2>
-    <div class="badges">
-      <div class="badge"><div class="b-name">First Light</div><div class="b-crit">Win your first deal</div></div>
-      <div class="badge"><div class="b-name">Regular / Devotee / Century</div><div class="b-crit">Win 10 / 50 / 100 deals</div></div>
-      <div class="badge"><div class="b-name">Warm / Hot / Eternal</div><div class="b-crit">Win streak of 3 / 7 / 30</div></div>
-      <div class="badge"><div class="b-name">Purist</div><div class="b-crit">Win with the full 1.5 stock bonus — no stock letters, parks, or recycles</div></div>
-      <div class="badge"><div class="b-name">Minimalist</div><div class="b-crit">Win in 5 words or fewer</div></div>
-      <div class="badge"><div class="b-name">Full Rack</div><div class="b-crit">Play an 8-letter word</div></div>
-      <div class="badge"><div class="b-name">High Roller</div><div class="b-crit">Single word worth 60+ points</div></div>
-      <div class="badge"><div class="b-name">Big Board</div><div class="b-crit">Deal score of 750+</div></div>
-      <div class="badge"><div class="b-name">Rare Bird 🥉🥈🥇</div><div class="b-crit">Play 1 / 10 / 50 words containing J, Q, X, or Z</div></div>
-      <div class="badge"><div class="b-name">Valet</div><div class="b-crit">Win a deal that used all three park bays</div></div>
-      <div class="badge"><div class="b-name">Tightrope</div><div class="b-crit">Win on Expert</div></div>
-      <div class="badge"><div class="b-name">Daybreak</div><div class="b-crit">Play your first daily challenge</div></div>
-      <div class="badge"><div class="b-name">Dedicated</div><div class="b-crit">Seven daily challenges in a row</div></div>
-      <div class="badge"><div class="b-name">Wordsmith 🥉🥈🥇</div><div class="b-crit">Play 100 / 500 / 2000 words lifetime</div></div>
-      <div class="badge"><div class="b-name">Millionaire's Club 🥉🥈🥇</div><div class="b-crit">10k / 100k / 1M total points</div></div>
+    <div class="prlist">
+      <div class="pr"><span class="p-id">#1</span><span>Challenge/free-play mode split + Word Ladder epic</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#2</span><span>Weekly meta + daily-reset word retirement</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#3</span><span>AGENTS.md repo guide</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#4</span><span>Rename LETTERFALL → DECKABET (repo + app + docs)</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#5</span><span>CLAUDE.md header + doc pointers</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#6</span><span>Endgame geometry: dynamic bays, board shapes, altitude guards, Encore</span><span style="margin-left:auto"><span class="st open">open</span></span></div>
     </div>
   </section>
 
   <section>
-    <p class="kicker">Parked</p>
-    <h2>Open questions</h2>
-    <ol>
-      <li><strong>Timer:</strong> does clear speed affect score, or stay achievement-only? Default: out of score — this is a thinking game.</li>
-      <li><strong>Android:</strong> Game Center is iOS-only; Play Games Services or a small backend when Android ships.</li>
-      <li><strong>Daily set multiplier:</strong> per-game ramp multiplier vs. difficulty presets — decide in LF-173.</li>
-      <li><strong>Free-play difficulty:</strong> player-picked preset vs. also offering the ramp — default: preset.</li>
-    </ol>
+    <p class="kicker">Design reference</p>
+
+    <details>
+      <summary>Scoring <span class="sum-note">letter values · multipliers · Encore</span></summary>
+      <div class="ref-body">
+        <p>Rewards hard letters, long words, word economy, stock discipline — and the closer.</p>
+        <div class="formula">letters   1: aeioulnstr   2: dg   3: bcmp   4: fhvwy   5: k   8: jx   10: qz
+
+wordScore = round( Σ letterValue × lengthMult )
+lengthMult      3:1.00  4:1.25  5:1.60  6:2.00  7:2.50  8:3.20
+Encore          the FINAL word of a winning deal scores ×2
+
+dealScore = round( base × wordEconomy × stockEconomy × difficulty )
+wordEconomy     ≤4:1.75  5:1.60  6:1.45  7:1.30  8:1.20  9:1.10  10:1.05  11+:1.00
+stockEconomy    clamp(1.5 − 0.08·reserveUsed − 0.05·parks − 0.08·recycles, 1.0, 1.5)
+difficulty      Casual ×1.00 · Standard ×1.25 · Expert ×1.60</div>
+        <p>Only wins bank points. Total points = Σ banked deal scores; daily total = Σ the day's 5 games.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>The Living Deck <span class="sum-note">generation v2 — the core</span></summary>
+      <div class="ref-body">
+        <ul>
+          <li><strong>Infinite, low-repeat:</strong> seeded deals at play time; no pool, no file to mine.</li>
+          <li><strong>Solvable in a par band:</strong> a win and a good score always reachable; deal-luck variance kept narrow.</li>
+          <li><strong>The undrawn stock doesn't exist yet:</strong> next card = f(seed, move history) at draw time — kills letter floods and lookahead tools.</li>
+          <li><strong>Guarantee, don't guide:</strong> an internal escape plan keeps deals completable but is never surfaced.</li>
+          <li><strong>Board geometry (sim-proven):</strong> shapes ramp flat [4×7] → steep as the daily difficulty lever; heights position-shuffled; rare letters surface early; vowel-lifeline steering; dynamic bays repair endgame breadth.</li>
+          <li><strong>Daily set:</strong> 5 shared scored games/day — the only publicly ranked mode; free play is private.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>Modes &amp; leaderboards <span class="sum-note">public daily · private free play</span></summary>
+      <div class="ref-body">
+        <ul>
+          <li><strong>Daily Challenge (public):</strong> Game Center boards — daily total, best word of the week, all-time points.</li>
+          <li><strong>Free play (private):</strong> unlimited, feeds personal stats: time played, games, avg time/game, letters constructed, unique words, most-played top 10, bests, streaks.</li>
+          <li><strong>Anti-cheat:</strong> client seeds at launch; server-issued seeds + move-log replay validation in M5.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details>
+      <summary>Word ladder <span class="sum-note">the living meta — post-launch</span></summary>
+      <div class="ref-body">
+        <p>Daily-challenge results advance a ranked tier; higher tiers retire the community's
+        most-played words. The ban list is recomputed <strong>each play day</strong> from the trailing
+        week's usage and lifts the next day — the meta breathes, never strangles. The generator
+        plays against each tier's <strong>effective lexicon</strong>, so every deal stays winnable
+        without the banned words.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Achievements <span class="sum-note">15 badge families</span></summary>
+      <div class="ref-body">
+        <p>First Light · Regular/Devotee/Century · Warm/Hot/Eternal streaks · Purist (no-stock clear)
+        · Minimalist (≤5 words) · Full Rack (8-letter word) · High Roller (60+ word) · Big Board (750+ deal)
+        · Rare Bird 🥉🥈🥇 (J/Q/X/Z words) · Valet (all bays used) · Tightrope (Expert win) · Daybreak
+        · Dedicated (7 dailies straight) · Wordsmith 🥉🥈🥇 · Millionaire's Club 🥉🥈🥇.</p>
+      </div>
+    </details>
   </section>
 
   <div class="foot">
-    Canonical source: <span class="mono">docs/ROADMAP.md</span> — this page is its rendering.
-    Workflow: one PR per ticket, branches named <span class="mono">lf-&lt;ticket&gt;/&lt;slug&gt;</span>,
-    typecheck + tests green before merge. DECKABET ♠ word klondike — every deal winnable.
+    Status updates land in the same PR as the work. Canonical source:
+    <span class="mono">docs/ROADMAP.md</span> (specs) — this page tracks execution.
+    DECKABET ♠ word klondike — every deal winnable.
   </div>
 </div>
