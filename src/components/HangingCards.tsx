@@ -80,8 +80,8 @@ export default function HangingCards({ reduceMotion = false }: { reduceMotion?: 
         Animated.delay(h.delay),
         Animated.spring(rise[i], {
           toValue: 1,
-          friction: 5.5,
-          tension: 42,
+          friction: 8,
+          tension: 12, // slow, weighty settle — not a snappy pop
           useNativeDriver: true,
         }),
       ]),
@@ -89,8 +89,8 @@ export default function HangingCards({ reduceMotion = false }: { reduceMotion?: 
         Animated.delay(h.delay),
         Animated.spring(entry[i], {
           toValue: 0,
-          friction: 4.5,
-          tension: 26,
+          friction: 6,
+          tension: 10, // slow pendulum settle
           useNativeDriver: true,
         }),
       ]),
@@ -144,8 +144,8 @@ export default function HangingCards({ reduceMotion = false }: { reduceMotion?: 
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       {hangers.map((h, i) => {
         const segLen = h.stringLen / SEGMENTS;
-        // Stretched: the card begins well below the bottom edge, then is released.
-        const start = height - h.stringLen + OFFSCREEN + h.cardH + 200;
+        // Stretched: the card begins just below the bottom edge, then is released.
+        const start = height - h.stringLen + OFFSCREEN + h.cardH + 90;
         const riseY = rise[i].interpolate({ inputRange: [0, 1], outputRange: [start, 0] });
         const px = Animated.multiply(tilt.x, h.depth * PARALLAX);
         const py = Animated.multiply(tilt.y, h.depth * PARALLAX);
