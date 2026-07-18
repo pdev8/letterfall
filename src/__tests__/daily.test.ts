@@ -15,7 +15,7 @@ import { dailySeed } from '../seedService';
 
 const DAY = '2026-07-19';
 
-describe('daily set (DB-174)', () => {
+describe('daily set (PL-174)', () => {
   it('builds 5 unplayed games with the shared daily seeds', () => {
     const set = newDailySet(DAY);
     expect(set.games).toHaveLength(DAILY_GAME_COUNT);

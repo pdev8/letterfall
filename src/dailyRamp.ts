@@ -1,8 +1,8 @@
-// Daily-set difficulty ramp (DB-173). The 5 scored games of a day get
-// progressively harder via board SHAPE, steering GENEROSITY (DB-172), and the
-// difficulty knobs recycles + max-parked (DB-131/DB-177). Pure data + helper.
+// Daily-set difficulty ramp (PL-173). The 5 scored games of a day get
+// progressively harder via board SHAPE, steering GENEROSITY (PL-172), and the
+// difficulty knobs recycles + max-parked (PL-131/PL-177). Pure data + helper.
 //
-// Decision (the DB-173 open question): there is NO separate per-game score
+// Decision (the PL-173 open question): there is NO separate per-game score
 // multiplier. Difficulty comes from the knobs, and `configMult` already
 // derives the multiplier from them (game 5's 0 recycles / 1 bay = ×1.4), so
 // harder games in the ramp are automatically worth more — no double-counting.
@@ -12,7 +12,7 @@ import type { GameConfig } from './scoring';
 export interface DailyGameParams {
   /** Board shape: 7 column heights summing to 28 (position-shuffled at generation). */
   heights: number[];
-  /** Steering generosity 0..1 fed to steerNextCard (DB-172). */
+  /** Steering generosity 0..1 fed to steerNextCard (PL-172). */
   generosity: number;
   /** Difficulty knobs (recycles allowed, max parked) — also set the score multiplier. */
   config: GameConfig;

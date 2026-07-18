@@ -17,7 +17,7 @@ const RECYCLES_PER_DEAL = DEFAULT_CONFIG.recycles; // 2 — default knob value
 const card = (letter: string, fromStock = false): ColumnCard => ({ letter, fromStock });
 
 /** Hand-built state: "cat" spellable on cols 4-6; cols 0-3 empty; designated
- *  park bays are cols 0,1,3 (col 2 is empty but NOT a bay, DB-179); reserve
+ *  park bays are cols 0,1,3 (col 2 is empty but NOT a bay, PL-179); reserve
  *  holds two cards ('q' on top). */
 function base(overrides: Partial<GameState> = {}): GameState {
   return {
@@ -47,7 +47,7 @@ describe('makeDealState', () => {
     expect(makeDealState(-1, { won: 0, played: 0, streak: 0 }).dealIndex).toBe(deals.length - 1);
   });
 
-  it('inits recyclesLeft from the config knob and sanitizes it (DB-131)', () => {
+  it('inits recyclesLeft from the config knob and sanitizes it (PL-131)', () => {
     const hard = makeDealState(0, { won: 0, played: 0, streak: 0 }, { recycles: 0, parkBays: 1 });
     expect(hard.config).toEqual({ recycles: 0, parkBays: 1 });
     expect(hard.recyclesLeft).toBe(0);
@@ -56,7 +56,7 @@ describe('makeDealState', () => {
   });
 });
 
-describe('designated park bays (DB-179)', () => {
+describe('designated park bays (PL-179)', () => {
   it('makeDealState marks config.parkBays distinct in-range columns, sorted', () => {
     for (const parkBays of [1, 2, 3]) {
       const s = makeDealState(0, { won: 0, played: 0, streak: 0 }, { recycles: 2, parkBays });
@@ -197,7 +197,7 @@ describe('parkReserve', () => {
     expect(next.movesMade).toBe(base().movesMade + 1);
   });
 
-  it('parks onto any designated bay, not just the first (DB-179)', () => {
+  it('parks onto any designated bay, not just the first (PL-179)', () => {
     const s = base(); // bays [0,1,3]
     const next = reducer(s, { type: 'parkReserve', col: 3 });
     expect(next.columns[3]).toEqual([{ letter: 'q', fromStock: true }]);
@@ -225,7 +225,7 @@ describe('parkReserve', () => {
     expect(tableauCount(next)).toBe(3); // c, a, t only
   });
 
-  it('surfaces the next stock card when parking empties the reserve (DB-179)', () => {
+  it('surfaces the next stock card when parking empties the reserve (PL-179)', () => {
     const s = base({ reserve: ['q'], stock: ['a', 'b'] }); // one card in hand
     const next = reducer(s, { type: 'parkReserve', col: 0 });
     expect(next.columns[0]).toEqual([{ letter: 'q', fromStock: true }]);
@@ -248,7 +248,7 @@ describe('parkReserve', () => {
   });
 });
 
-describe('reroll (DB-178 — opening card exchange with the stock)', () => {
+describe('reroll (PL-178 — opening card exchange with the stock)', () => {
   // A pristine, pre-play opening: 7 single-card native columns + a small stock,
   // nothing drawn/trayed/played. `card()` defaults fromStock:false.
   const opening = (o: Partial<GameState> = {}): GameState =>
@@ -521,7 +521,7 @@ describe('scoring counters', () => {
   });
 });
 
-describe('sanitizeGameState (DB-122 resume guard)', () => {
+describe('sanitizeGameState (PL-122 resume guard)', () => {
   it('accepts a genuine fresh deal', () => {
     const s = makeDealState(0, { won: 0, played: 0, streak: 0 });
     expect(sanitizeGameState(s)).toBe(s);
@@ -600,14 +600,14 @@ describe('sanitizeGameState (DB-122 resume guard)', () => {
     expect(sanitizeGameState({ ...base(), dealIndex: -1 })).toBeNull();
   });
 
-  it('coerces a missing rerollsUsed to 0 for pre-DB-178 snapshots (back-compat)', () => {
+  it('coerces a missing rerollsUsed to 0 for pre-PL-178 snapshots (back-compat)', () => {
     const { rerollsUsed: _drop, ...legacy } = base();
     const out = sanitizeGameState(legacy);
     expect(out).not.toBeNull();
     expect(out?.rerollsUsed).toBe(0);
   });
 
-  it('derives missing bays for pre-DB-179 snapshots (from the deal index)', () => {
+  it('derives missing bays for pre-PL-179 snapshots (from the deal index)', () => {
     const { bays: _drop, ...legacy } = base();
     const out = sanitizeGameState(legacy);
     expect(out).not.toBeNull();

@@ -60,7 +60,7 @@ describe('storage core', () => {
   });
 
   it('a pre-bump v1 envelope (old shape) falls back instead of loading a stale shape', async () => {
-    // Regression: DB-131 reshaped history/stats without a version bump, so old
+    // Regression: PL-131 reshaped history/stats without a version bump, so old
     // v1 data loaded with the wrong shape and crashed ("cannot read property
     // score"). Bumping SCHEMA_VERSION to 2 makes any v1 blob fall back.
     expect(SCHEMA_VERSION).toBeGreaterThanOrEqual(2);

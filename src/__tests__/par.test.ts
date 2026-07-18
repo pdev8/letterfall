@@ -170,9 +170,9 @@ describe('word-length gates', () => {
       if (meetsWordLengthGate(deal)) sevens++;
     }
     // Evidence, not a tight assertion: the ≈10% figure is a POOL-level target
-    // tuned in DB-175, and single deals are never rejected for lacking an 8.
+    // tuned in PL-175, and single deals are never rejected for lacking an 8.
     console.log(
-      `[DB-175] over ${N} generated deals: 8-letter rate ${((100 * eights) / N).toFixed(0)}% ` +
+      `[PL-175] over ${N} generated deals: 8-letter rate ${((100 * eights) / N).toFixed(0)}% ` +
         `(${eights}/${N}), 7-gate pass rate ${((100 * sevens) / N).toFixed(0)}% (${sevens}/${N})`,
     );
     expect(eights).toBeGreaterThanOrEqual(0);
@@ -180,7 +180,7 @@ describe('word-length gates', () => {
   });
 });
 
-describe('generateDeal — DB-175 quality gates (opt-in)', () => {
+describe('generateDeal — PL-175 quality gates (opt-in)', () => {
   it('requireSevenGate: true returns winnable deals that all pass the 7 gate', () => {
     for (const seed of [1, 7, 42, 100, 2024]) {
       const deal = generateDeal(seed, { requireSevenGate: true });

@@ -1,4 +1,4 @@
-// DECKABET dark card-room theme.
+// PUZZLEX dark card-room theme.
 export const C = {
   bg: '#0f1216',
   surface: '#151a20',

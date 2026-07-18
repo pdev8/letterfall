@@ -1,4 +1,4 @@
-// DB-175 — PAR estimation + word-length quality gates for the Living Deck.
+// PL-175 — PAR estimation + word-length quality gates for the Living Deck.
 //
 // MEASUREMENT ONLY (docs/GENERATION.md pillar 6: "guarantee the deal, don't
 // guide the play"). This module never touches live play; it exists so the
@@ -31,7 +31,7 @@ import type { Deal } from './types';
 
 // ---------------------------------------------------------------- compact node
 
-// Mirrors the DB-171 solver's encoding: inside a column string a parked stock
+// Mirrors the PL-171 solver's encoding: inside a column string a parked stock
 // card is UPPERCASE and a native card lowercase, so a column's native cards are
 // exactly its lowercase chars and any top card is playable via its letter
 // lowercased. A par search starts from an all-native board (no parks yet).

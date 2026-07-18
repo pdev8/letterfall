@@ -1,4 +1,4 @@
-// DB-174: dealToState builds a playable GameState from a concrete Deal (the
+// PL-174: dealToState builds a playable GameState from a concrete Deal (the
 // bridge that lets daily mode run a generated deal through the same reducer).
 import { dealToState } from '../game';
 import { DEFAULT_CONFIG } from '../scoring';
@@ -54,7 +54,7 @@ describe('dealToState', () => {
     expect(s.recyclesLeft).toBe(DEFAULT_CONFIG.recycles);
   });
 
-  it('designates parkBays distinct in-range bays, deterministically per deal (DB-179)', () => {
+  it('designates parkBays distinct in-range bays, deterministically per deal (PL-179)', () => {
     const s = dealToState(DEAL);
     expect(s.bays).toHaveLength(DEFAULT_CONFIG.parkBays);
     expect(new Set(s.bays).size).toBe(s.bays.length);

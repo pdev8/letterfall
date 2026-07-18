@@ -1,10 +1,10 @@
-// DB-172 — draw-time stock steering (the Living Deck, docs/GENERATION.md
+// PL-172 — draw-time stock steering (the Living Deck, docs/GENERATION.md
 // pillars 2/5/6).
 //
 // The undrawn stock DOES NOT EXIST YET. The next drawn card is computed HERE,
 // at draw time, as a deterministic function of (seed, move history). This
 // module is pure — no React, no I/O, no mutation of its inputs — so a run can
-// be replayed and verified (the phase-2 server replay validator, DB-186).
+// be replayed and verified (the phase-2 server replay validator, PL-186).
 //
 // What it does: over a LEGAL candidate set (letters that keep the deal
 // completable — the caller supplies that set as `candidatePool`; see below),
@@ -14,10 +14,10 @@
 // is the caller's invariant (this module only ever chooses among letters the
 // caller already vetted). Dead is dead, on the player's line.
 //
-// Scope (DB-172): the algorithm + tests only. Wiring this into the live reducer
+// Scope (PL-172): the algorithm + tests only. Wiring this into the live reducer
 // / GameState — and computing the completability-preserving `candidatePool`
-// from a full board via src/solver.ts — is DB-174 (daily mode). Landed pure,
-// exactly as DB-170's generator did.
+// from a full board via src/solver.ts — is PL-174 (daily mode). Landed pure,
+// exactly as PL-170's generator did.
 
 import { wordsFromLetters } from './dict';
 import { makeRng } from './rng';
@@ -127,7 +127,7 @@ function guard(candidates: string[], filter: (c: string) => boolean): string[] {
  * The next drawn letter for this context. Deterministic: same `ctx` (and same
  * `candidatePool`) ⇒ same letter, always.
  *
- * `candidatePool` is the LEGAL set — in integration (DB-174) the caller passes
+ * `candidatePool` is the LEGAL set — in integration (PL-174) the caller passes
  * the letters that keep the deal completable; here it defaults to all 26.
  *
  * Algorithm (docs/GENERATION.md "How a deal is born"):

@@ -1,4 +1,4 @@
-// DB-172 — draw-time steering tests.
+// PL-172 — draw-time steering tests.
 //
 // Tuning under test (from src/steering.ts):
 //   DUPLICATE_CAP = 3   — a letter seen ≥3× (visible + recent) is dropped

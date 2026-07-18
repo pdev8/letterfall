@@ -112,7 +112,7 @@ describe('generateDeal — board-shape parameter', () => {
     expect(replay(deal).won).toBe(true);
   });
 
-  it('honors non-staircase board shapes (DB-173 flat/gentle) and stays winnable', () => {
+  it('honors non-staircase board shapes (PL-173 flat/gentle) and stays winnable', () => {
     for (const heights of [
       [4, 4, 4, 4, 4, 4, 4], // flat
       [2, 3, 4, 4, 5, 5, 5], // gentle

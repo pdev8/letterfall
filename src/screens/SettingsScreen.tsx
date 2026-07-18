@@ -18,11 +18,11 @@ function bonusLabel(config: GameConfig): string {
 }
 
 /**
- * Settings (DB-130 scaffold, DB-131 difficulty knobs). Owns its own
+ * Settings (PL-130 scaffold, PL-131 difficulty knobs). Owns its own
  * persistence: loads on mount, saves fire-and-forget on every change.
  * Difficulty is two knobs — recycles and park bays — that harden the game
  * and raise the score bonus; they apply from the next deal. Toggles are
- * consumed by DB-132; the rulebook row activates with DB-133.
+ * consumed by PL-132; the rulebook row activates with PL-133.
  */
 export default function SettingsScreen({ onClose }: { onClose: () => void }) {
   const insets = useSafeAreaInsets(); // back button must clear the notch / Island
@@ -84,7 +84,7 @@ export default function SettingsScreen({ onClose }: { onClose: () => void }) {
         <View style={styles.backBtnBalance} />
       </View>
 
-      {/* difficulty knobs (DB-131): harder config → bigger score bonus */}
+      {/* difficulty knobs (PL-131): harder config → bigger score bonus */}
       <View style={styles.knobHead}>
         <Text style={styles.sectionLabel}>DIFFICULTY</Text>
         <Text style={styles.bonusTag}>{bonusLabel(settings.config)}</Text>
@@ -97,7 +97,7 @@ export default function SettingsScreen({ onClose }: { onClose: () => void }) {
         fewer recycles and bays = harder, worth more — applies from your next deal
       </Text>
 
-      {/* feedback toggles (DB-132) */}
+      {/* feedback toggles (PL-132) */}
       <Text style={styles.sectionLabel}>FEEDBACK</Text>
       {toggleRow('Haptics', 'haptics')}
       {toggleRow('Sound', 'sound')}
@@ -109,7 +109,7 @@ export default function SettingsScreen({ onClose }: { onClose: () => void }) {
           <Text style={styles.rowLabel}>Rulebook</Text>
           <Text style={styles.comingSoon}>coming soon</Text>
         </View>
-        <Text style={styles.version}>DECKABET {APP_VERSION}</Text>
+        <Text style={styles.version}>PUZZLEX {APP_VERSION}</Text>
       </View>
     </View>
   );

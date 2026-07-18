@@ -1,4 +1,4 @@
-// DECKABET scoring — canonical implementation of docs/ROADMAP.md "Scoring".
+// PUZZLEX scoring — canonical implementation of docs/ROADMAP.md "Scoring".
 // Pure functions only. Players never see this math directly (spec §4c):
 // the UI presents named bonuses computed from these values.
 
@@ -65,7 +65,7 @@ export function stockEconomyMult(
 }
 
 /**
- * Per-deal game configuration (DB-131): no named presets — difficulty is two
+ * Per-deal game configuration (PL-131): no named presets — difficulty is two
  * knobs the player sets, and the score multiplier derives from them.
  */
 export interface GameConfig {

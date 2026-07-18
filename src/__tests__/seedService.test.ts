@@ -1,6 +1,6 @@
 import { dailySeed, localSeedSource, playDayOf, SEED_SALT } from '../seedService';
 
-describe('seed service (DB-176)', () => {
+describe('seed service (PL-176)', () => {
   it('playDayOf formats a UTC ISO date', () => {
     expect(playDayOf(Date.UTC(2026, 6, 19, 3, 0, 0))).toBe('2026-07-19');
     expect(playDayOf(Date.UTC(2026, 0, 1, 23, 59, 0))).toBe('2026-01-01');

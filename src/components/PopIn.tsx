@@ -4,7 +4,7 @@ import type { StyleProp, ViewStyle } from 'react-native';
 
 /**
  * Pops its children in on mount (scale + fade). Re-key to replay.
- * `reduceMotion` renders the final state instantly (DB-132).
+ * `reduceMotion` renders the final state instantly (PL-132).
  */
 export default function PopIn({
   children,

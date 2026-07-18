@@ -1,5 +1,5 @@
-// Lifetime stats + streaks (DB-121) — pure accounting, no React, no I/O.
-// Persisted per mode via appStorage; surfaced in the My Stats tab (DB-144).
+// Lifetime stats + streaks (PL-121) — pure accounting, no React, no I/O.
+// Persisted per mode via appStorage; surfaced in the My Stats tab (PL-144).
 import { wordScore } from './scoring';
 
 /** Challenge mode lands in E5; until then everything records under 'free'. */

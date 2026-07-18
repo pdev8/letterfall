@@ -8,7 +8,7 @@ export const MAX_WORD = 8;
 const FRESH_STATS: SessionStats = { won: 0, played: 0, streak: 0 };
 
 /**
- * Builds a fresh GameState from a concrete `Deal` (DB-174 daily mode), instead
+ * Builds a fresh GameState from a concrete `Deal` (PL-174 daily mode), instead
  * of an index into the static pool. Mirrors makeDealState's column/stock
  * construction — columns are native (fromStock:false), the stock is the deal's
  * draw order, `config` fixes the difficulty knobs, all counters start at zero.
@@ -47,7 +47,7 @@ export function dealToState(
 }
 
 /**
- * Builds a fresh deal. `config` (DB-131) fixes this deal's difficulty knobs:
+ * Builds a fresh deal. `config` (PL-131) fixes this deal's difficulty knobs:
  * recycles allowed and park-bay count. It is sanitized here so every deal in
  * play carries a valid config.
  */
@@ -104,13 +104,13 @@ function countNative(columns: GameState['columns']): number {
   return columns.reduce((n, c) => n + c.filter((card) => !card.fromStock).length, 0);
 }
 
-/** Parked stock cards currently on the board (DB-177 bay cap). */
+/** Parked stock cards currently on the board (PL-177 bay cap). */
 export function parkedCount(columns: GameState['columns']): number {
   return columns.reduce((n, c) => n + c.filter((card) => card.fromStock).length, 0);
 }
 
 /**
- * The designated park bays for a deal (DB-179): `count` distinct column indices
+ * The designated park bays for a deal (PL-179): `count` distinct column indices
  * (0–6), chosen deterministically from `seed` so the same deal always marks the
  * same columns (stable across replays and resume). Sorted for stable rendering.
  */
@@ -132,7 +132,7 @@ function hashDeal(deal: Deal): number {
   return h >>> 0;
 }
 
-// ---------------------------------------------------------------- resume (DB-122)
+// ---------------------------------------------------------------- resume (PL-122)
 
 const COLUMN_COUNT = 7;
 
@@ -152,7 +152,7 @@ function isCount(x: unknown): x is number {
 
 /**
  * Strict (non-clamping) config check for persisted snapshots. Old saves
- * (pre-DB-131) have no config at all — they fail here and the app starts a
+ * (pre-PL-131) have no config at all — they fail here and the app starts a
  * fresh deal; that IS the migration.
  */
 function isValidConfig(x: unknown): x is GameConfig {
@@ -164,7 +164,7 @@ function isValidConfig(x: unknown): x is GameConfig {
 }
 
 /**
- * Structural guard for persisted snapshots (DB-122). Returns `x` typed as
+ * Structural guard for persisted snapshots (PL-122). Returns `x` typed as
  * GameState only if every field a resumed deal depends on checks out;
  * anything malformed (or an already-won deal) returns null. Never throws.
  */
@@ -190,14 +190,14 @@ export function sanitizeGameState(x: unknown): GameState | null {
   if (!isCount(s.recyclesLeft) || s.recyclesLeft > s.config.recycles) return null;
   if (!isCount(s.movesMade) || !isCount(s.reserveLettersPlayed)) return null;
   if (!isCount(s.parksUsed) || !isCount(s.recyclesUsed)) return null;
-  // rerollsUsed (DB-178) post-dates the snapshot format at SCHEMA_VERSION 2, so
+  // rerollsUsed (PL-178) post-dates the snapshot format at SCHEMA_VERSION 2, so
   // an in-progress deal saved before this feature simply lacks it — coerce a
   // missing counter to 0 rather than discard the resume; reject only bad values.
   if (s.rerollsUsed === undefined) s.rerollsUsed = 0;
   else if (!isCount(s.rerollsUsed)) return null;
   if (!Array.isArray(s.played) || !s.played.every((w) => typeof w === 'string')) return null;
   if (!isCount(s.dealIndex) || !Number.isInteger(s.dealIndex)) return null;
-  // bays (DB-179) post-date the snapshot format: a pre-DB-179 save simply lacks
+  // bays (PL-179) post-date the snapshot format: a pre-PL-179 save simply lacks
   // them — derive from the deal index rather than discard the resume; reject a
   // present-but-malformed set (bad index, dupes, wrong count).
   if (s.bays === undefined) {
@@ -299,7 +299,7 @@ export function reducer(state: GameState, action: Action): GameState {
     case 'parkReserve': {
       if (state.won) return state;
       if (state.reserve.length === 0) return state;
-      // Designated bays (DB-179): park only onto one of this deal's marked
+      // Designated bays (PL-179): park only onto one of this deal's marked
       // columns, and only once it's been cleared. There are exactly
       // `config.parkBays` bays, so how many can be parked at once is bounded by
       // how many bays you've emptied — clear a marked column to open a spot.
@@ -314,7 +314,7 @@ export function reducer(state: GameState, action: Action): GameState {
       let stock = state.stock;
       // Parking clears the active card; surface the next one so a card is always
       // ready. If cards are still stacked underneath, the one beneath shows;
-      // otherwise draw the next stock card (drawing is free — DB-179).
+      // otherwise draw the next stock card (drawing is free — PL-179).
       if (reserve.length === 0 && stock.length > 0) {
         reserve = [stock[0]];
         stock = stock.slice(1);
@@ -332,7 +332,7 @@ export function reducer(state: GameState, action: Action): GameState {
     }
 
     case 'reroll': {
-      // Opening reroll (DB-178): before play, exchange the selected columns'
+      // Opening reroll (PL-178): before play, exchange the selected columns'
       // face-up TOP cards with the stock — a mulligan for a bad-looking deal.
       // A deterministic rotation, not a shuffle: each picked top goes to the
       // BOTTOM of the stock, and the same number of cards evict off the FRONT

@@ -1,7 +1,7 @@
-// Feedback mapping (DB-132) — PURE. The native trigger lives in the screen
+// Feedback mapping (PL-132) — PURE. The native trigger lives in the screen
 // (expo-haptics), but the decision "which signal, if the toggle is on" is
 // pure and unit-tested here. Sound is gated too but stays a no-op until real
-// audio lands with DB-163 (sound design).
+// audio lands with PL-163 (sound design).
 
 /** A player action that may produce feedback. */
 export type FeedbackKind = 'tap' | 'play' | 'win' | 'invalid';
@@ -21,7 +21,7 @@ export function hapticFor(kind: FeedbackKind, hapticsEnabled: boolean): HapticSi
   return hapticsEnabled ? HAPTIC[kind] : null;
 }
 
-/** Whether a sound should play for `kind` (audio itself arrives at DB-163). */
+/** Whether a sound should play for `kind` (audio itself arrives at PL-163). */
 export function shouldPlaySound(soundEnabled: boolean): boolean {
   return soundEnabled;
 }

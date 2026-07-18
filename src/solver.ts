@@ -1,9 +1,9 @@
-// DB-171 — a bounded, pure "can this board still be finished?" solver.
+// PL-171 — a bounded, pure "can this board still be finished?" solver.
 //
 // MEASUREMENT ONLY (docs/GENERATION.md pillar 6: "guarantee the deal, don't
 // guide the play"). Its jobs are par estimation, the openness metric, and the
 // post-game "a win was still possible until move N" insight. It is NEVER used
-// for draw-time rescue — steering (DB-172) maintains its own escape plan.
+// for draw-time rescue — steering (PL-172) maintains its own escape plan.
 //
 // The stock in a GameState is CONCRETE (a fixed array), so draws are
 // deterministic and the solver reasons over the exact remaining cards.
@@ -58,7 +58,7 @@ function toNode(state: GameState): Node {
 /**
  * Column-permutation-invariant memo key. Winnability doesn't depend on WHICH
  * column a card sits in — plays use any column top, and a park targets any empty
- * column capped only by the total parked count (DB-177) — so sorting the column
+ * column capped only by the total parked count (PL-177) — so sorting the column
  * strings collapses transpositions and shrinks the search dramatically.
  */
 function keyOf(node: Node): string {
