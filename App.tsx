@@ -21,11 +21,11 @@ export default function App() {
   // Two independent layers:
   //  - `screen` picks the base surface: the home menu, free play, or the daily
   //    lobby. Free play mounts only while chosen, and resumes its saved deal
-  //    (DB-122), so leaving to Home and back is seamless.
+  //    (PL-122), so leaving to Home and back is seamless.
   //  - `showSettings` overlays settings above whatever is showing.
   const [screen, setScreen] = useState<'home' | 'game' | 'daily'>('home');
   const [showSettings, setShowSettings] = useState(false);
-  // Daily mode (DB-174): App owns the set (single source of truth) so a
+  // Daily mode (PL-174): App owns the set (single source of truth) so a
   // finished game's progress/total show instantly on return — no reload race.
   const [dailySet, setDailySet] = useState<DailySet | null>(null);
   // The daily game currently being played (index into the set), or null.

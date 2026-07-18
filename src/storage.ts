@@ -1,4 +1,4 @@
-// Versioned key-value storage layer (DB-120). Pure core: the backend is
+// Versioned key-value storage layer (PL-120). Pure core: the backend is
 // injected (AsyncStorage in the app, an in-memory mock in tests). Values are
 // wrapped in a version envelope so future tickets can migrate old data.
 
@@ -10,7 +10,7 @@ export interface KV {
 
 // Bump this when any persisted value's SHAPE changes without a migration:
 // old-version envelopes then fail the version check and fall back to defaults
-// instead of loading a stale shape and crashing. (v1→v2: DB-131 reshaped
+// instead of loading a stale shape and crashing. (v1→v2: PL-131 reshaped
 // lifetime stats + game history; no migration pre-launch, so stored data
 // resets.) Post-launch shape changes must ship a real migration, not a bump.
 export const SCHEMA_VERSION = 2;

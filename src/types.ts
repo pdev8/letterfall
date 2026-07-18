@@ -1,4 +1,4 @@
-// Shared types for DECKABET.
+// Shared types for PUZZLEX.
 import type { GameConfig } from './scoring';
 
 export interface Deal {
@@ -44,12 +44,12 @@ export interface SessionStats {
 export interface GameState {
   dealIndex: number;
   /**
-   * This deal's difficulty knobs (DB-131), fixed at deal time — settings
+   * This deal's difficulty knobs (PL-131), fixed at deal time — settings
    * changes only apply from the NEXT deal, never mid-deal.
    */
   config: GameConfig;
   /**
-   * Designated park bays (DB-179): the `config.parkBays` column indices (chosen
+   * Designated park bays (PL-179): the `config.parkBays` column indices (chosen
    * randomly at deal time) that accept a parked reserve card once cleared. Only
    * these columns are park targets — marked with an indicator so the player
    * knows which columns to prioritize clearing.
@@ -72,7 +72,7 @@ export interface GameState {
   parksUsed: number;
   recyclesUsed: number;
   /**
-   * Opening reroll cards taken (DB-178): count of face-up tops the player
+   * Opening reroll cards taken (PL-178): count of face-up tops the player
    * exchanged with the stock before play. Free (no scoring effect); records
    * that the opening was gambled (useful for stats / a future "as dealt" badge).
    */
@@ -86,7 +86,7 @@ export type Action =
   | { type: 'tapColumn'; col: number }
   | { type: 'tapReserve' }
   | { type: 'parkReserve'; col: number }
-  /** Opening reroll (DB-178): exchange the given columns' face-up top cards with the stock. */
+  /** Opening reroll (PL-178): exchange the given columns' face-up top cards with the stock. */
   | { type: 'reroll'; cols: number[] }
   | { type: 'tapTray'; index: number }
   | { type: 'swapTray'; a: number; b: number }
@@ -94,5 +94,5 @@ export type Action =
   | { type: 'play' }
   /** New deal; `config` applies the caller's current knobs (falls back to the deal's own). */
   | { type: 'redeal'; config?: GameConfig }
-  /** Replace the whole state with a persisted snapshot (DB-122 resume). */
+  /** Replace the whole state with a persisted snapshot (PL-122 resume). */
   | { type: 'restore'; state: GameState };

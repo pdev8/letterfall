@@ -19,7 +19,7 @@ const CARD_W = 46;
 const CARD_H = 64;
 
 /**
- * Opening reroll (DB-178). Before play, the player sees the deal's face-up
+ * Opening reroll (PL-178). Before play, the player sees the deal's face-up
  * column tops fanned out; tapping a card raises it (selected), tapping again
  * lowers it. "Swap" sends the raised tops to the bottom of the stock and rolls
  * the next stock cards up into their spots — one shot, then the panel closes

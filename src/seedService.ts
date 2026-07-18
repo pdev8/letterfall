@@ -1,5 +1,5 @@
-// Seed service (DB-176). Turns a play-day + game index into the deterministic
-// seed that drives the Living Deck (DB-170 generator, DB-172 steering), so
+// Seed service (PL-176). Turns a play-day + game index into the deterministic
+// seed that drives the Living Deck (PL-170 generator, PL-172 steering), so
 // every player gets the SAME daily set. Two phases:
 //
 //   Phase 1 (launch, no backend): seeds are derived on-device from
@@ -8,7 +8,7 @@
 //   whole steering algorithm could simulate draws — accepted at launch, same
 //   risk every offline word game carries.
 //
-//   Phase 2 (server, DB-186 Supabase): a server issues the daily seeds and
+//   Phase 2 (server, PL-186 Supabase): a server issues the daily seeds and
 //   validates submitted move logs by replaying them through the same
 //   deterministic steering. The `SeedSource` interface below is the seam —
 //   the app depends on it, not on the local hash, so swapping in a server

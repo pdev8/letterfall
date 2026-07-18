@@ -1,8 +1,8 @@
-<!-- Title format: [<n>. <scope>] DB-xxx: summary — n = merge-order number (merge PRs ascending) -->
+<!-- Title format: [<n>. <scope>] PL-xxx: summary — n = merge-order number (merge PRs ascending) -->
 
 ## Ticket
 
-DB-___ — <!-- link the roadmap ticket; docs/chore PRs: say so -->
+PL-___ — <!-- link the roadmap ticket; docs/chore PRs: say so -->
 
 ## What & why
 

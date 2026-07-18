@@ -1,6 +1,6 @@
-// Persisted user settings (DB-130). Pure: no React, no I/O — the storage
-// binding lives in appStorage.ts. The game-config knobs (DB-131) flow into
-// each NEW deal via GameScreen; the toggles are consumed by DB-132.
+// Persisted user settings (PL-130). Pure: no React, no I/O — the storage
+// binding lives in appStorage.ts. The game-config knobs (PL-131) flow into
+// each NEW deal via GameScreen; the toggles are consumed by PL-132.
 import { sanitizeConfig, type GameConfig, DEFAULT_CONFIG } from './scoring';
 
 export type Settings = {

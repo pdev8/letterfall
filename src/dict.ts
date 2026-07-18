@@ -27,7 +27,7 @@ function sortKey(word: string): string {
 /**
  * sorted-letters -> the lexicon words (3-8 letters) with exactly those letters.
  * Built once at module scope. Powers dead-deal detection (`existsPlayableWord`),
- * the DB-171 solver's play enumeration (`isWordFromLetters`), and openness
+ * the PL-171 solver's play enumeration (`isWordFromLetters`), and openness
  * counting (`wordsFromLetters`).
  */
 const wordsByKey: Map<string, string[]> = (() => {

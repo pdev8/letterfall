@@ -12,7 +12,7 @@
 - **sha256:** `3f16130220645692ed49c7134e24a18504c2ca55b3c012f7290e3e77c63b1a89`
 - **Line count:** 172,823 words (one lowercase word per line, LF line endings)
 
-Consumed by `scripts/build-lexicon.py` (DB-201), which filters to 3–8-letter
+Consumed by `scripts/build-lexicon.py` (PL-201), which filters to 3–8-letter
 words, applies the overlays in `assets/lexicon-overlays/`, joins frequency
-tiers, and emits `assets/lexicon.json`. See the DB-200 decision record in
+tiers, and emits `assets/lexicon.json`. See the PL-200 decision record in
 `docs/ROADMAP.md` for the sourcing/licensing evaluation.

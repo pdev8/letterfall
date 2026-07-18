@@ -52,10 +52,10 @@ import type { Deal, TrayEntry } from '../types';
 export default function GameScreen({
   // Optional with a no-op default so existing usage/tests don't break.
   onOpenSettings = () => {},
-  // Free play: back to the home menu (DB-145).
+  // Free play: back to the home menu (PL-145).
   onBack,
   // Free play uses none of the daily props below; passing `deal` switches to
-  // daily mode (DB-174) — a fixed deal, no redeal, recorded via onComplete/onExit.
+  // daily mode (PL-174) — a fixed deal, no redeal, recorded via onComplete/onExit.
   deal,
   config,
   statsMode = 'free',
@@ -93,7 +93,7 @@ export default function GameScreen({
   // so their dependency arrays (and free-play behavior) are untouched.
   const statsModeRef = useRef(statsMode);
   statsModeRef.current = statsMode;
-  // Fixed at mount: daily games never resume/persist as the free game (DB-122).
+  // Fixed at mount: daily games never resume/persist as the free game (PL-122).
   const isDailyRef = useRef(dailyMode);
 
   const [state, dispatch] = useReducer(reducer, null, () =>
@@ -103,13 +103,13 @@ export default function GameScreen({
   );
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
-  // Opening reroll (DB-178): a fresh deal starts by offering the swap panel;
+  // Opening reroll (PL-178): a fresh deal starts by offering the swap panel;
   // Skip or the first real move dismisses it, a resumed mid-deal hides it, and
   // a redeal re-arms it.
   const [showReroll, setShowReroll] = useState(true);
 
-  // Fire a haptic for a game event, honoring the toggle (DB-132). Sound joins
-  // at DB-163. Wrapped in try/catch — haptics can throw on unsupported devices.
+  // Fire a haptic for a game event, honoring the toggle (PL-132). Sound joins
+  // at PL-163. Wrapped in try/catch — haptics can throw on unsupported devices.
   const fire = useCallback((kind: FeedbackKind) => {
     const signal = hapticFor(kind, settingsRef.current.haptics);
     if (signal === null) return;
@@ -161,7 +161,7 @@ export default function GameScreen({
   const canRecycle = state.stock.length === 0 && state.reserve.length > 0 && state.recyclesLeft > 0;
   const canDraw = state.stock.length > 0 || canRecycle;
   const reserveTop = state.reserve.length > 0 ? state.reserve[state.reserve.length - 1] : null;
-  // Designated bays (DB-179): park only onto a marked column that's been cleared.
+  // Designated bays (PL-179): park only onto a marked column that's been cleared.
   const emptyBayOpen = state.bays.some((b) => state.columns[b]?.length === 0);
   const canPark = reserveTop !== null && !state.won && emptyBayOpen;
   // Parking with more reserve underneath exposes a fresh letter, so an open bay
@@ -171,7 +171,7 @@ export default function GameScreen({
   const showNoPlayHint = !state.won && !isDead && !anyPlay && tableauLeft > 0;
   const reserveInTray = state.tray.some((e) => e.source === 'reserve');
   const bestWord = state.played.reduce((a, b) => (b.length > a.length ? b : a), '');
-  // Scored under this deal's own difficulty knobs (DB-131).
+  // Scored under this deal's own difficulty knobs (PL-131).
   const wonScore = state.won
     ? dealScore({
         words: state.played,
@@ -182,13 +182,13 @@ export default function GameScreen({
       })
     : 0;
 
-  // ---------------- lifetime stats (DB-121)
+  // ---------------- lifetime stats (PL-121)
   // Separate persisted layer over the reducer's session stats; surfaced in
-  // DB-144's My Stats tab. Everything records under 'free' until challenge
+  // PL-144's My Stats tab. Everything records under 'free' until challenge
   // mode (E5) exists.
   // When the current deal started; stamped on mount and on every redeal.
   const dealStartRef = useRef(0);
-  // Difficulty knobs (DB-131) come from the live settings store; the next
+  // Difficulty knobs (PL-131) come from the live settings store; the next
   // deal reads settingsRef.current.config on redeal (never mid-deal).
   // null until loadStats resolves; outcomes finishing before then (never in
   // practice — a deal takes minutes) queue up and fold in on load.
@@ -204,10 +204,10 @@ export default function GameScreen({
     saveStats(lifetimeRef.current).catch(() => {}); // storage never crashes the game
   }, []);
 
-  // ---------------- missed-word feedback loop (DB-203)
+  // ---------------- missed-word feedback loop (PL-203)
   // Same shape as the lifetime layer: null until loadMissedWords resolves;
   // misses attempted before then queue up and fold in on load. Local-only
-  // until Supabase sync (DB-186).
+  // until Supabase sync (PL-186).
   const missedRef = useRef<MissedWords | null>(null);
   const pendingMissesRef = useRef<string[]>([]);
 
@@ -220,10 +220,10 @@ export default function GameScreen({
     saveMissedWords(missedRef.current).catch(() => {}); // storage never crashes the game
   }, []);
 
-  // ---------------- game history + personal bests (DB-123)
+  // ---------------- game history + personal bests (PL-123)
   // Same shape as the lifetime layer: null until loadHistory resolves;
   // records finishing before then queue up and fold in on load. Surfaced in
-  // DB-144's history view — no UI here yet.
+  // PL-144's history view — no UI here yet.
   const historyRef = useRef<HistoryState | null>(null);
   const pendingGamesRef = useRef<GameRecord[]>([]);
 
@@ -265,9 +265,9 @@ export default function GameScreen({
         saveHistory(h).catch(() => {});
       }
     });
-    // Resume a killed-mid-deal game (DB-122). The board may swap a few ms
+    // Resume a killed-mid-deal game (PL-122). The board may swap a few ms
     // after first paint — acceptable. Backdating the deal clock by the saved
-    // elapsed time keeps DB-121's time-played honest across the relaunch.
+    // elapsed time keeps PL-121's time-played honest across the relaunch.
     // A daily game is never the resumable free game, so it never restores.
     if (!isDailyRef.current) {
       loadGame()
@@ -282,7 +282,7 @@ export default function GameScreen({
     }
   }, []);
 
-  // Persist the in-progress deal on every change (DB-122). A restore dispatch
+  // Persist the in-progress deal on every change (PL-122). A restore dispatch
   // re-triggers this and re-saves the same state — harmless. Daily games are
   // never the resumable free game, so they never touch this slot.
   useEffect(() => {
@@ -372,7 +372,7 @@ export default function GameScreen({
     dispatch({ type: 'tapReserve' });
   };
 
-  // ---------------- opening reroll (DB-178)
+  // ---------------- opening reroll (PL-178)
   const rerollTops: RerollTop[] = state.columns
     .map((col, i) => ({
       col: i,
@@ -451,7 +451,7 @@ export default function GameScreen({
         // Snapshot the park bays' screen rects for the drop hit-test.
         slotRects.current = [];
         slotRefs.current.forEach((ref, col) => {
-          // Any empty column is a drop target while under the park cap (DB-177).
+          // Any empty column is a drop target while under the park cap (PL-177).
           ref?.measureInWindow((x, y, w, h) => {
             slotRects.current.push({ col, x, y, w, h });
           });
@@ -614,7 +614,7 @@ export default function GameScreen({
     if (busyRef.current) return;
     if (!wordValid) {
       // Rejected attempt: log playable-looking words so dictionary gaps
-      // become data (DB-203), shake the tray as feedback, and stay put.
+      // become data (PL-203), shake the tray as feedback, and stay put.
       if (state.tray.length >= 3) recordMissedWord(word);
       fire('invalid');
       runShake(trayShakeX);
@@ -666,13 +666,13 @@ export default function GameScreen({
         }),
       );
     }
-    // The new deal picks up the player's current knobs (DB-131).
+    // The new deal picks up the player's current knobs (PL-131).
     dispatch({ type: 'redeal', config: settingsRef.current.config });
     dealStartRef.current = Date.now(); // the new deal's clock starts now
     setShowReroll(true); // a fresh deal earns a fresh opening reroll
   };
 
-  // Daily mode (DB-174): a game ends by banking its result and leaving to the
+  // Daily mode (PL-174): a game ends by banking its result and leaving to the
   // daily screen. No redeal — the seed is fixed. The lifetime/history layers
   // already recorded on the win transition (under 'challenge'); this hands the
   // outcome to the daily set so its progress/total advance.
@@ -683,7 +683,7 @@ export default function GameScreen({
 
   const onShare = async () => {
     const message =
-      `DECKABET ♠\n` +
+      `PUZZLEX ♠\n` +
       `${wonScore} pts · ${state.played.length} words · best: ${bestWord.toUpperCase()}\n` +
       `word klondike — every deal winnable`;
     try {
@@ -738,7 +738,7 @@ export default function GameScreen({
                   <Text style={styles.backGlyph}>‹</Text>
                 </Pressable>
               ) : null}
-              <Text style={styles.wordmark}>DECKABET</Text>
+              <Text style={styles.wordmark}>PUZZLEX</Text>
             </View>
             <View style={styles.topBarRight}>
               <View style={styles.statBlock}>
@@ -852,7 +852,7 @@ export default function GameScreen({
           </View>
         </View>
 
-        {/* park-bay indicators (DB-179): these columns accept a parked reserve
+        {/* park-bay indicators (PL-179): these columns accept a parked reserve
             card once cleared — clear them first to open parking space */}
         <View style={styles.bayRow}>
           {state.columns.map((_, i) => (
@@ -873,7 +873,7 @@ export default function GameScreen({
             // cascaded so only its top edge (cascadeReveal) peeks out.
             const liftShift = Math.round(cardH * 0.2);
             const cascade = { marginTop: cascadeReveal - cardH };
-            const isBay = state.bays.includes(i); // DB-179: park target column
+            const isBay = state.bays.includes(i); // PL-179: park target column
             return (
               <View key={i} style={{ width: colW }}>
                 {Array.from({ length: faceDown }, (_, j) => (
@@ -1321,7 +1321,7 @@ const styles = StyleSheet.create({
   },
 
   // tableau
-  // Park-bay markers (DB-179), aligned to the columns below them.
+  // Park-bay markers (PL-179), aligned to the columns below them.
   bayRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',

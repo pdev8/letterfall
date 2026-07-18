@@ -1,4 +1,4 @@
-// Reactive settings store (DB-132) — one source of truth shared by the
+// Reactive settings store (PL-132) — one source of truth shared by the
 // settings screen (writer) and the game screen (reader), so toggling a
 // setting takes effect immediately without threading props through App.
 // Loads once on first subscribe; writes persist through appStorage.

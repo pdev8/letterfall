@@ -1,4 +1,4 @@
-# DECKABET — Roadmap to the App Store
+# PUZZLEX — Roadmap to the App Store
 
 > Word Klondike. Every deal winnable. This document is the **canonical roadmap**:
 > epics, tickets, and the game-design specs (scoring, difficulty, leaderboards,
@@ -6,14 +6,14 @@
 > `docs/roadmap.html` (published as a Claude artifact); if they ever disagree,
 > **this file wins**.
 
-**Workflow:** one PR per ticket. Branch naming `db-<ticket>/<slug>` (e.g.
-`db-110/scoring-module`). Every PR: typecheck + tests green, ticket ID in the
+**Workflow:** one PR per ticket. Branch naming `pl-<ticket>/<slug>` (e.g.
+`pl-110/scoring-module`). Every PR: typecheck + tests green, ticket ID in the
 PR title. Tickets are sized S (≤half day), M (~1 day), L (multi-day).
 
 **Progress tracking:** `docs/roadmap.html` (the published artifact) is the
 live tracker — journey stepper, per-ticket status, shipped log. Update ticket
 status there **in the same PR that completes the work**. Current position:
-0/43 tickets shipped; next up DB-100; DB-177 is flagged ready-early.
+0/43 tickets shipped; next up PL-100; PL-177 is flagged ready-early.
 
 **Where we are (v0, done):** core loop — 7-column tableau, stock → reserve
 draw, 2 recycles, word tray (drag-to-swap, tap-to-return), park bays (first 3
@@ -40,12 +40,12 @@ theme, win/dead-deal overlays, session stats.
 
 | ID | Ticket | Size | Acceptance criteria |
 |---|---|---|---|
-| DB-100 | Port reducer tests into repo with Jest | S | `npm test` runs the park/swap/withdraw/win suite + deal schema validation (28 cards, 20 stock, valid letters); scratchpad scripts retired |
-| DB-101 | GitHub Actions CI | S | Typecheck + tests on every PR; red PRs can't merge |
-| DB-102 | ESLint + Prettier | S | Config committed, codebase clean, CI enforces |
-| DB-103 | Split App.tsx into components + screens scaffold | M | `src/components/` (Card, Tray, Tableau, Piles), `src/screens/`, App.tsx < 150 lines; no behavior change |
-| DB-104 | PR template + CONTRIBUTING.md | S | Template asks for ticket ID, test evidence, screenshots for UI changes |
-| DB-105 | Deal generator as repo script, witnesses stored | M | `scripts/generate-deals.py` checked in; `assets/seeds.json` deals carry witness solutions; Jest replays every witness through the reducer |
+| PL-100 | Port reducer tests into repo with Jest | S | `npm test` runs the park/swap/withdraw/win suite + deal schema validation (28 cards, 20 stock, valid letters); scratchpad scripts retired |
+| PL-101 | GitHub Actions CI | S | Typecheck + tests on every PR; red PRs can't merge |
+| PL-102 | ESLint + Prettier | S | Config committed, codebase clean, CI enforces |
+| PL-103 | Split App.tsx into components + screens scaffold | M | `src/components/` (Card, Tray, Tableau, Piles), `src/screens/`, App.tsx < 150 lines; no behavior change |
+| PL-104 | PR template + CONTRIBUTING.md | S | Template asks for ticket ID, test evidence, screenshots for UI changes |
+| PL-105 | Deal generator as repo script, witnesses stored | M | `scripts/generate-deals.py` checked in; `assets/seeds.json` deals carry witness solutions; Jest replays every witness through the reducer |
 
 ## Epic E1 — Scoring Engine
 
@@ -53,19 +53,19 @@ theme, win/dead-deal overlays, session stats.
 
 | ID | Ticket | Size | Acceptance criteria |
 |---|---|---|---|
-| DB-110 | `src/scoring.ts`: letter values + word score | S | Matches spec tables exactly; unit tests incl. QUIZ=28 example |
-| DB-111 | Deal score: economy/stock/difficulty multipliers; reducer tracks counters | M | GameState carries reserveLettersPlayed, parksUsed, recyclesUsed; dealScore matches worked example; tests |
-| DB-112 | Live word score preview in tray | S | Building a valid word shows its score on the PLAY button |
-| DB-113 | Win screen score breakdown | M | Animated tally: per-word scores → named bonus chips (Word Economy +30%, Stock Discipline +21%, ENCORE ×2 — never raw multiplier math, spec §4c) → total; matches scoring module output |
+| PL-110 | `src/scoring.ts`: letter values + word score | S | Matches spec tables exactly; unit tests incl. QUIZ=28 example |
+| PL-111 | Deal score: economy/stock/difficulty multipliers; reducer tracks counters | M | GameState carries reserveLettersPlayed, parksUsed, recyclesUsed; dealScore matches worked example; tests |
+| PL-112 | Live word score preview in tray | S | Building a valid word shows its score on the PLAY button |
+| PL-113 | Win screen score breakdown | M | Animated tally: per-word scores → named bonus chips (Word Economy +30%, Stock Discipline +21%, ENCORE ×2 — never raw multiplier math, spec §4c) → total; matches scoring module output |
 
 ## Epic E2 — Persistence & Stats
 
 | ID | Ticket | Size | Acceptance criteria |
 |---|---|---|---|
-| DB-120 | Storage layer (AsyncStorage wrapper, schema version, migrations) | S | Typed get/set, versioned, unit-tested with mock storage |
-| DB-121 | Lifetime stats + streaks persisted | M | Per mode (challenge/free): total time played, total games/wins, average time per game, letters constructed, words played, unique words, per-word usage counts (most-played top 10), best word, streaks, total points — all survive relaunch; deal timer plumbing included |
-| DB-122 | Resume in-progress deal | M | Kill app mid-deal → relaunch restores exact state (incl. tray) |
-| DB-123 | Game history (last 50 results, personal bests) | S | Best deal score, best word score, fastest clear recorded per difficulty |
+| PL-120 | Storage layer (AsyncStorage wrapper, schema version, migrations) | S | Typed get/set, versioned, unit-tested with mock storage |
+| PL-121 | Lifetime stats + streaks persisted | M | Per mode (challenge/free): total time played, total games/wins, average time per game, letters constructed, words played, unique words, per-word usage counts (most-played top 10), best word, streaks, total points — all survive relaunch; deal timer plumbing included |
+| PL-122 | Resume in-progress deal | M | Kill app mid-deal → relaunch restores exact state (incl. tray) |
+| PL-123 | Game history (last 50 results, personal bests) | S | Best deal score, best word score, fastest clear recorded per difficulty |
 
 ## Epic E10 — Real Dictionary (M2, immediately after E2)
 
@@ -76,12 +76,12 @@ misses surface instead of silently frustrating players.*
 
 | ID | Ticket | Size | Acceptance criteria |
 |---|---|---|---|
-| DB-200 | Dictionary sourcing + licensing decision | S | Open candidates evaluated (SCOWL, ENABLE2k, EOWL, wordfreq-filtered); choice + license terms documented here; target list size for 3–8-letter play decided |
-| DB-201 | Lexicon build pipeline | M | `scripts/build-lexicon` deterministically generates the game lexicon from the chosen source: 3–8 letters, offensive-word policy applied, per-word frequency metadata retained (feeds E7 openness/steering and E8 retirement); committed with provenance header |
-| DB-202 | Regenerate deals + witnesses on the new lexicon | S | `generate-deals` runs against the new lexicon; witness-replay + schema tests green; sim spot-check (win rates, openness) reported in the PR |
-| DB-203 | Missed-word feedback loop | S | Valid-looking words the player attempts that the lexicon rejects are logged locally; top misses inspectable in dev; export documented (Supabase sync arrives with DB-186) |
+| PL-200 | Dictionary sourcing + licensing decision | S | Open candidates evaluated (SCOWL, ENABLE2k, EOWL, wordfreq-filtered); choice + license terms documented here; target list size for 3–8-letter play decided |
+| PL-201 | Lexicon build pipeline | M | `scripts/build-lexicon` deterministically generates the game lexicon from the chosen source: 3–8 letters, offensive-word policy applied, per-word frequency metadata retained (feeds E7 openness/steering and E8 retirement); committed with provenance header |
+| PL-202 | Regenerate deals + witnesses on the new lexicon | S | `generate-deals` runs against the new lexicon; witness-replay + schema tests green; sim spot-check (win rates, openness) reported in the PR |
+| PL-203 | Missed-word feedback loop | S | Valid-looking words the player attempts that the lexicon rejects are logged locally; top misses inspectable in dev; export documented (Supabase sync arrives with PL-186) |
 
-### DB-200 decision record (2026-07-18)
+### PL-200 decision record (2026-07-18)
 
 **Validity lexicon: ENABLE2k (`enable1.txt`) — public domain.** 172k words,
 the de facto standard for digital word games (it is Words With Friends'
@@ -103,7 +103,7 @@ band structure is better used as optional metadata than as the source of
 truth).
 
 **Risks accepted:** ENABLE is US-flavored (some UK spellings absent) and
-static (no new coinages since 2000) — DB-203's missed-word loop plus a small
+static (no new coinages since 2000) — PL-203's missed-word loop plus a small
 committed `additions.txt`/`removals.txt` overlay in the pipeline handles
 both over time.
 
@@ -111,29 +111,29 @@ both over time.
 
 | ID | Ticket | Size | Acceptance criteria |
 |---|---|---|---|
-| DB-130 | Settings screen + persisted settings store | S | Gear icon in top bar opens settings; values persist |
-| DB-131 | Difficulty configurations wired to game config | M | Settings replaces the preset selector with knob rows (recycles 0–2, park bays 1–3); knobs flow into per-deal game config (constants become config; reducer reads the deal's own limits); configMult applied per scoring spec; Difficulty presets removed from settings/scoring/history |
-| DB-132 | Sound, haptics, reduce-motion toggles | M | expo-haptics on card taps/plays/wins; toggles respected everywhere incl. animations |
-| DB-133 | Rulebook screen | M | How to play (goal, tap/drag verbs, reserve, parking, recycles) in plain language with visuals; scoring as named bonuses with one worked example — **zero equations** (spec §4c); "fine print" link to exact tables; linked from settings + first launch |
+| PL-130 | Settings screen + persisted settings store | S | Gear icon in top bar opens settings; values persist |
+| PL-131 | Difficulty configurations wired to game config | M | Settings replaces the preset selector with knob rows (recycles 0–2, park bays 1–3); knobs flow into per-deal game config (constants become config; reducer reads the deal's own limits); configMult applied per scoring spec; Difficulty presets removed from settings/scoring/history |
+| PL-132 | Sound, haptics, reduce-motion toggles | M | expo-haptics on card taps/plays/wins; toggles respected everywhere incl. animations |
+| PL-133 | Rulebook screen | M | How to play (goal, tap/drag verbs, reserve, parking, recycles) in plain language with visuals; scoring as named bonuses with one worked example — **zero equations** (spec §4c); "fine print" link to exact tables; linked from settings + first launch |
 
 ## Epic E4 — Leaderboards
 
 | ID | Ticket | Size | Acceptance criteria |
 |---|---|---|---|
-| DB-140 | Local leaderboards | S | Top 20 deal scores per difficulty, stored locally, viewable in-app |
-| DB-141 | Daily set leaderboard integration | M | Depends on E7 (DB-174): cumulative daily total submits to the daily board; practice replays unscored |
-| DB-142 | Game Center: config plugin + authentication | M | expo config plugin sets GC entitlement; silent auth on launch; graceful offline fallback |
-| DB-143 | Game Center: submit + fetch leaderboards | M | Challenge-mode boards only: Daily total (recurring) + All-time challenge points; submit on daily-set completion |
-| DB-144 | Leaderboard + stats screen | M | Tabs: Daily / All-time / My stats (personal dashboard incl. free play); player rank; local fallback when GC unavailable |
+| PL-140 | Local leaderboards | S | Top 20 deal scores per difficulty, stored locally, viewable in-app |
+| PL-141 | Daily set leaderboard integration | M | Depends on E7 (PL-174): cumulative daily total submits to the daily board; practice replays unscored |
+| PL-142 | Game Center: config plugin + authentication | M | expo config plugin sets GC entitlement; silent auth on launch; graceful offline fallback |
+| PL-143 | Game Center: submit + fetch leaderboards | M | Challenge-mode boards only: Daily total (recurring) + All-time challenge points; submit on daily-set completion |
+| PL-144 | Leaderboard + stats screen | M | Tabs: Daily / All-time / My stats (personal dashboard incl. free play); player rank; local fallback when GC unavailable |
 
 ## Epic E5 — Achievements
 
 | ID | Ticket | Size | Acceptance criteria |
 |---|---|---|---|
-| DB-150 | Achievement engine | M | Declarative rules evaluated on game events; persisted unlock state; no game-logic coupling |
-| DB-151 | Badge definitions (spec below) | S | All ~18 badges defined with id, name, tiers, criteria, artwork slot |
-| DB-152 | Badge gallery + unlock toast | M | Grid with locked/unlocked/tier states; toast + haptic on unlock |
-| DB-153 | Game Center achievements sync | S | Unlocks mirror to GC; idempotent resubmission |
+| PL-150 | Achievement engine | M | Declarative rules evaluated on game events; persisted unlock state; no game-logic coupling |
+| PL-151 | Badge definitions (spec below) | S | All ~18 badges defined with id, name, tiers, criteria, artwork slot |
+| PL-152 | Badge gallery + unlock toast | M | Grid with locked/unlocked/tier states; toast + haptic on unlock |
+| PL-153 | Game Center achievements sync | S | Unlocks mirror to GC; idempotent resubmission |
 
 ## Epic E7 — The Living Deck (Generation v2) ★ core
 
@@ -144,17 +144,17 @@ Retires the static deal pool. Gates the daily-set half of E4.*
 
 | ID | Ticket | Size | Acceptance criteria |
 |---|---|---|---|
-| DB-170 | On-device deal generator (TS port, seeded PRNG) | M | Solution-first tableau construction from a seed; same seed ⇒ same deal; distribution guards (duplicate caps, vowel/consonant window, rarity budget); board-shape parameter with position-shuffled heights; altitude guards (rares surface early, vowel-biased column bottoms); openness threshold; **word-length quality gates (5 always reachable, a 7 discoverable, 8s ≈10% of deals)**; unit-tested |
-| DB-171 | Solvability measurement solver | L | Bounded memoized solver answers "is this state completable?" — used for par estimation, openness metrics, and the post-game "a win was possible until move N" insight; **never for draw-time rescue**; property-tested against random play |
-| DB-172 | Draw-time stock steering | L | Next card = f(seed, move history); fairness guards enforced (duplicate caps, vowel lifeline) with a **warmth curve** (early draws kinder, neutral by mid-game — no win-path rescue, dead is dead); generosity knob scales the curve per daily game; deterministic replay verified in tests |
-| DB-173 | Difficulty ramp parameters | M | `src/dailyRamp.ts`: per-game (1–5) board shape + steering generosity + recycles + max-parked per GENERATION.md; decided — no separate daily multiplier (configMult derives it from the knobs); tested |
-| DB-174 | Daily set mode | M | **Engine done** (`src/daily.ts`): 5 shared-seed games/day (seed service + ramp + generator), cumulative daily total, day-reset, countdown data, persisted. **Remaining:** the Daily *screen* (mode picker, game slots, countdown) wiring the engine into the app — a thin follow-up needing on-device verification. |
-| DB-175 | Par estimation + score bands | M | Generator estimates achievable score; deals outside the par band rejected; word-length gate rates tuned here (7-discoverable on every deal, 8s ≈10%); band documented and tested |
-| DB-176 | Seed service: phase 1 + phase 2 stub | M | Launch: hash(date, gameIndex, salt) on device; documented server-issued-seed + move-log replay validation design for phase 2 |
-| DB-186 | Backend foundation on Supabase | L | Supabase project + schema: daily seeds, score submissions, move logs, word-usage aggregates; anonymous device auth with optional Game Center identity link; RLS policies; DB-176 phase 2, DB-184, and DB-185 all build on this |
-| DB-177 | Dynamic bays (rule change — superseded by DB-179) | M | Park onto ANY empty column; parked cards capped at `config.parkBays` (unifies with the DB-131 knob; `parkedCount` enforces); dead-deal rescue + park-target UI updated; reducer tests cover the cap; full sim rerun lands with DB-172 steering |
-| DB-179 | Designated park bays (rule change — supersedes DB-177) | S | Park only onto this deal's **designated bays**: `state.bays`, the `config.parkBays` column indices chosen randomly at deal time (`pickBays`, deterministic per deal/seed) and marked with an on-board indicator so the player knows which columns to prioritize clearing. A bay accepts a parked card only once it's been cleared; one card per bay, so simultaneous parks are bounded by emptied bays (no separate `parkedCount` cap). Parking **surfaces the next card** — if the reserve empties, the next stock card is drawn in (drawing is free). Winnability unaffected — every deal is winnable without parks. `parkReserve` restricted to `bays` + auto-advance; a cleared bay is marked by the **park plus alone** (no orange outline); dead-deal rescue + park-target UI (only bays are drop targets) updated; bay indicator row; reducer/sanitize tests (designation, determinism, bay-only parking, auto-draw, back-compat coerce). Known follow-up: the measurement solver still models DB-177 "any empty column" (harmless over-approximation since no-park solutions exist) — tighten to designated bays for exact par/openness later |
-| DB-178 | Opening reroll — exchange cards with the stock (rule change) | S | Before play a panel fans the deal's face-up column tops; tap to raise/lower, then **Swap** (one shot — closes the panel and shows the new board) or **Skip** (play as dealt). Swap is a deterministic **rotation**: each raised top goes to the BOTTOM of the stock and that many cards evict off the FRONT of the stock into the vacated spots, so the 48-card multiset is conserved. It's a **straight letter swap** — the rolled-in cards arrive **green** (native, still required to clear), so the clear-count is unchanged; you trade a known letter for an unknown one. No cap (bounded only by stock size); **free** (no scoring effect). Deliberately a **gamble**: the stock is face-down and there's no solver check, so a reroll may strand the board — the deal *as dealt* keeps the every-deal-winnable promise; only the voluntary reroll is exempt. Only the 7 face-up tops are shown (buried cards stay hidden). `reroll` action (pre-play only, native tops only); `rerollsUsed` counts cards swapped; reducer tests (rotation, clear-count unchanged, no-cap, stock-bound, guards) + `RerollPanel` UI; pre-DB-178 resume snapshots coerce the missing counter to 0 |
+| PL-170 | On-device deal generator (TS port, seeded PRNG) | M | Solution-first tableau construction from a seed; same seed ⇒ same deal; distribution guards (duplicate caps, vowel/consonant window, rarity budget); board-shape parameter with position-shuffled heights; altitude guards (rares surface early, vowel-biased column bottoms); openness threshold; **word-length quality gates (5 always reachable, a 7 discoverable, 8s ≈10% of deals)**; unit-tested |
+| PL-171 | Solvability measurement solver | L | Bounded memoized solver answers "is this state completable?" — used for par estimation, openness metrics, and the post-game "a win was possible until move N" insight; **never for draw-time rescue**; property-tested against random play |
+| PL-172 | Draw-time stock steering | L | Next card = f(seed, move history); fairness guards enforced (duplicate caps, vowel lifeline) with a **warmth curve** (early draws kinder, neutral by mid-game — no win-path rescue, dead is dead); generosity knob scales the curve per daily game; deterministic replay verified in tests |
+| PL-173 | Difficulty ramp parameters | M | `src/dailyRamp.ts`: per-game (1–5) board shape + steering generosity + recycles + max-parked per GENERATION.md; decided — no separate daily multiplier (configMult derives it from the knobs); tested |
+| PL-174 | Daily set mode | M | **Engine done** (`src/daily.ts`): 5 shared-seed games/day (seed service + ramp + generator), cumulative daily total, day-reset, countdown data, persisted. **Remaining:** the Daily *screen* (mode picker, game slots, countdown) wiring the engine into the app — a thin follow-up needing on-device verification. |
+| PL-175 | Par estimation + score bands | M | Generator estimates achievable score; deals outside the par band rejected; word-length gate rates tuned here (7-discoverable on every deal, 8s ≈10%); band documented and tested |
+| PL-176 | Seed service: phase 1 + phase 2 stub | M | Launch: hash(date, gameIndex, salt) on device; documented server-issued-seed + move-log replay validation design for phase 2 |
+| PL-186 | Backend foundation on Supabase | L | Supabase project + schema: daily seeds, score submissions, move logs, word-usage aggregates; anonymous device auth with optional Game Center identity link; RLS policies; PL-176 phase 2, PL-184, and PL-185 all build on this |
+| PL-177 | Dynamic bays (rule change — superseded by PL-179) | M | Park onto ANY empty column; parked cards capped at `config.parkBays` (unifies with the PL-131 knob; `parkedCount` enforces); dead-deal rescue + park-target UI updated; reducer tests cover the cap; full sim rerun lands with PL-172 steering |
+| PL-179 | Designated park bays (rule change — supersedes PL-177) | S | Park only onto this deal's **designated bays**: `state.bays`, the `config.parkBays` column indices chosen randomly at deal time (`pickBays`, deterministic per deal/seed) and marked with an on-board indicator so the player knows which columns to prioritize clearing. A bay accepts a parked card only once it's been cleared; one card per bay, so simultaneous parks are bounded by emptied bays (no separate `parkedCount` cap). Parking **surfaces the next card** — if the reserve empties, the next stock card is drawn in (drawing is free). Winnability unaffected — every deal is winnable without parks. `parkReserve` restricted to `bays` + auto-advance; a cleared bay is marked by the **park plus alone** (no orange outline); dead-deal rescue + park-target UI (only bays are drop targets) updated; bay indicator row; reducer/sanitize tests (designation, determinism, bay-only parking, auto-draw, back-compat coerce). Known follow-up: the measurement solver still models PL-177 "any empty column" (harmless over-approximation since no-park solutions exist) — tighten to designated bays for exact par/openness later |
+| PL-178 | Opening reroll — exchange cards with the stock (rule change) | S | Before play a panel fans the deal's face-up column tops; tap to raise/lower, then **Swap** (one shot — closes the panel and shows the new board) or **Skip** (play as dealt). Swap is a deterministic **rotation**: each raised top goes to the BOTTOM of the stock and that many cards evict off the FRONT of the stock into the vacated spots, so the 48-card multiset is conserved. It's a **straight letter swap** — the rolled-in cards arrive **green** (native, still required to clear), so the clear-count is unchanged; you trade a known letter for an unknown one. No cap (bounded only by stock size); **free** (no scoring effect). Deliberately a **gamble**: the stock is face-down and there's no solver check, so a reroll may strand the board — the deal *as dealt* keeps the every-deal-winnable promise; only the voluntary reroll is exempt. Only the 7 face-up tops are shown (buried cards stay hidden). `reroll` action (pre-play only, native tops only); `rerollsUsed` counts cards swapped; reducer tests (rotation, clear-count unchanged, no-cap, stock-bound, guards) + `RerollPanel` UI; pre-PL-178 resume snapshots coerce the missing counter to 0 |
 
 ## Epic E8 — Word Ladder & Living Meta (post-launch, M5)
 
@@ -167,12 +167,12 @@ that day only, so the meta breathes daily instead of accumulating forever.*
 
 | ID | Ticket | Size | Acceptance criteria |
 |---|---|---|---|
-| DB-180 | Ladder: tiers, promotion, persisted rank | M | Tiers (e.g. Bronze→Diamond) advanced by daily-challenge results; rank shown in profile; demotion rules decided and documented |
-| DB-181 | Word retirement engine (phase 1: static lists) | M | Per-tier ban lists from static frequency data; retired words rejected with "retired at your rank" feedback; free play unaffected |
-| DB-182 | Effective-lexicon integration with the living deck | M | Solvability checks and openness metric run against base lexicon minus the player's tier bans — deals stay winnable under bans; tested per tier |
-| DB-183 | Retired-words gallery + tier UI | M | Ladder screen: current tier, next promotion, list of words retired at each tier |
-| DB-184 | Phase 2: usage telemetry + daily-reset retirement | L | Challenge-mode word usage aggregated server-side over a trailing 7-day window; each play day publishes that day's retired list with the daily set (top-K, sliced per tier); yesterday's bans lift automatically — no permanent accumulation; K tuned and documented |
-| DB-185 | Weekly meta surfaces | M | Community *most-used words of the week* displayed in-app (also the source pool for daily retirement); *best word of the week* — weekly recurring GC board + personal stat; both reset weekly |
+| PL-180 | Ladder: tiers, promotion, persisted rank | M | Tiers (e.g. Bronze→Diamond) advanced by daily-challenge results; rank shown in profile; demotion rules decided and documented |
+| PL-181 | Word retirement engine (phase 1: static lists) | M | Per-tier ban lists from static frequency data; retired words rejected with "retired at your rank" feedback; free play unaffected |
+| PL-182 | Effective-lexicon integration with the living deck | M | Solvability checks and openness metric run against base lexicon minus the player's tier bans — deals stay winnable under bans; tested per tier |
+| PL-183 | Retired-words gallery + tier UI | M | Ladder screen: current tier, next promotion, list of words retired at each tier |
+| PL-184 | Phase 2: usage telemetry + daily-reset retirement | L | Challenge-mode word usage aggregated server-side over a trailing 7-day window; each play day publishes that day's retired list with the daily set (top-K, sliced per tier); yesterday's bans lift automatically — no permanent accumulation; K tuned and documented |
+| PL-185 | Weekly meta surfaces | M | Community *most-used words of the week* displayed in-app (also the source pool for daily retirement); *best word of the week* — weekly recurring GC board + personal stat; both reset weekly |
 
 ## Epic E9 — The Toolkit (fun mechanics, post-launch M5)
 
@@ -187,12 +187,12 @@ invariant survives tool use.*
 
 | ID | Ticket | Size | Acceptance criteria |
 |---|---|---|---|
-| DB-190 | Toolkit design finalization | S | Tool list + charge economy locked (proposal: 3 charges/day shared across tools); mode gating + assisted-win scoring policy decided and documented here |
-| DB-191 | Slide-up Toolkit panel | M | Drawer slides up from the bottom edge (PanResponder, consistent with existing drag conventions); charge pips; disabled state in challenge mode with explanatory copy |
-| DB-192 | Tool: Grab Bag | M | Swap any one visible card (column top or reserve) for a card from the grab bag; replacement letter chosen through steering so the deal stays winnable; animates the exchange |
-| DB-193 | Tool: Scrap | M | Remove one visible letter card outright (native card removal counts toward clearing); solvability re-verified; satisfying destruction animation |
-| DB-194 | Charges + gating persistence | M | Daily charge refresh at play-day rollover; per-mode gating (never in challenge, toggle in free play, default-on in Casual); assisted flag threads into stats/history |
-| DB-195 | Wildcards — earned, banked, played as any letter | M | Earned at career-point milestones (thresholds configurable, e.g. every 500 banked points); balance persists via the storage layer and **accumulates with no daily reset** (unlike tool charges); played from the tray as a distinct ♠ blank that completes any word — counts toward word length, letter value 0 (Scrabble-blank rule), max one per word; validation supports the blank (any completing letter); shown distinctly in the win tally; follows Toolkit gating (never in the daily challenge; assisted marking applies) |
+| PL-190 | Toolkit design finalization | S | Tool list + charge economy locked (proposal: 3 charges/day shared across tools); mode gating + assisted-win scoring policy decided and documented here |
+| PL-191 | Slide-up Toolkit panel | M | Drawer slides up from the bottom edge (PanResponder, consistent with existing drag conventions); charge pips; disabled state in challenge mode with explanatory copy |
+| PL-192 | Tool: Grab Bag | M | Swap any one visible card (column top or reserve) for a card from the grab bag; replacement letter chosen through steering so the deal stays winnable; animates the exchange |
+| PL-193 | Tool: Scrap | M | Remove one visible letter card outright (native card removal counts toward clearing); solvability re-verified; satisfying destruction animation |
+| PL-194 | Charges + gating persistence | M | Daily charge refresh at play-day rollover; per-mode gating (never in challenge, toggle in free play, default-on in Casual); assisted flag threads into stats/history |
+| PL-195 | Wildcards — earned, banked, played as any letter | M | Earned at career-point milestones (thresholds configurable, e.g. every 500 banked points); balance persists via the storage layer and **accumulates with no daily reset** (unlike tool charges); played from the tray as a distinct ♠ blank that completes any word — counts toward word length, letter value 0 (Scrabble-blank rule), max one per word; validation supports the blank (any completing letter); shown distinctly in the win tally; follows Toolkit gating (never in the daily challenge; assisted marking applies) |
 
 ## Epic E11 — The Buy Round (post-launch, M5)
 
@@ -206,24 +206,24 @@ players, it stays leaderboard-fair — good plays literally fund the run.*
 
 | ID | Ticket | Size | Acceptance criteria |
 |---|---|---|---|
-| DB-210 | Buy Round design finalization | S | Pricing/tier table locked (proposal: <150 pts = eco, no buy; 150+ = common shelf, 1 pick; 300+ = mid shelf incl. premium consonants, 2 picks; 500+ = top shelf incl. J/Q/X/Z + choice vowels, 3 picks); pocket cap; scoring interaction (bought letters pre-paid — no stock-economy tax); game 1 never has a buy; free-play variant decided |
-| DB-211 | Buy screen | M | Between-games shop with tier shelves; locked shelves visible (aspiration); shows buy power and its expiry; skippable; fits the card-room aesthetic |
-| DB-212 | Pocket letters gameplay | M | Purchased letters ride into the next deal as a pocket row — playable like parked cards, never count toward clearing, distinct visual; solvability unaffected (strictly additive); tests per the standard |
-| DB-213 | Economy wiring | M | dealScore → buy-power conversion at set thresholds; **no rollover** (unspent power expires when the next game starts); daily-set integration between games; telemetry hooks for tuning |
+| PL-210 | Buy Round design finalization | S | Pricing/tier table locked (proposal: <150 pts = eco, no buy; 150+ = common shelf, 1 pick; 300+ = mid shelf incl. premium consonants, 2 picks; 500+ = top shelf incl. J/Q/X/Z + choice vowels, 3 picks); pocket cap; scoring interaction (bought letters pre-paid — no stock-economy tax); game 1 never has a buy; free-play variant decided |
+| PL-211 | Buy screen | M | Between-games shop with tier shelves; locked shelves visible (aspiration); shows buy power and its expiry; skippable; fits the card-room aesthetic |
+| PL-212 | Pocket letters gameplay | M | Purchased letters ride into the next deal as a pocket row — playable like parked cards, never count toward clearing, distinct visual; solvability unaffected (strictly additive); tests per the standard |
+| PL-213 | Economy wiring | M | dealScore → buy-power conversion at set thresholds; **no rollover** (unspent power expires when the next game starts); daily-set integration between games; telemetry hooks for tuning |
 
 ## Epic E6 — App Store Readiness
 
 | ID | Ticket | Size | Acceptance criteria |
 |---|---|---|---|
-| DB-160 | Branding: icon, splash, wordmark | M | Final art replaces Expo defaults; dark splash matches theme |
-| DB-161 | Onboarding tutorial | M | First-launch guided deal teaching tap/drag/park; skippable; replayable from settings |
-| DB-162 | Accessibility pass | M | VoiceOver labels on all interactive elements; dynamic type on text; honors reduce-motion |
-| DB-163 | Sound design | M | Card slide/flip/play/win sounds; mute honors silent switch |
-| DB-164 | Crash reporting + error boundary | S | Sentry wired via EAS; error boundary recovers to a fresh deal |
-| DB-165 | EAS build + TestFlight pipeline | M | `eas build` profiles; internal TestFlight distribution documented |
-| DB-166 | Privacy policy + App Store metadata | M | Privacy manifest (GC only, no tracking), screenshots, description, keywords |
-| DB-167 | Submit + review fixes | M | App approved on the App Store |
-| DB-168 | Home / mode-select screen | S | Landing screen chooses **Free Play** or **Daily** (Daily moves off the play screen); Free Play gets a back-to-menu affordance. Ambient title animation (`HangingCards`): the DECKABET letters are cards on puppeteer strings (running off the top edge), released from below to snap up elastically and dangle on a 3-link rope; randomized hang heights and rise order. All native-driver. Honors reduce-motion with a still, level row. App becomes a small `home`/`game`/`daily` router; Free Play mounts only when chosen and resumes its saved deal (DB-122) |
+| PL-160 | Branding: icon, splash, wordmark | M | Final art replaces Expo defaults; dark splash matches theme |
+| PL-161 | Onboarding tutorial | M | First-launch guided deal teaching tap/drag/park; skippable; replayable from settings |
+| PL-162 | Accessibility pass | M | VoiceOver labels on all interactive elements; dynamic type on text; honors reduce-motion |
+| PL-163 | Sound design | M | Card slide/flip/play/win sounds; mute honors silent switch |
+| PL-164 | Crash reporting + error boundary | S | Sentry wired via EAS; error boundary recovers to a fresh deal |
+| PL-165 | EAS build + TestFlight pipeline | M | `eas build` profiles; internal TestFlight distribution documented |
+| PL-166 | Privacy policy + App Store metadata | M | Privacy manifest (GC only, no tracking), screenshots, description, keywords |
+| PL-167 | Submit + review fixes | M | App approved on the App Store |
+| PL-168 | Home / mode-select screen | S | Landing screen chooses **Free Play** or **Daily** (Daily moves off the play screen); Free Play gets a back-to-menu affordance. Ambient title animation (`HangingCards`): the PUZZLEX letters are cards on puppeteer strings (running off the top edge), released from below to snap up elastically and dangle on a 3-link rope; randomized hang heights and rise order. All native-driver. Honors reduce-motion with a still, level row. App becomes a small `home`/`game`/`daily` router; Free Play mounts only when chosen and resumes its saved deal (PL-122) |
 
 ---
 
@@ -232,7 +232,7 @@ players, it stays leaderboard-fair — good plays literally fund the run.*
 ## Scoring (canonical)
 
 Scoring rewards **hard letters, long words, word economy, and stock discipline**.
-All scoring happens in `src/scoring.ts` (DB-110/111) as pure functions of the
+All scoring happens in `src/scoring.ts` (PL-110/111) as pure functions of the
 finished deal's stats.
 
 ### 1. Letter values (Scrabble-derived)
@@ -287,7 +287,7 @@ stockEconomyMult = clamp( 1.5
 ```
 
 Draws themselves are free — browsing the stock is fine; *consuming* it costs.
-The opening reroll (DB-178) has **no scoring effect** — it's a free pre-play
+The opening reroll (PL-178) has **no scoring effect** — it's a free pre-play
 setup choice, not a stock lean.
 
 **Difficulty** (see Configurations spec): no named presets — the multiplier
@@ -333,8 +333,8 @@ never see a formula. In-game, scoring is presented as **named bonuses**:
 | "Your last word counts double" `ENCORE ×2` | Encore |
 | "Harder mode, bigger scores" `Expert ×1.6` | difficultyMult |
 
-The win-screen tally (DB-113) shows these as chips that add up in front of
-the player — teaching by showing. The rulebook (DB-133) explains them in
+The win-screen tally (PL-113) shows these as chips that add up in front of
+the player — teaching by showing. The rulebook (PL-133) explains them in
 plain language with a worked visual example. Exact tables live behind an
 optional "fine print" link for min-maxers. If playtesting still shows
 confusion, simplification happens at the presentation layer first; the
@@ -374,8 +374,8 @@ difficulty takes effect on the next deal.
   weekly; retired-word lists reset every play day (E8).
 - **Free play is private.** Unlimited deals, player-picked difficulty
   preset, never on a public board. It feeds the personal stats dashboard
-  and local bests (DB-140: top-20 per difficulty, on device).
-- **Personal stats** (DB-121, shown in DB-144's My Stats tab): total time
+  and local bests (PL-140: top-20 per difficulty, on device).
+- **Personal stats** (PL-121, shown in PL-144's My Stats tab): total time
   played, total games and wins, average time per game, letters constructed,
   words played, unique words, most-played words (top 10), best word, best
   deal, streaks — tracked per mode.
@@ -388,7 +388,7 @@ difficulty takes effect on the next deal.
 ## Achievements
 
 Tiers: 🥉 bronze / 🥈 silver / 🥇 gold where noted. Engine is declarative
-(DB-150); definitions in one file (DB-151); mirrored to Game Center (DB-153).
+(PL-150); definitions in one file (PL-151); mirrored to Game Center (PL-153).
 
 | Badge | Criteria |
 |---|---|
@@ -412,5 +412,5 @@ Tiers: 🥉 bronze / 🥈 silver / 🥇 gold where noted. Engine is declarative
 
 1. Timer: does clear-speed affect score or stay achievement-only? (default: stay out of score — thoughtful play > speed)
 2. Android: Game Center is iOS-only; Play Games Services or backend leaderboard when Android ships.
-3. Daily set score multiplier: per-game ramp multiplier vs. difficulty presets (decide in DB-173).
+3. Daily set score multiplier: per-game ramp multiplier vs. difficulty presets (decide in PL-173).
 4. Free-play difficulty: player-picked preset (E3) vs. also offering the ramp — default: preset.

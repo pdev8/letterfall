@@ -1,7 +1,7 @@
 import { DAILY_GAME_COUNT, DAILY_RAMP, rampFor } from '../dailyRamp';
 import { configMult } from '../scoring';
 
-describe('daily ramp (DB-173)', () => {
+describe('daily ramp (PL-173)', () => {
   it('has 5 games, each a valid board shape summing to 28', () => {
     expect(DAILY_GAME_COUNT).toBe(5);
     for (const g of DAILY_RAMP) {

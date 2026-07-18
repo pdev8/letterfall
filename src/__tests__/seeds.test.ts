@@ -6,7 +6,7 @@ import type { GameState, Seeds } from '../types';
 const seeds = seedsJson as unknown as Seeds;
 
 describe('seeds.json schema', () => {
-  it('has deals and nothing else (lexicon moved to assets/lexicon.json in DB-202)', () => {
+  it('has deals and nothing else (lexicon moved to assets/lexicon.json in PL-202)', () => {
     expect(seeds.deals.length).toBeGreaterThan(0);
     expect(Object.keys(seedsJson as object)).toEqual(['deals']);
   });

@@ -4,13 +4,13 @@ import { Animated, Easing, StyleSheet, useWindowDimensions, View } from 'react-n
 import LetterCard from './LetterCard';
 import { C } from '../theme';
 
-// Title-screen ambience (DB-168): the DECKABET letters are cards hung on strings
+// Title-screen ambience (PL-168): the PUZZLEX letters are cards hung on strings
 // on roughly one line. They're pulled up from below, whipping into place like a
 // real string (a 3-link rope that bends, plus a damped pendulum swing-in), then
 // dangle gently. All motion is native-driver. Honors reduce-motion with a
 // still, level row.
 
-const LETTERS = 'DECKABET'.split('');
+const LETTERS = 'PUZZLEX'.split('');
 const SEGMENTS = 3; // string links — more = ropier bend
 const STRING_W = 1.5;
 // The rope is long — most of it lives above the top edge (the puppeteer). Its

@@ -1,6 +1,6 @@
 // Seeded, pure PRNG for the Living Deck (E7). Deterministic: a given seed
-// always yields the same sequence, so on-device deal generation (DB-170) and
-// draw-time steering (DB-172) can be replayed and verified in tests.
+// always yields the same sequence, so on-device deal generation (PL-170) and
+// draw-time steering (PL-172) can be replayed and verified in tests.
 //
 // Core generator is mulberry32 — a tiny, well-documented 32-bit PRNG with a
 // full 2^32 period and good statistical quality for game use. Reference:

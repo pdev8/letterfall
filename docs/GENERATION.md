@@ -1,6 +1,6 @@
 # The Living Deck — Deal Generation v2 (canonical)
 
-> **This is the core of DECKABET.** Infinite deals, every one winnable, none
+> **This is the core of PUZZLEX.** Infinite deals, every one winnable, none
 > predictable, none railroaded. Implemented by epic **E7** in `ROADMAP.md`.
 > The static 290-deal pool in `assets/seeds.json` is interim scaffolding and
 > retires when E7 lands.
@@ -77,7 +77,7 @@ must reward skill with discoverable long words:
 - **6s and 7s must be discoverable by skilled play** — at least one line of
   play reaches a 7-letter word (solver-verified at generation, never hinted);
 - **8s are the rarest prize**: possible on a minority of deals (target ≈10%,
-  tuned in DB-175), never guaranteed.
+  tuned in PL-175), never guaranteed.
 
 Deals failing these gates are rejected and regenerated, same as par-band
 misses.
@@ -102,7 +102,7 @@ constraints: par-band check, distribution guards, and an **openness metric**
 threshold so players aren't funneled into the witness).
 
 **Solvability checking at draw time** is the hard engineering problem
-(DB-171): a bounded, memoized solver over ≤28 remaining cards. The escape-plan
+(PL-171): a bounded, memoized solver over ≤28 remaining cards. The escape-plan
 approach makes it tractable — maintain one known completion; when the player's
 move breaks it, search for a new one; steering only offers letters for which a
 plan exists.
@@ -132,7 +132,7 @@ two problems with the classic staircase [1..7] + fixed left bays:
 
 The fixes, all sim-informed:
 
-- **Dynamic bays (rule change, ships pre-v2 — DB-177).** Parking is no longer
+- **Dynamic bays (rule change, ships pre-v2 — PL-177).** Parking is no longer
   positional: the reserve card may be parked on **any empty column**, with at
   most **3 parked cards on the board** at once. The left side loses its false
   magnetism, emptied columns become tools anywhere, and the endgame gains
@@ -168,7 +168,7 @@ The fixes, all sim-informed:
 | 5 | Steep [1,1,2,4,6,7,7] | Minimal (least-helpful legal letters) | 0 | 1 |
 
 Daily total = Σ of the five deal scores (scoring spec in `ROADMAP.md`).
-**Decided (DB-173): no separate daily multiplier.** Difficulty comes from the
+**Decided (PL-173): no separate daily multiplier.** Difficulty comes from the
 knobs (recycles + max-parked), and `configMult` already derives the score
 multiplier from them — game 5's 0-recycle / 1-bay config is ×1.4 — so harder
 games in the ramp are automatically worth more. The ramp lives in
@@ -185,7 +185,7 @@ locally seeded, and feeds personal stats only (see "Modes & Leaderboards" in
   full steering algorithm could simulate draws — accepted at launch (equal to
   the risk every offline word game carries). Casual file-peeking is already
   impossible: there is no deal file.
-- **Phase 2 (server — Supabase, DB-186):** seeds issued by a server per daily game; client
+- **Phase 2 (server — Supabase, PL-186):** seeds issued by a server per daily game; client
   submits the move log with the score; server replays moves through the same
   deterministic steering to validate both draws and score. This is the replay
   validator already noted in the leaderboard spec.

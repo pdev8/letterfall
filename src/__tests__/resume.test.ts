@@ -1,4 +1,4 @@
-// DB-122: SavedGame validation. loadGame/saveGame themselves are a thin
+// PL-122: SavedGame validation. loadGame/saveGame themselves are a thin
 // store.get/set binding over AsyncStorage (untestable in node); the logic
 // that decides whether a persisted snapshot restores lives in the pure
 // parseSavedGame, tested here.

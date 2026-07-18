@@ -8,7 +8,7 @@ import { useSettings } from '../settingsStore';
 import { C } from '../theme';
 
 /**
- * Landing screen (DB-145): choose Free Play or Daily. The Matrix-style letter
+ * Landing screen (PL-145): choose Free Play or Daily. The Matrix-style letter
  * rain runs behind the menu; Daily lives here, not inside the play screen.
  */
 export default function HomeScreen({
@@ -37,7 +37,7 @@ export default function HomeScreen({
           <Text style={styles.gearGlyph}>{'⚙︎'}</Text>
         </Pressable>
 
-        {/* No title text — the hanging cards spell DECKABET. This spacer keeps
+        {/* No title text — the hanging cards spell PUZZLEX. This spacer keeps
             the menu where it was. */}
         <View style={styles.hero} />
 

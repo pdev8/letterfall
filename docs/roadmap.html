@@ -1,4 +1,4 @@
-<title>DECKABET — Project Tracker</title>
+<title>PUZZLEX — Project Tracker</title>
 <style>
   :root {
     --bg: #f4f0e5;
@@ -165,17 +165,17 @@
 
 <div class="page">
   <header>
-    <div class="wordmark">DECKABET <span class="spade">♠</span></div>
+    <div class="wordmark">PUZZLEX <span class="spade">♠</span></div>
     <h1>Project Tracker</h1>
     <p class="lede">Word Klondike, App Store bound. The playable core and the full design are done —
-    the implementation train starts at DB-100. Canonical specs: <span class="mono">docs/ROADMAP.md</span> ·
+    the implementation train starts at PL-100. Canonical specs: <span class="mono">docs/ROADMAP.md</span> ·
     <span class="mono">docs/GENERATION.md</span>.</p>
     <div class="statrow">
       <div class="stat"><div class="v green">✓</div><div class="k">core loop playable</div></div>
       <div class="stat"><div class="v green">✓</div><div class="k">design specced</div></div>
       <div class="stat"><div class="v">33 / 59</div><div class="k">tickets shipped</div></div>
-      <div class="stat"><div class="v orange">#63</div><div class="k">in review</div></div>
-      <div class="stat"><div class="v">61 + 2</div><div class="k">PRs merged + open</div></div>
+      <div class="stat"><div class="v orange">#64</div><div class="k">in review</div></div>
+      <div class="stat"><div class="v">63 + 1</div><div class="k">PRs merged + open</div></div>
     </div>
   </header>
 
@@ -205,45 +205,45 @@
     <div class="epic">
       <div class="epic-head"><span class="e-id">E0</span><span class="e-name">Engineering Foundation</span><span class="e-count">6/6</span><span class="e-mile">M1</span></div>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-100</span><span class="t-name">Jest + reducer test suite in repo <span class="t-note">(PR #11 — 39 tests)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-100</span><span class="t-name">Jest + reducer test suite in repo <span class="t-note">(PR #11 — 39 tests)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>The game's rulebook-in-code (parking, swapping, withdrawing, winning) is now covered by an automated test suite that runs with one command. Every future change gets checked against the rules before it ships, so new features can't quietly break the game.</p>
-          <p><a href="https://github.com/pdev8/deckabet/pull/11">PR #11</a></p>
+          <p><a href="https://github.com/pdev8/puzzlex/pull/11">PR #11</a></p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-101</span><span class="t-name">GitHub Actions CI on every PR <span class="t-note">(PR #12)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-101</span><span class="t-name">GitHub Actions CI on every PR <span class="t-note">(PR #12)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>Every proposed change runs the typecheck and full test suite automatically on GitHub, and a failing change can't be merged. Players never get a build that flunked its own tests.</p>
-          <p><a href="https://github.com/pdev8/deckabet/pull/12">PR #12</a></p>
+          <p><a href="https://github.com/pdev8/puzzlex/pull/12">PR #12</a></p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-102</span><span class="t-name">ESLint + Prettier <span class="t-note">(PR #13)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-102</span><span class="t-name">ESLint + Prettier <span class="t-note">(PR #13)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>Automatic code formatting and linting, enforced by CI. Keeps the codebase consistent and catches common mistakes before they become bugs.</p>
-          <p><a href="https://github.com/pdev8/deckabet/pull/13">PR #13</a></p>
+          <p><a href="https://github.com/pdev8/puzzlex/pull/13">PR #13</a></p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-103</span><span class="t-name">Split App.tsx into components + screens <span class="t-note">(PR #20 — App.tsx: 22 lines)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-103</span><span class="t-name">Split App.tsx into components + screens <span class="t-note">(PR #20 — App.tsx: 22 lines)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>The app started as one giant file; this split it into small, focused components and screens with no behavior change. Purely structural, but every later feature — settings, stats screens, leaderboards — got much easier to build.</p>
-          <p><a href="https://github.com/pdev8/deckabet/pull/20">PR #20</a></p>
+          <p><a href="https://github.com/pdev8/puzzlex/pull/20">PR #20</a></p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-104</span><span class="t-name">PR template + CONTRIBUTING <span class="t-note">(PR #14)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-104</span><span class="t-name">PR template + CONTRIBUTING <span class="t-note">(PR #14)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>A pull-request checklist and contributor guide: every change must name its ticket, show test evidence, and include screenshots for UI work. Keeps the one-PR-per-ticket workflow honest.</p>
-          <p><a href="https://github.com/pdev8/deckabet/pull/14">PR #14</a></p>
+          <p><a href="https://github.com/pdev8/puzzlex/pull/14">PR #14</a></p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-105</span><span class="t-name">Deal generator in repo, witnesses stored + replayed in tests <span class="t-note">(PR #19)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-105</span><span class="t-name">Deal generator in repo, witnesses stored + replayed in tests <span class="t-note">(PR #19)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>The script that creates deals now lives in the repo, and every shipped deal stores a "witness" — a recorded winning line. Tests replay each witness through the real game rules, so "every deal starts winnable" is proven on every change, not just claimed.</p>
-          <p><a href="https://github.com/pdev8/deckabet/pull/19">PR #19</a></p>
+          <p><a href="https://github.com/pdev8/puzzlex/pull/19">PR #19</a></p>
         </div>
       </details>
     </div>
@@ -251,31 +251,31 @@
     <div class="epic">
       <div class="epic-head"><span class="e-id">E1</span><span class="e-name">Scoring Engine</span><span class="e-count">4/4</span><span class="e-mile">M1</span></div>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-110</span><span class="t-name">Letter values + word score <span class="t-note">(QUIZ = 28 — PR #15)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-110</span><span class="t-name">Letter values + word score <span class="t-note">(QUIZ = 28 — PR #15)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>Every letter gets a Scrabble-style value and longer words multiply up steeply — QUIZ scores 28 while CAT scores 5, and one 6-letter word beats two 3-letter words made of the same letters. This is the foundation the rest of scoring builds on.</p>
-          <p><a href="https://github.com/pdev8/deckabet/pull/15">PR #15</a></p>
+          <p><a href="https://github.com/pdev8/puzzlex/pull/15">PR #15</a></p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-111</span><span class="t-name">Deal score: economy / stock / difficulty multipliers + Encore; reducer counters <span class="t-note">(PR #16)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-111</span><span class="t-name">Deal score: economy / stock / difficulty multipliers + Encore; reducer counters <span class="t-note">(PR #16)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>A win's final score rewards style, not just words: using fewer, bigger words and leaning less on the stock multiplies your points, as does a harder difficulty setting — and your final word scores double (Encore). The game now tracks the needed counters (reserve letters played, parks, recycles) as you play.</p>
-          <p><a href="https://github.com/pdev8/deckabet/pull/16">PR #16</a></p>
+          <p><a href="https://github.com/pdev8/puzzlex/pull/16">PR #16</a></p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-112</span><span class="t-name">Live word-score preview on PLAY button <span class="t-note">(PR #17)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-112</span><span class="t-name">Live word-score preview on PLAY button <span class="t-note">(PR #17)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>While you build a valid word in the tray, the PLAY button shows what it will score — so you can weigh cashing in now against stretching for a longer, richer word.</p>
-          <p><a href="https://github.com/pdev8/deckabet/pull/17">PR #17</a></p>
+          <p><a href="https://github.com/pdev8/puzzlex/pull/17">PR #17</a></p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-113</span><span class="t-name">Win-screen score breakdown <span class="t-note">(named bonus chips — PR #18)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-113</span><span class="t-name">Win-screen score breakdown <span class="t-note">(named bonus chips — PR #18)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>After a win, an animated tally adds up each word's points plus named bonus chips — "Word Economy +30%", "Stock Discipline +21%", "ENCORE ×2" — never raw multiplier math. It teaches the scoring system by showing it pay out.</p>
-          <p><a href="https://github.com/pdev8/deckabet/pull/18">PR #18</a></p>
+          <p><a href="https://github.com/pdev8/puzzlex/pull/18">PR #18</a></p>
         </div>
       </details>
     </div>
@@ -283,31 +283,31 @@
     <div class="epic">
       <div class="epic-head"><span class="e-id">E2</span><span class="e-name">Persistence &amp; Stats</span><span class="e-count">4/4</span><span class="e-mile">M2</span></div>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-120</span><span class="t-name">Versioned storage layer <span class="t-note">(PR #22)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-120</span><span class="t-name">Versioned storage layer <span class="t-note">(PR #22)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>The save-data foundation under everything: a typed, versioned storage layer with migrations, so your stats and progress survive app updates without corruption.</p>
-          <p><a href="https://github.com/pdev8/deckabet/pull/22">PR #22</a></p>
+          <p><a href="https://github.com/pdev8/puzzlex/pull/22">PR #22</a></p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-121</span><span class="t-name">Lifetime stats per mode <span class="t-note">(PR #23 — 13 tests)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-121</span><span class="t-name">Lifetime stats per mode <span class="t-note">(PR #23 — 13 tests)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>The game remembers your lifetime record, kept separately for challenge and free play: time played, games and wins, letters constructed, unique words, most-played words, best word, streaks, total points — all surviving relaunch. Includes the deal timer plumbing.</p>
-          <p><a href="https://github.com/pdev8/deckabet/pull/23">PR #23</a></p>
+          <p><a href="https://github.com/pdev8/puzzlex/pull/23">PR #23</a></p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-122</span><span class="t-name">Resume in-progress deal after relaunch <span class="t-note">(PR #25 — 21 tests)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-122</span><span class="t-name">Resume in-progress deal after relaunch <span class="t-note">(PR #25 — 21 tests)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>Kill or close the app mid-deal and it restores exactly where you were, tray included. No more losing a good board to a phone call.</p>
-          <p><a href="https://github.com/pdev8/deckabet/pull/25">PR #25</a></p>
+          <p><a href="https://github.com/pdev8/puzzlex/pull/25">PR #25</a></p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-123</span><span class="t-name">Game history + personal bests <span class="t-note">(PR #26 — 11 tests)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-123</span><span class="t-name">Game history + personal bests <span class="t-note">(PR #26 — 11 tests)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>Your last 50 results plus personal bests — best deal score, best word score, fastest clear — recorded per difficulty, so you have something to beat.</p>
-          <p><a href="https://github.com/pdev8/deckabet/pull/26">PR #26</a></p>
+          <p><a href="https://github.com/pdev8/puzzlex/pull/26">PR #26</a></p>
         </div>
       </details>
     </div>
@@ -315,27 +315,27 @@
     <div class="epic">
       <div class="epic-head"><span class="e-id">E10</span><span class="e-name">Real Dictionary</span><span class="e-count">0/4</span><span class="e-mile">M2 · after E2</span></div>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-200</span><span class="t-name">Dictionary sourcing + licensing decision <span class="t-note">(PR #27 — ENABLE2k, public domain)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-200</span><span class="t-name">Dictionary sourcing + licensing decision <span class="t-note">(PR #27 — ENABLE2k, public domain)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>The current word list rejects legitimate English words, which players reported in play. We evaluated open dictionaries and chose ENABLE2k — public domain, 172k words, the same list Words With Friends uses — so real words stop bouncing and there's zero licensing risk for the App Store.</p>
-          <p><a href="https://github.com/pdev8/deckabet/pull/27">PR #27</a></p>
+          <p><a href="https://github.com/pdev8/puzzlex/pull/27">PR #27</a></p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-201</span><span class="t-name">Lexicon build pipeline <span class="t-note">(PR #29 — 80,157 words, tiered)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-201</span><span class="t-name">Lexicon build pipeline <span class="t-note">(PR #29 — 80,157 words, tiered)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>A repeatable build script that turns the raw dictionary into the game's word list: 3–8 letter words, an offensive-word policy applied, and each word tagged with how common it is (that commonality data later feeds difficulty steering and word retirement). Result: 80,157 words — about 7× today's list.</p>
-          <p><a href="https://github.com/pdev8/deckabet/pull/29">PR #29</a></p>
+          <p><a href="https://github.com/pdev8/puzzlex/pull/29">PR #29</a></p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-202</span><span class="t-name">Regenerate deals + witnesses on the new lexicon <span class="t-note">(PR #32 — 80k live)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-202</span><span class="t-name">Regenerate deals + witnesses on the new lexicon <span class="t-note">(PR #32 — 80k live)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>Rebuild the shipped deals and their witness solutions against the new, much bigger dictionary, and re-verify every deal still starts winnable. This is the moment players actually feel the dictionary upgrade: far fewer "that's a real word!" rejections.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-203</span><span class="t-name">Missed-word feedback loop <span class="t-note">(PR #33 — 12 tests)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-203</span><span class="t-name">Missed-word feedback loop <span class="t-note">(PR #33 — 12 tests)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>When you try a legitimate-looking word the game rejects, it gets logged on the device so we can spot dictionary gaps and add missing words over time — instead of silently frustrating players.</p>
         </div>
@@ -345,25 +345,25 @@
     <div class="epic">
       <div class="epic-head"><span class="e-id">E3</span><span class="e-name">Settings &amp; Difficulty</span><span class="e-count">3/4</span><span class="e-mile">M2</span></div>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-130</span><span class="t-name">Settings screen + persisted store <span class="t-note">(PR #35 — 13 tests)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-130</span><span class="t-name">Settings screen + persisted store <span class="t-note">(PR #35 — 13 tests)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>A settings screen behind a gear icon, with choices that persist between sessions. It's the home for difficulty, sound, and accessibility options.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-131</span><span class="t-name">Difficulty configurations <span class="t-note">(PR #37 — knobs, ×1.0–×1.4)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-131</span><span class="t-name">Difficulty configurations <span class="t-note">(PR #37 — knobs, ×1.0–×1.4)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>Pick your challenge level: harder presets allow fewer recycles and park bays but multiply your score in return. Changes take effect on your next deal, never mid-game.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-132</span><span class="t-name">Sound, haptics, reduce-motion toggles <span class="t-note">(PR #38 — haptics live, reduce-motion)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-132</span><span class="t-name">Sound, haptics, reduce-motion toggles <span class="t-note">(PR #38 — haptics live, reduce-motion)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>Toggles for sound effects, haptic feedback on card taps and plays, and reduced motion — respected everywhere in the app, including animations.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-133</span><span class="t-name">Rulebook <span class="t-note">(plain-language rules + scoring as named bonuses, zero equations; fine-print link)</span></span><span class="t-size">M</span><span class="st next">next</span></summary>
+        <summary class="trow"><span class="t-id">PL-133</span><span class="t-name">Rulebook <span class="t-note">(plain-language rules + scoring as named bonuses, zero equations; fine-print link)</span></span><span class="t-size">M</span><span class="st next">next</span></summary>
         <div class="t-body">
           <p>An in-game rulebook that teaches the goal, the tap/drag verbs, the reserve, parking, and recycles in plain language with visuals — and explains scoring as named bonuses with one worked example, zero equations. Exact tables live behind a "fine print" link for min-maxers.</p>
         </div>
@@ -373,69 +373,69 @@
     <div class="epic">
       <div class="epic-head"><span class="e-id">E7</span><span class="e-name">The Living Deck ★ core</span><span class="e-count">8/9</span><span class="e-mile">M3</span></div>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-186</span><span class="t-name">Backend foundation on Supabase <span class="t-note">(seeds, submissions, move logs, usage aggregates; anon auth + RLS)</span></span><span class="t-size">L</span><span class="st post">post-launch</span></summary>
+        <summary class="trow"><span class="t-id">PL-186</span><span class="t-name">Backend foundation on Supabase <span class="t-note">(seeds, submissions, move logs, usage aggregates; anon auth + RLS)</span></span><span class="t-size">L</span><span class="st post">post-launch</span></summary>
         <div class="t-body">
           <p>The server foundation for everything social: daily seeds, score submissions, move logs, and word-usage aggregates, with anonymous device accounts and strict row-level access rules. Validated leaderboards, word retirement, and the weekly meta all build on this.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-177</span><span class="t-name">Dynamic bays — park on any empty column, max 3 parked <span class="t-note">(PR #40 — superseded by DB-179)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-177</span><span class="t-name">Dynamic bays — park on any empty column, max 3 parked <span class="t-note">(PR #40 — superseded by PL-179)</span></span><span class="t-size">M</span><span class="st done">done</span></summary>
         <div class="t-body">
-          <p>A rule change proven in simulation: park the reserve card on any empty column (with at most 3 parked cards on the board) instead of only the left three bays. It kills the trap where clearing the left side first felt smart but quietly wrecked your endgame, and it lets you stage a long closing word by parking into emptied columns. <em>Superseded by DB-179 (designated random bays).</em></p>
+          <p>A rule change proven in simulation: park the reserve card on any empty column (with at most 3 parked cards on the board) instead of only the left three bays. It kills the trap where clearing the left side first felt smart but quietly wrecked your endgame, and it lets you stage a long closing word by parking into emptied columns. <em>Superseded by PL-179 (designated random bays).</em></p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-179</span><span class="t-name">Designated park bays — 3 random marked columns, cleared to unlock <span class="t-note">(supersedes DB-177)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-179</span><span class="t-name">Designated park bays — 3 random marked columns, cleared to unlock <span class="t-note">(supersedes PL-177)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>Not every empty column is a park spot anymore. Each deal designates a few random columns as park bays, marked on the board (a marker above the column, and a park plus once it's cleared). You can only park the reserve card onto one of those columns, and only after you've cleared it — so the marks tell you which columns to prioritize clearing to open up parking space. Parking a card surfaces the next one right away. The number of bays is the difficulty knob (fewer on harder deals). Every deal is still winnable without parking at all, so this never strands a deal.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-178</span><span class="t-name">Opening reroll — swap the deal's top cards with the stock before play <span class="t-note">(a gamble; free)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-178</span><span class="t-name">Opening reroll — swap the deal's top cards with the stock before play <span class="t-note">(a gamble; free)</span></span><span class="t-size">S</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>Before play, a panel fans out the deal's face-up top cards. Tap the ones you don't like to raise them, then <b>Swap</b> — they drop to the bottom of the stock and the same number of cards roll up off the top to take their place; the panel closes and your new board shows. Or <b>Skip</b> and play as dealt. It's a straight letter swap: the cards you roll in are normal green cards you still have to play, so you're trading letters you don't like for unknown ones off the stock. It's free and uncapped, but a gamble: the stock is face-down and the dealt board's guaranteed win is off once you reroll — you might set up a better board, or a worse one.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-170</span><span class="t-name">On-device seeded generator: board shapes, distribution + altitude guards, openness</span><span class="t-size">M</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-170</span><span class="t-name">On-device seeded generator: board shapes, distribution + altitude guards, openness</span><span class="t-size">M</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>The deal generator moves onto your phone: from a seed it builds a board that starts with a proven winning line, guards the letter mix (no duplicate floods, rare letters surface early, vowel-friendly column bottoms), and rejects boards that don't offer plenty of playable words. Same seed always produces the same deal — that's what makes shared daily games possible.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-171</span><span class="t-name">Solvability measurement solver — par, openness, "possible until move N"</span><span class="t-size">L</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-171</span><span class="t-name">Solvability measurement solver — par, openness, "possible until move N"</span><span class="t-size">L</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>A background checker that can tell whether a board can still be finished. It's used to measure — estimating a deal's par score, scoring how open a board is, and powering the post-game insight "a win was still possible until move 14" after a loss — never to bail the player out of a bad position.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-172</span><span class="t-name">Draw-time stock steering — f(seed, move history), fairness guards + warmth curve</span><span class="t-size">L</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-172</span><span class="t-name">Draw-time stock steering — f(seed, move history), fairness guards + warmth curve</span><span class="t-size">L</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>The undrawn stock doesn't exist until you draw: the next card is computed on the spot from the seed and your moves, so there's nothing stored for cheat tools to peek at. Steering enforces fairness — duplicate caps so you never see seven E's, a guaranteed vowel when you're starved — with a warmth curve that makes a deal's early draws kinder and goes neutral by mid-game. It never rescues a lost position: dead is dead, on your line, not the shuffle.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-173</span><span class="t-name">Difficulty ramp: shape + generosity + recycles + max-parked per game 1–5</span><span class="t-size">M</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-173</span><span class="t-name">Difficulty ramp: shape + generosity + recycles + max-parked per game 1–5</span><span class="t-size">M</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>The daily set's difficulty dial: across games 1–5, board shape steepens, draw generosity tightens, and recycles and parking shrink — so game 1 is a warm-up and game 5 is the test. Also decides the daily-set score multiplier.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-174</span><span class="t-name">Daily set mode — 5 scored games, shared seeds, daily total, countdown</span><span class="t-size">M</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-174</span><span class="t-name">Daily set mode — 5 scored games, shared seeds, daily total, countdown</span><span class="t-size">M</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>The scored mode: five games a day, the same deals for every player, adding up to one daily total with a reset countdown. Scarcity makes the total mean something; free play stays unlimited and unscored.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-175</span><span class="t-name">Par estimation + score bands</span><span class="t-size">M</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-175</span><span class="t-name">Par estimation + score bands</span><span class="t-size">M</span><span class="st done">done</span></summary>
         <div class="t-body">
           <p>The generator estimates what score each deal realistically supports (its par) and rejects deals outside a target band. That keeps deal luck off the leaderboard — daily totals compare skill, not shuffle fortune.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-176</span><span class="t-name">Seed service: local hash now, server-issued + replay validation designed</span><span class="t-size">M</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-176</span><span class="t-name">Seed service: local hash now, server-issued + replay validation designed</span><span class="t-size">M</span><span class="st done">done</span></summary>
         <div class="t-body">
-          <p>How scored games get their seeds: at launch they're derived on the device from the date, so everyone plays the same set. The phase-2 design — server-issued seeds plus move-log replay validation, the real anti-cheat — is documented here and built later on DB-186.</p>
+          <p>How scored games get their seeds: at launch they're derived on the device from the date, so everyone plays the same set. The phase-2 design — server-issued seeds plus move-log replay validation, the real anti-cheat — is documented here and built later on PL-186.</p>
         </div>
       </details>
     </div>
@@ -443,31 +443,31 @@
     <div class="epic">
       <div class="epic-head"><span class="e-id">E4</span><span class="e-name">Leaderboards</span><span class="e-count">0/5</span><span class="e-mile">M3</span></div>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-140</span><span class="t-name">Local leaderboards (free-play bests)</span><span class="t-size">S</span><span class="st open">engine done</span></summary>
+        <summary class="trow"><span class="t-id">PL-140</span><span class="t-name">Local leaderboards (free-play bests)</span><span class="t-size">S</span><span class="st open">engine done</span></summary>
         <div class="t-body">
           <p>Your top 20 deal scores per difficulty, stored on the device and browsable in-app. Free play stays private — these boards are yours alone.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-141</span><span class="t-name">Daily-set leaderboard integration <span class="t-note">(needs DB-174)</span></span><span class="t-size">M</span><span class="st todo">todo</span></summary>
+        <summary class="trow"><span class="t-id">PL-141</span><span class="t-name">Daily-set leaderboard integration <span class="t-note">(needs PL-174)</span></span><span class="t-size">M</span><span class="st todo">todo</span></summary>
         <div class="t-body">
-          <p>Wires the daily set's cumulative total into the daily leaderboard once DB-174 exists. Practice replays of daily games never score.</p>
+          <p>Wires the daily set's cumulative total into the daily leaderboard once PL-174 exists. Practice replays of daily games never score.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-142</span><span class="t-name">Game Center: config plugin + auth</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
+        <summary class="trow"><span class="t-id">PL-142</span><span class="t-name">Game Center: config plugin + auth</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
         <div class="t-body">
           <p>Hooks the app into Apple's Game Center: entitlement via an Expo config plugin, silent sign-in at launch, and a graceful fallback when offline or signed out.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-143</span><span class="t-name">GC boards: daily total, best word of the week, all-time points</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
+        <summary class="trow"><span class="t-id">PL-143</span><span class="t-name">GC boards: daily total, best word of the week, all-time points</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
         <div class="t-body">
           <p>The public leaderboards, challenge mode only: today's daily total, the best single word of the week, and all-time challenge points. Everyone plays the same seeds, so ranks compare like-for-like.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-144</span><span class="t-name">Leaderboard + My Stats screen</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
+        <summary class="trow"><span class="t-id">PL-144</span><span class="t-name">Leaderboard + My Stats screen</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
         <div class="t-body">
           <p>One screen for competition and identity: Daily and All-time board tabs with your rank, plus a My Stats personal dashboard (including free play). Falls back to local data when Game Center is unavailable.</p>
         </div>
@@ -477,25 +477,25 @@
     <div class="epic">
       <div class="epic-head"><span class="e-id">E5</span><span class="e-name">Achievements</span><span class="e-count">0/4</span><span class="e-mile">M3</span></div>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-150</span><span class="t-name">Declarative achievement engine</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
+        <summary class="trow"><span class="t-id">PL-150</span><span class="t-name">Declarative achievement engine</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
         <div class="t-body">
           <p>A rules-driven engine that watches game events and unlocks badges, kept fully separate from game logic — so adding a new badge never risks breaking the game.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-151</span><span class="t-name">Badge definitions (15 families, tiered)</span><span class="t-size">S</span><span class="st todo">todo</span></summary>
+        <summary class="trow"><span class="t-id">PL-151</span><span class="t-name">Badge definitions (15 families, tiered)</span><span class="t-size">S</span><span class="st todo">todo</span></summary>
         <div class="t-body">
           <p>All the badge families defined in one file — from First Light (first win) through Purist (no-stock clear) to Millionaire's Club (1M points) — each with a name, tiers, criteria, and an artwork slot.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-152</span><span class="t-name">Badge gallery + unlock toasts</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
+        <summary class="trow"><span class="t-id">PL-152</span><span class="t-name">Badge gallery + unlock toasts</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
         <div class="t-body">
           <p>A gallery grid showing locked, unlocked, and tier states — plus a toast and a haptic buzz the moment you earn one.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-153</span><span class="t-name">Game Center achievements sync</span><span class="t-size">S</span><span class="st todo">todo</span></summary>
+        <summary class="trow"><span class="t-id">PL-153</span><span class="t-name">Game Center achievements sync</span><span class="t-size">S</span><span class="st todo">todo</span></summary>
         <div class="t-body">
           <p>Badge unlocks mirror to Game Center achievements, so they show up on your Apple gaming profile too. Resubmission is safe if a sync repeats.</p>
         </div>
@@ -504,66 +504,66 @@
 
     <div class="epic">
       <div class="epic-head"><span class="e-id">E11</span><span class="e-name">The Buy Round</span><span class="e-count">0/4</span><span class="e-mile">M5 · post-launch</span></div>
-      <details class="trow-d"><summary class="trow"><span class="t-id">DB-210</span><span class="t-name">Buy Round design finalization <span class="t-note">(tiers, eco threshold, pocket cap)</span></span><span class="t-size">S</span><span class="st post">post-launch</span></summary><div class="t-body"><p>Lock the economy: last game's points buy letters for the next game — under 150 points means no buy at all (the eco round), bigger scores unlock better letter shelves, and buy power never rolls over. Counter-Strike rules: reward good plays, punish coasting.</p></div></details>
-      <details class="trow-d"><summary class="trow"><span class="t-id">DB-211</span><span class="t-name">Buy screen <span class="t-note">(between-games shop)</span></span><span class="t-size">M</span><span class="st post">post-launch</span></summary><div class="t-body"><p>The Wheel-of-Fortune moment: a shop between games showing your buy power, the shelves you unlocked, and the ones you didn't (locked shelves stay visible as aspiration). Skippable.</p></div></details>
-      <details class="trow-d"><summary class="trow"><span class="t-id">DB-212</span><span class="t-name">Pocket letters gameplay</span><span class="t-size">M</span><span class="st post">post-launch</span></summary><div class="t-body"><p>Bought letters ride into the next deal as a pocket row — playable like parked cards, never needed to clear the board, visually distinct. Strictly additive, so deal fairness is untouched.</p></div></details>
-      <details class="trow-d"><summary class="trow"><span class="t-id">DB-213</span><span class="t-name">Economy wiring <span class="t-note">(no rollover, daily-set integration)</span></span><span class="t-size">M</span><span class="st post">post-launch</span></summary><div class="t-body"><p>Convert deal scores to buy power at set thresholds, expire it when the next game starts, and slot the buy round between the daily set's five games — deterministic and identical pricing for everyone keeps the leaderboard fair.</p></div></details>
+      <details class="trow-d"><summary class="trow"><span class="t-id">PL-210</span><span class="t-name">Buy Round design finalization <span class="t-note">(tiers, eco threshold, pocket cap)</span></span><span class="t-size">S</span><span class="st post">post-launch</span></summary><div class="t-body"><p>Lock the economy: last game's points buy letters for the next game — under 150 points means no buy at all (the eco round), bigger scores unlock better letter shelves, and buy power never rolls over. Counter-Strike rules: reward good plays, punish coasting.</p></div></details>
+      <details class="trow-d"><summary class="trow"><span class="t-id">PL-211</span><span class="t-name">Buy screen <span class="t-note">(between-games shop)</span></span><span class="t-size">M</span><span class="st post">post-launch</span></summary><div class="t-body"><p>The Wheel-of-Fortune moment: a shop between games showing your buy power, the shelves you unlocked, and the ones you didn't (locked shelves stay visible as aspiration). Skippable.</p></div></details>
+      <details class="trow-d"><summary class="trow"><span class="t-id">PL-212</span><span class="t-name">Pocket letters gameplay</span><span class="t-size">M</span><span class="st post">post-launch</span></summary><div class="t-body"><p>Bought letters ride into the next deal as a pocket row — playable like parked cards, never needed to clear the board, visually distinct. Strictly additive, so deal fairness is untouched.</p></div></details>
+      <details class="trow-d"><summary class="trow"><span class="t-id">PL-213</span><span class="t-name">Economy wiring <span class="t-note">(no rollover, daily-set integration)</span></span><span class="t-size">M</span><span class="st post">post-launch</span></summary><div class="t-body"><p>Convert deal scores to buy power at set thresholds, expire it when the next game starts, and slot the buy round between the daily set's five games — deterministic and identical pricing for everyone keeps the leaderboard fair.</p></div></details>
     </div>
 
     <div class="epic">
       <div class="epic-head"><span class="e-id">E6</span><span class="e-name">App Store Readiness</span><span class="e-count">0/8</span><span class="e-mile">M4</span></div>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-160</span><span class="t-name">Branding: icon, splash, wordmark</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
+        <summary class="trow"><span class="t-id">PL-160</span><span class="t-name">Branding: icon, splash, wordmark</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
         <div class="t-body">
           <p>Real app icon, splash screen, and wordmark replace the Expo defaults, with a dark splash that matches the card-room theme.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-161</span><span class="t-name">Onboarding tutorial (guided first deal)</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
+        <summary class="trow"><span class="t-id">PL-161</span><span class="t-name">Onboarding tutorial (guided first deal)</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
         <div class="t-body">
           <p>A guided first deal that teaches tap, drag, and park by doing rather than reading. Skippable, and replayable from settings.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-162</span><span class="t-name">Accessibility: VoiceOver, dynamic type, reduce motion</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
+        <summary class="trow"><span class="t-id">PL-162</span><span class="t-name">Accessibility: VoiceOver, dynamic type, reduce motion</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
         <div class="t-body">
           <p>VoiceOver labels on every interactive element, text that scales with the system setting, and animations that honor reduce-motion — so more people can actually play.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-163</span><span class="t-name">Sound design</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
+        <summary class="trow"><span class="t-id">PL-163</span><span class="t-name">Sound design</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
         <div class="t-body">
           <p>Card slide, flip, play, and win sounds that make the game feel physical — and that respect the phone's silent switch.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-164</span><span class="t-name">Crash reporting + error boundary</span><span class="t-size">S</span><span class="st todo">todo</span></summary>
+        <summary class="trow"><span class="t-id">PL-164</span><span class="t-name">Crash reporting + error boundary</span><span class="t-size">S</span><span class="st todo">todo</span></summary>
         <div class="t-body">
           <p>Crash reporting so we hear about failures before reviews do, plus an error boundary that recovers to a fresh deal instead of a frozen screen.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-165</span><span class="t-name">EAS build + TestFlight pipeline</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
+        <summary class="trow"><span class="t-id">PL-165</span><span class="t-name">EAS build + TestFlight pipeline</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
         <div class="t-body">
           <p>An automated build pipeline and TestFlight distribution, so beta builds reach real phones with one command.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-166</span><span class="t-name">Privacy policy + store metadata + screenshots</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
+        <summary class="trow"><span class="t-id">PL-166</span><span class="t-name">Privacy policy + store metadata + screenshots</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
         <div class="t-body">
           <p>The store listing itself: privacy policy and manifest (Game Center only, no tracking), screenshots, description, and keywords.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-167</span><span class="t-name">Submit + review fixes → approved</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
+        <summary class="trow"><span class="t-id">PL-167</span><span class="t-name">Submit + review fixes → approved</span><span class="t-size">M</span><span class="st todo">todo</span></summary>
         <div class="t-body">
-          <p>Submit to Apple, fix whatever review flags, and land the approval. The milestone where DECKABET becomes a real App Store game.</p>
+          <p>Submit to Apple, fix whatever review flags, and land the approval. The milestone where PUZZLEX becomes a real App Store game.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-168</span><span class="t-name">Home / mode-select screen — animated title, Free Play vs Daily</span><span class="t-size">S</span><span class="st done">done</span></summary>
+        <summary class="trow"><span class="t-id">PL-168</span><span class="t-name">Home / mode-select screen — animated title, Free Play vs Daily</span><span class="t-size">S</span><span class="st done">done</span></summary>
         <div class="t-body">
-          <p>A proper landing screen: choose Free Play or Daily (Daily lives here now, not on the play screen), with a back-to-menu button once you're playing. The DECKABET letters are cards on puppeteer strings that run off the top edge — released from below, they snap up and dangle on a springy rope. Honors reduce-motion with a still, level version.</p>
+          <p>A proper landing screen: choose Free Play or Daily (Daily lives here now, not on the play screen), with a back-to-menu button once you're playing. The PUZZLEX letters are cards on puppeteer strings that run off the top edge — released from below, they snap up and dangle on a springy rope. Honors reduce-motion with a still, level version.</p>
         </div>
       </details>
     </div>
@@ -571,37 +571,37 @@
     <div class="epic">
       <div class="epic-head"><span class="e-id">E8</span><span class="e-name">Word Ladder &amp; Living Meta</span><span class="e-count">0/6</span><span class="e-mile">M5 · post-launch</span></div>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-180</span><span class="t-name">Ladder tiers + promotion from daily results</span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
+        <summary class="trow"><span class="t-id">PL-180</span><span class="t-name">Ladder tiers + promotion from daily results</span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
         <div class="t-body">
           <p>A ranked ladder (think Bronze through Diamond) that you climb through daily-challenge results, with your tier shown on your profile and clear promotion/demotion rules.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-181</span><span class="t-name">Word retirement engine (phase 1: static lists)</span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
+        <summary class="trow"><span class="t-id">PL-181</span><span class="t-name">Word retirement engine (phase 1: static lists)</span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
         <div class="t-body">
           <p>The ladder's teeth: at higher tiers, common crutch words are banned, rejected with "retired at your rank" feedback. Phase 1 uses static frequency lists; free play is never affected.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-182</span><span class="t-name">Effective-lexicon integration — deals winnable under bans</span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
+        <summary class="trow"><span class="t-id">PL-182</span><span class="t-name">Effective-lexicon integration — deals winnable under bans</span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
         <div class="t-body">
           <p>The generator and solver play against your tier's word list minus the day's bans, so a high-tier deal still starts winnable without the retired words. The fairness promise holds even when the meta takes your favorites away.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-183</span><span class="t-name">Retired-words gallery + tier UI</span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
+        <summary class="trow"><span class="t-id">PL-183</span><span class="t-name">Retired-words gallery + tier UI</span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
         <div class="t-body">
           <p>A ladder screen showing your current tier, what promotion takes, and the gallery of words retired at each rank — the meta made visible.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-184</span><span class="t-name">Usage telemetry + daily-reset retirement (trailing 7-day window)</span><span class="t-size">L</span><span class="st post">post-launch</span></summary>
+        <summary class="trow"><span class="t-id">PL-184</span><span class="t-name">Usage telemetry + daily-reset retirement (trailing 7-day window)</span><span class="t-size">L</span><span class="st post">post-launch</span></summary>
         <div class="t-body">
           <p>The living meta for real: challenge-mode word usage across all players is aggregated server-side over the trailing week, and each play day publishes that day's retired list with the daily set. Yesterday's bans lift automatically — the meta breathes daily instead of strangling.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-185</span><span class="t-name">Weekly meta: most-used words + best word of the week</span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
+        <summary class="trow"><span class="t-id">PL-185</span><span class="t-name">Weekly meta: most-used words + best word of the week</span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
         <div class="t-body">
           <p>Community flavor: the most-used words of the week shown in-app (also the source pool for daily retirement) and a weekly best-word-of-the-week board. Both reset weekly.</p>
         </div>
@@ -611,37 +611,37 @@
     <div class="epic">
       <div class="epic-head"><span class="e-id">E9</span><span class="e-name">The Toolkit — fun mechanics</span><span class="e-count">0/6</span><span class="e-mile">M5 · post-launch</span></div>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-190</span><span class="t-name">Toolkit design finalization <span class="t-note">(charge economy, gating, assisted-win policy)</span></span><span class="t-size">S</span><span class="st post">post-launch</span></summary>
+        <summary class="trow"><span class="t-id">PL-190</span><span class="t-name">Toolkit design finalization <span class="t-note">(charge economy, gating, assisted-win policy)</span></span><span class="t-size">S</span><span class="st post">post-launch</span></summary>
         <div class="t-body">
           <p>Locks the toolkit design before any code: which tools exist, how daily charges work (proposal: 3 per day shared across tools), and exactly how assisted wins are marked and gated so the competitive game stays pure.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-191</span><span class="t-name">Slide-up Toolkit panel with daily charge pips</span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
+        <summary class="trow"><span class="t-id">PL-191</span><span class="t-name">Slide-up Toolkit panel with daily charge pips</span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
         <div class="t-body">
           <p>A drawer that slides up from the bottom edge showing your tools and remaining daily charges as pips. Disabled in the daily challenge, with copy explaining why.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-192</span><span class="t-name">Tool: Grab Bag — swap a visible card, steering-safe</span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
+        <summary class="trow"><span class="t-id">PL-192</span><span class="t-name">Tool: Grab Bag — swap a visible card, steering-safe</span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
         <div class="t-body">
           <p>Swap any one visible card (a column top or the reserve) for a fresh one. The replacement is drawn through the Living Deck's steering with all its fairness guards, so the tool can't flood the board or wreck the deal — and the exchange gets a satisfying animation.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-193</span><span class="t-name">Tool: Scrap — remove a letter outright</span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
+        <summary class="trow"><span class="t-id">PL-193</span><span class="t-name">Tool: Scrap — remove a letter outright</span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
         <div class="t-body">
           <p>Destroy one visible letter card outright — native cards removed this way still count toward clearing the board. Comes with a satisfying destruction animation.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-194</span><span class="t-name">Daily charges + mode gating <span class="t-note">(never in challenge; toggle in free play; default-on in Casual)</span></span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
+        <summary class="trow"><span class="t-id">PL-194</span><span class="t-name">Daily charges + mode gating <span class="t-note">(never in challenge; toggle in free play; default-on in Casual)</span></span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
         <div class="t-body">
           <p>The plumbing that keeps tools fun and fair: charges refresh at play-day rollover; tools never appear in the daily challenge, are a settings toggle in free play, and are on by default in Casual; assisted wins are flagged in stats and history.</p>
         </div>
       </details>
       <details class="trow-d">
-        <summary class="trow"><span class="t-id">DB-195</span><span class="t-name">Wildcards <span class="t-note">(earned at point milestones, banked with no reset, played as a ♠ blank — value 0, one per word)</span></span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
+        <summary class="trow"><span class="t-id">PL-195</span><span class="t-name">Wildcards <span class="t-note">(earned at point milestones, banked with no reset, played as a ♠ blank — value 0, one per word)</span></span><span class="t-size">M</span><span class="st post">post-launch</span></summary>
         <div class="t-body">
           <p>Wildcards are earned at career-point milestones and banked forever — unlike tool charges, they never reset. Played from the tray as a distinct ♠ blank that completes any word: counts toward word length, worth 0 points (the Scrabble-blank rule), max one per word, and never usable in the daily challenge.</p>
         </div>
@@ -658,64 +658,65 @@
       <span class="chip done">290 solver-verified deals</span>
       <span class="chip done">Dark card-room theme + ghost spots</span>
       <span class="chip done">Win / dead-deal detection</span>
-      <span class="chip done">DECKABET name (availability-checked)</span>
+      <span class="chip done">PUZZLEX name (availability-checked)</span>
       <span class="chip done">Full design: scoring · Living Deck · modes · ladder</span>
     </div>
     <div class="prlist">
-      <div class="pr"><span class="p-id">#1</span><a href="https://github.com/pdev8/deckabet/pull/1">Challenge/free-play mode split + Word Ladder epic</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#2</span><a href="https://github.com/pdev8/deckabet/pull/2">Weekly meta + daily-reset word retirement</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#3</span><a href="https://github.com/pdev8/deckabet/pull/3">AGENTS.md repo guide</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#4</span><a href="https://github.com/pdev8/deckabet/pull/4">Rename LETTERFALL → DECKABET (repo + app + docs)</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#5</span><a href="https://github.com/pdev8/deckabet/pull/5">CLAUDE.md header + doc pointers</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#6</span><a href="https://github.com/pdev8/deckabet/pull/6">[1. docs] Endgame geometry: dynamic bays, board shapes, altitude guards, Encore</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#7</span><a href="https://github.com/pdev8/deckabet/pull/7">[2. docs] Project tracker redesign</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#9</span><a href="https://github.com/pdev8/deckabet/pull/9">[3. docs] Rulebook + Toolkit epic E9</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#8</span><a href="https://github.com/pdev8/deckabet/pull/8">[4. docs] Workflow standards: testing, PR titles, tracker</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#10</span><a href="https://github.com/pdev8/deckabet/pull/10">[5. docs] Recover stranded stacked-PR content</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#11</span><a href="https://github.com/pdev8/deckabet/pull/11">[6. E0] DB-100: Jest + reducer test suite</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#12</span><a href="https://github.com/pdev8/deckabet/pull/12">[7. E0] DB-101: GitHub Actions CI</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#13</span><a href="https://github.com/pdev8/deckabet/pull/13">[8. E0] DB-102: ESLint + Prettier</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#14</span><a href="https://github.com/pdev8/deckabet/pull/14">[9. E0] DB-104: PR template + CONTRIBUTING</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#15</span><a href="https://github.com/pdev8/deckabet/pull/15">[10. E1] DB-110: scoring module — letter values + word score</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#16</span><a href="https://github.com/pdev8/deckabet/pull/16">[11. E1] DB-111: deal score + reducer counters</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#17</span><a href="https://github.com/pdev8/deckabet/pull/17">[12. E1] DB-112: live word-score preview</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#18</span><a href="https://github.com/pdev8/deckabet/pull/18">[13. E1] DB-113: win-screen score breakdown</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#19</span><a href="https://github.com/pdev8/deckabet/pull/19">[14. E0] DB-105: generator in repo + witnessed deals</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#20</span><a href="https://github.com/pdev8/deckabet/pull/20">[15. E0] DB-103: component split</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#21</span><a href="https://github.com/pdev8/deckabet/pull/21">[17. chore] Ticket prefix LF → DB</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#22</span><a href="https://github.com/pdev8/deckabet/pull/22">[18. E2] DB-120: versioned storage layer</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#23</span><a href="https://github.com/pdev8/deckabet/pull/23">[19. E2] DB-121: lifetime stats + deal timer</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#24</span><a href="https://github.com/pdev8/deckabet/pull/24">[20. docs] E10 dictionary epic + Supabase backend ticket</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#25</span><a href="https://github.com/pdev8/deckabet/pull/25">[21. E2] DB-122: resume in-progress deal</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#26</span><a href="https://github.com/pdev8/deckabet/pull/26">[22. E2] DB-123: game history + personal bests</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#27</span><a href="https://github.com/pdev8/deckabet/pull/27">[23. E10] DB-200: dictionary decision — ENABLE2k</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#28</span><a href="https://github.com/pdev8/deckabet/pull/28">[24. docs] E9 wildcards ticket</a><span style="margin-left:auto"><span class="st open">open</span></span></div>
-      <div class="pr"><span class="p-id">#29</span><a href="https://github.com/pdev8/deckabet/pull/29">[25. E10] DB-201: lexicon build pipeline</a><span style="margin-left:auto"><span class="st open">open</span></span></div>
+      <div class="pr"><span class="p-id">#1</span><a href="https://github.com/pdev8/puzzlex/pull/1">Challenge/free-play mode split + Word Ladder epic</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#2</span><a href="https://github.com/pdev8/puzzlex/pull/2">Weekly meta + daily-reset word retirement</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#3</span><a href="https://github.com/pdev8/puzzlex/pull/3">AGENTS.md repo guide</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#4</span><a href="https://github.com/pdev8/puzzlex/pull/4">Rename LETTERFALL → PUZZLEX (repo + app + docs)</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#5</span><a href="https://github.com/pdev8/puzzlex/pull/5">CLAUDE.md header + doc pointers</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#6</span><a href="https://github.com/pdev8/puzzlex/pull/6">[1. docs] Endgame geometry: dynamic bays, board shapes, altitude guards, Encore</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#7</span><a href="https://github.com/pdev8/puzzlex/pull/7">[2. docs] Project tracker redesign</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#9</span><a href="https://github.com/pdev8/puzzlex/pull/9">[3. docs] Rulebook + Toolkit epic E9</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#8</span><a href="https://github.com/pdev8/puzzlex/pull/8">[4. docs] Workflow standards: testing, PR titles, tracker</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#10</span><a href="https://github.com/pdev8/puzzlex/pull/10">[5. docs] Recover stranded stacked-PR content</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#11</span><a href="https://github.com/pdev8/puzzlex/pull/11">[6. E0] PL-100: Jest + reducer test suite</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#12</span><a href="https://github.com/pdev8/puzzlex/pull/12">[7. E0] PL-101: GitHub Actions CI</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#13</span><a href="https://github.com/pdev8/puzzlex/pull/13">[8. E0] PL-102: ESLint + Prettier</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#14</span><a href="https://github.com/pdev8/puzzlex/pull/14">[9. E0] PL-104: PR template + CONTRIBUTING</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#15</span><a href="https://github.com/pdev8/puzzlex/pull/15">[10. E1] PL-110: scoring module — letter values + word score</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#16</span><a href="https://github.com/pdev8/puzzlex/pull/16">[11. E1] PL-111: deal score + reducer counters</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#17</span><a href="https://github.com/pdev8/puzzlex/pull/17">[12. E1] PL-112: live word-score preview</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#18</span><a href="https://github.com/pdev8/puzzlex/pull/18">[13. E1] PL-113: win-screen score breakdown</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#19</span><a href="https://github.com/pdev8/puzzlex/pull/19">[14. E0] PL-105: generator in repo + witnessed deals</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#20</span><a href="https://github.com/pdev8/puzzlex/pull/20">[15. E0] PL-103: component split</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#21</span><a href="https://github.com/pdev8/puzzlex/pull/21">[17. chore] Ticket prefix LF → DB</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#22</span><a href="https://github.com/pdev8/puzzlex/pull/22">[18. E2] PL-120: versioned storage layer</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#23</span><a href="https://github.com/pdev8/puzzlex/pull/23">[19. E2] PL-121: lifetime stats + deal timer</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#24</span><a href="https://github.com/pdev8/puzzlex/pull/24">[20. docs] E10 dictionary epic + Supabase backend ticket</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#25</span><a href="https://github.com/pdev8/puzzlex/pull/25">[21. E2] PL-122: resume in-progress deal</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#26</span><a href="https://github.com/pdev8/puzzlex/pull/26">[22. E2] PL-123: game history + personal bests</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#27</span><a href="https://github.com/pdev8/puzzlex/pull/27">[23. E10] PL-200: dictionary decision — ENABLE2k</a><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#28</span><a href="https://github.com/pdev8/puzzlex/pull/28">[24. docs] E9 wildcards ticket</a><span style="margin-left:auto"><span class="st open">open</span></span></div>
+      <div class="pr"><span class="p-id">#29</span><a href="https://github.com/pdev8/puzzlex/pull/29">[25. E10] PL-201: lexicon build pipeline</a><span style="margin-left:auto"><span class="st open">open</span></span></div>
     <div class="pr"><span class="p-id">#39</span><span>[39. fix] Settings back button clears the Dynamic Island (safe-area)</span><span style="margin-left:auto"><span class="st open">open</span></span></div>
-      <div class="pr"><span class="p-id">#40</span><span>[1. E7] DB-177: dynamic bays</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#41</span><span>[2. E7] DB-170: seeded deal generator</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#42</span><span>[3. E7] DB-171: solvability solver</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#43</span><span>[4. E7] DB-172: draw-time steering</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#44</span><span>[5. E7] DB-173: difficulty ramp</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#45</span><span>[6. E7] DB-176: seed service</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#46</span><span>[7. E7] DB-175: par estimation + bands</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#47</span><span>[8. E7] DB-174: daily-set engine</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#40</span><span>[1. E7] PL-177: dynamic bays</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#41</span><span>[2. E7] PL-170: seeded deal generator</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#42</span><span>[3. E7] PL-171: solvability solver</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#43</span><span>[4. E7] PL-172: draw-time steering</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#44</span><span>[5. E7] PL-173: difficulty ramp</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#45</span><span>[6. E7] PL-176: seed service</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#46</span><span>[7. E7] PL-175: par estimation + bands</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#47</span><span>[8. E7] PL-174: daily-set engine</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
       <div class="pr"><span class="p-id">#48</span><span>[9. fix] game crash on load (schema drift) + cleanup</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#49</span><span>[10. E7] DB-174: daily challenge screen</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#49</span><span>[10. E7] PL-174: daily challenge screen</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
       <div class="pr"><span class="p-id">#50</span><span>[50. fix] deal letter balance — no more clumped deals</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#51</span><span>[51. E7] DB-178: opening reroll</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#52</span><span>[52. E7] DB-178: reroll cards come in green (required)</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#51</span><span>[51. E7] PL-178: opening reroll</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#52</span><span>[52. E7] PL-178: reroll cards come in green (required)</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
       <div class="pr"><span class="p-id">#53</span><span>[53. fix] face-down cards render as full card backs</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
       <div class="pr"><span class="p-id">#54</span><span>[54. docs] tracker reconcile (#52 + #53)</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
       <div class="pr"><span class="p-id">#55</span><span>[55. fix] reserve card stays on top through its snap-back</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
       <div class="pr"><span class="p-id">#56</span><span>[56. fix] no park-flash of the consumed reserve card</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#57</span><span>[57. E7] DB-179: designated park bays</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#58</span><span>[58. E7] DB-179: park plus + surface next card</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#57</span><span>[57. E7] PL-179: designated park bays</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#58</span><span>[58. E7] PL-179: park plus + surface next card</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
       <div class="pr"><span class="p-id">#59</span><span>[59. fix] haptics in the opening reroll</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#60</span><span>[60. E6] DB-168: home / mode-select screen</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#60</span><span>[60. E6] PL-168: home / mode-select screen</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
       <div class="pr"><span class="p-id">#61</span><span>[61. fix] reroll swap Heavy impact</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
-      <div class="pr"><span class="p-id">#62</span><span>[62. chore] remove committed swap file + ignore editor temp</span><span style="margin-left:auto"><span class="st open">in review</span></span></div>
-      <div class="pr"><span class="p-id">#63</span><span>[63. E6] DB-168: hanging-cards title animation</span><span style="margin-left:auto"><span class="st open">in review</span></span></div>
+      <div class="pr"><span class="p-id">#62</span><span>[62. chore] remove committed swap file + ignore editor temp</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#63</span><span>[63. E6] PL-168: hanging-cards title animation</span><span style="margin-left:auto"><span class="st done">done</span></span></div>
+      <div class="pr"><span class="p-id">#64</span><span>[64. chore] rename DECKABET → PUZZLEX, DB- → PL-</span><span style="margin-left:auto"><span class="st open">in review</span></span></div>
       </div>
   </section>
 
@@ -806,6 +807,6 @@ configMult      1.0 + 0.10×(2−recycles) + 0.10×(3−parkBays)  → ×1.0–�
   <div class="foot">
     Status updates land in the same PR as the work. Canonical source:
     <span class="mono">docs/ROADMAP.md</span> (specs) — this page tracks execution.
-    DECKABET ♠ word klondike — every deal winnable.
+    PUZZLEX ♠ word klondike — every deal winnable.
   </div>
 </div>

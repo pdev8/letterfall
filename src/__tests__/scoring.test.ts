@@ -95,7 +95,7 @@ describe('dealBaseScore (Encore)', () => {
   });
 });
 
-describe('configMult (difficulty knobs, DB-131)', () => {
+describe('configMult (difficulty knobs, PL-131)', () => {
   it('is 1.0 at the defaults (2 recycles, 3 bays)', () => {
     expect(configMult(DEFAULT_CONFIG)).toBeCloseTo(1.0);
   });

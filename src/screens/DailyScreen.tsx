@@ -1,4 +1,4 @@
-// Daily Challenge screen (DB-174) — the front door to the ranked five-game
+// Daily Challenge screen (PL-174) — the front door to the ranked five-game
 // set. Pure view over the DailySet: it shows the cumulative total, per-game
 // progress, and the reset countdown, and hands PLAY taps up to App (which owns
 // the set, builds the deal, and banks each result). Styled as the same

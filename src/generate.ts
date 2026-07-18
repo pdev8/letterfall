@@ -1,4 +1,4 @@
-// On-device deal generator (DB-170) — the foundation of the Living Deck (E7).
+// On-device deal generator (PL-170) — the foundation of the Living Deck (E7).
 //
 // Pure and deterministic: `generateDeal(seed)` builds a winnable Deal by
 // SOLUTION-FIRST construction, a faithful TypeScript port of the v1 Python
@@ -14,7 +14,7 @@
 // Scope: this ticket lands ONLY the pure generator + the duplicate-cap
 // distribution guard. The remaining E7 constraints — altitude guards,
 // vowel/consonant window, rarity budget, par bands, openness threshold, and
-// word-length quality gates — are DEFERRED to DB-171/172/175 and are NOT
+// word-length quality gates — are DEFERRED to PL-171/172/175 and are NOT
 // implemented here (docs/GENERATION.md "How a deal is born").
 
 import lexiconJson from '../assets/lexicon.json';
@@ -50,11 +50,11 @@ export interface GenerateOptions {
   lexicon?: string[];
   /** Board shape: 7 column heights (each ≥1) summing to 28. Defaults to the [1..7] staircase. */
   heights?: number[];
-  /** DB-175: also reject candidates whose estimated par falls outside PAR_BAND
+  /** PL-175: also reject candidates whose estimated par falls outside PAR_BAND
    * (keeps daily totals about skill, not deal luck). Default false — off by
    * default so existing generation behaviour and tests are unchanged. */
   requireParBand?: boolean;
-  /** DB-175: also reject candidates whose best line reaches no ≥7-letter word
+  /** PL-175: also reject candidates whose best line reaches no ≥7-letter word
    * (the "a 7 discoverable by skill" quality gate). Default false. */
   requireSevenGate?: boolean;
 }
@@ -309,7 +309,7 @@ function deriveSeed(seed: number, attempt: number): number {
 }
 
 function validateHeights(heights: number[]): void {
-  // 7 columns, each ≥1 card, 28 total. Any such shape is legal — DB-173's
+  // 7 columns, each ≥1 card, 28 total. Any such shape is legal — PL-173's
   // difficulty ramp uses flat [4×7], gentle [2,3,4,4,5,5,5], steep, etc., not
   // just the [1..7] staircase. Heights are position-shuffled by the caller.
   const ok =
@@ -347,7 +347,7 @@ export function generateDeal(seed: number, opts: GenerateOptions = {}): Deal {
       solverWords: candidate.solverWords,
       witness: candidate.witness,
     };
-    // DB-175 quality gates (opt-in; both default off so baseline generation is
+    // PL-175 quality gates (opt-in; both default off so baseline generation is
     // untouched). The par search is deterministic, so the accept loop stays
     // reproducible: same seed ⇒ same accepted deal.
     if (opts.requireParBand && !inParBand(estimatePar(deal).par)) continue;

@@ -1,7 +1,7 @@
-// Missed-word feedback loop (DB-203) — pure accounting, no React, no I/O.
+// Missed-word feedback loop (PL-203) — pure accounting, no React, no I/O.
 // Valid-looking words the player attempts that the lexicon rejects are
-// tallied here so dictionary gaps become data (feeds the DB-201 pipeline's
-// additions overlay; Supabase sync lands with DB-186).
+// tallied here so dictionary gaps become data (feeds the PL-201 pipeline's
+// additions overlay; Supabase sync lands with PL-186).
 
 /** Cap on tracked words — the map never grows past this. */
 export const MISSED_LIMIT = 500;

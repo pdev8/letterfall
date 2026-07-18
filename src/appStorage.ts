@@ -27,7 +27,7 @@ export function saveStats(s: LifetimeStats): Promise<void> {
   return store.set(STATS_KEY, s);
 }
 
-// ---------------------------------------------------------------- resume (DB-122)
+// ---------------------------------------------------------------- resume (PL-122)
 
 export const GAME_KEY = 'inProgressGame';
 
@@ -48,13 +48,13 @@ export function clearGame(): Promise<void> {
   return store.remove(GAME_KEY);
 }
 
-// ---------------------------------------------------------------- missed words (DB-203)
+// ---------------------------------------------------------------- missed words (PL-203)
 
 /**
  * Export = the stored JSON envelope under this key
  * (`{"v":1,"data":{"<word>":<count>,...}}` in AsyncStorage). Read it off a
  * dev device / simulator to inspect dictionary gaps; Supabase sync lands
- * with DB-186.
+ * with PL-186.
  */
 export const MISSED_KEY = 'missedWords';
 
@@ -67,7 +67,7 @@ export function saveMissedWords(m: MissedWords): Promise<void> {
   return store.set(MISSED_KEY, m);
 }
 
-// ---------------------------------------------------------------- settings (DB-130)
+// ---------------------------------------------------------------- settings (PL-130)
 
 export const SETTINGS_KEY = 'settings';
 
@@ -84,7 +84,7 @@ export function saveSettings(s: Settings): Promise<void> {
   return store.set(SETTINGS_KEY, s);
 }
 
-// ---------------------------------------------------------------- history (DB-123)
+// ---------------------------------------------------------------- history (PL-123)
 
 export const HISTORY_KEY = 'gameHistory';
 
@@ -101,7 +101,7 @@ export function saveHistory(h: HistoryState): Promise<void> {
   return store.set(HISTORY_KEY, h);
 }
 
-// ---- daily set (DB-174)
+// ---- daily set (PL-174)
 export const DAILY_KEY = 'dailySet';
 
 /** Loads the daily set for today (UTC), resetting/rebuilding on a new play day. */

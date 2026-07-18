@@ -1,9 +1,9 @@
-// Daily set mode (DB-174) — the public, ranked game. The heart of it is this
+// Daily set mode (PL-174) — the public, ranked game. The heart of it is this
 // pure, deterministic state machine that composes the whole Living Deck:
-//   seed service (DB-176) → per-game seeds, same for everyone
-//   difficulty ramp (DB-173) → per-game board shape / generosity / knobs
-//   generator (DB-170) → the actual deal for a game (built on demand)
-//   scoring (DB-1xx) → each game's banked dealScore
+//   seed service (PL-176) → per-game seeds, same for everyone
+//   difficulty ramp (PL-173) → per-game board shape / generosity / knobs
+//   generator (PL-170) → the actual deal for a game (built on demand)
+//   scoring (PL-1xx) → each game's banked dealScore
 // Five scored games a day, one cumulative daily total, reset at the play-day
 // rollover. Free play stays separate and unscored.
 //

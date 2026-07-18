@@ -1,6 +1,6 @@
-// Game history + personal bests (DB-123) — pure accounting, no React, no I/O.
-// Persisted via appStorage; surfaced in the My Stats tab (DB-144).
-// DB-131: difficulty presets are gone — free play is a SINGLE bests bucket
+// Game history + personal bests (PL-123) — pure accounting, no React, no I/O.
+// Persisted via appStorage; surfaced in the My Stats tab (PL-144).
+// PL-131: difficulty presets are gone — free play is a SINGLE bests bucket
 // (the deal score already reflects hardness via configMult); each record
 // keeps the config it was played under.
 import { wordScore, type GameConfig } from './scoring';
@@ -105,7 +105,7 @@ export function recordGame(h: HistoryState, r: GameRecord): HistoryState {
   return { games, bests };
 }
 
-// ---------------------------------------------------------------- sanitize (DB-131)
+// ---------------------------------------------------------------- sanitize (PL-131)
 
 function isScore(x: unknown): x is number {
   return typeof x === 'number' && Number.isFinite(x) && x >= 0;
@@ -143,7 +143,7 @@ function isRecord(x: unknown): x is GameRecord {
 
 /**
  * Whole-or-nothing structural guard for persisted history: anything
- * malformed resets to emptyHistory(). Pre-DB-131 data (per-difficulty bests,
+ * malformed resets to emptyHistory(). Pre-PL-131 data (per-difficulty bests,
  * records carrying `difficulty` instead of `config`) fails here and is
  * discarded — acceptable pre-launch; there is no migration.
  */
