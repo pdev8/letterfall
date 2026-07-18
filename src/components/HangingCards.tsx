@@ -15,8 +15,9 @@ const LETTERS = 'DECKABET'.split('');
 const SEGMENTS = 3; // string links — more = ropier bend
 const PARALLAX = 16; // px shift at full tilt, scaled by depth
 const STRING_W = 1.5;
-const OFFSCREEN = 280; // string continues this far above the top edge (the puppeteer)
-const SEG_AMP = [1.1, 1.5, 2.1]; // idle bend per link, growing toward the card
+// The rope is long — most of it lives above the top edge (the puppeteer). Its
+// pivot is far away, so swing angles stay small (a long pendulum barely leans).
+const SEG_AMP = [0.4, 0.55, 0.75]; // idle bend per link, growing toward the card
 const DEG = { inputRange: [-90, 90], outputRange: ['-90deg', '90deg'] };
 
 const rand = (min: number, max: number): number => min + Math.random() * (max - min);
@@ -25,7 +26,10 @@ const clamp = (v: number, lo: number, hi: number): number => Math.max(lo, Math.m
 interface Hanger {
   letter: string;
   x: number; // card center x
-  stringLen: number; // top edge → card top at rest
+  restTop: number; // card top at rest
+  startTranslate: number; // translateY at the stretched start (card below the screen)
+  anchorTop: number; // screen y of the string's top — always negative (off-screen)
+  stringLen: number; // anchor → card top at rest
   cardW: number;
   cardH: number;
   depth: number;
@@ -43,18 +47,28 @@ function makeHangers(width: number, height: number): Hanger[] {
   const totalW = n * cardW + (n - 1) * gap;
   const startX = (width - totalW) / 2;
   const baseTop = Math.round(height * 0.42); // the shared line the word hangs on (where the title sat)
-  return LETTERS.map((letter, i) => ({
-    letter,
-    x: Math.round(startX + i * (cardW + gap) + cardW / 2),
-    // Full rope length: off-screen puppeteer run + the visible drop to the card.
-    stringLen: OFFSCREEN + baseTop + Math.round(rand(-12, 12)),
-    cardW,
-    cardH,
-    depth: rand(0.82, 1),
-    startAngle: rand(13, 20) * (i % 2 === 0 ? 1 : -1),
-    period: rand(2800, 3800),
-    delay: Math.round(i * 70 + rand(0, 140)),
-  }));
+  return LETTERS.map((letter, i) => {
+    const restTop = baseTop + Math.round(rand(-12, 12)); // slight per-card offset
+    // The card starts just below the bottom edge (stretched down), released from there.
+    const startTranslate = height + 40 - restTop;
+    // Anchor high enough above the top that even at the stretched start
+    // (translated down by startTranslate) the string top stays off-screen.
+    const anchorTop = -(startTranslate + 80);
+    return {
+      letter,
+      x: Math.round(startX + i * (cardW + gap) + cardW / 2),
+      restTop,
+      startTranslate,
+      anchorTop,
+      stringLen: restTop - anchorTop,
+      cardW,
+      cardH,
+      depth: rand(0.82, 1),
+      startAngle: rand(2, 3.5) * (i % 2 === 0 ? 1 : -1),
+      period: rand(2800, 3800),
+      delay: Math.round(i * 70 + rand(0, 140)),
+    };
+  });
 }
 
 export default function HangingCards({ reduceMotion = false }: { reduceMotion?: boolean }) {
@@ -144,9 +158,10 @@ export default function HangingCards({ reduceMotion = false }: { reduceMotion?: 
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
       {hangers.map((h, i) => {
         const segLen = h.stringLen / SEGMENTS;
-        // Stretched: the card begins just below the bottom edge, then is released.
-        const start = height - h.stringLen + OFFSCREEN + h.cardH + 90;
-        const riseY = rise[i].interpolate({ inputRange: [0, 1], outputRange: [start, 0] });
+        const riseY = rise[i].interpolate({
+          inputRange: [0, 1],
+          outputRange: [h.startTranslate, 0],
+        });
         const px = Animated.multiply(tilt.x, h.depth * PARALLAX);
         const py = Animated.multiply(tilt.y, h.depth * PARALLAX);
         const d = (h.stringLen + h.cardH) / 2; // pivot-to-top offset for the whole rope
@@ -184,7 +199,7 @@ export default function HangingCards({ reduceMotion = false }: { reduceMotion?: 
         return (
           <View
             key={i}
-            style={[styles.anchor, { left: h.x - h.cardW / 2, top: -OFFSCREEN, width: h.cardW }]}
+            style={[styles.anchor, { left: h.x - h.cardW / 2, top: h.anchorTop, width: h.cardW }]}
           >
             {node}
           </View>
