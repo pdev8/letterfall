@@ -98,10 +98,11 @@ Two layers, strictly separated:
   `parkReserve` auto-return it first. Breaking this corrupts `play`.
 - `parkReserve` auto-advances: if parking empties the reserve, the next stock
   card is drawn in so a card is always ready (PL-179).
-- Deal validity: 7 columns of heights 1–7 (28 cards, bottom→top strings in
-  seeds.json), 20-card stock, every deal has a witness solution (verified at
-  generation; generator + witnesses currently live outside the repo — PL-105
-  checks them in).
+- Deal validity: 7 columns of **4 cards each** (flat, 28 cards, bottom→top
+  strings in seeds.json — the free-play pool via `scripts/generate-deals.py`;
+  the [1..7] staircase was flattened by design, may return later), 20-card
+  stock, every deal has a witness solution (verified at generation). Daily uses
+  the live generator (`generate.ts`) with per-game board shapes (`dailyRamp`).
 
 ### UI conventions (learned the hard way)
 
