@@ -47,8 +47,14 @@ function makeHangers(width: number, height: number): Hanger[] {
   const totalW = n * cardW + (n - 1) * gap;
   const startX = (width - totalW) / 2;
   const baseTop = Math.round(height * 0.42); // the shared line the word hangs on (where the title sat)
+  // Random rise order — the letters don't come up left-to-right.
+  const order = LETTERS.map((_, i) => i);
+  for (let k = order.length - 1; k > 0; k--) {
+    const j = Math.floor(Math.random() * (k + 1));
+    [order[k], order[j]] = [order[j], order[k]];
+  }
   return LETTERS.map((letter, i) => {
-    const restTop = baseTop + Math.round(rand(-12, 12)); // slight per-card offset
+    const restTop = baseTop + Math.round(rand(-42, 42)); // randomized hang height per letter
     // The card starts just below the bottom edge (stretched down), released from there.
     const startTranslate = height + 40 - restTop;
     // Anchor high enough above the top that even at the stretched start
@@ -66,7 +72,7 @@ function makeHangers(width: number, height: number): Hanger[] {
       depth: rand(0.82, 1),
       startAngle: rand(2, 3.5) * (i % 2 === 0 ? 1 : -1),
       period: rand(2800, 3800),
-      delay: Math.round(i * 70 + rand(0, 140)),
+      delay: Math.round(order[i] * 95 + rand(0, 70)), // staggered in the shuffled order
     };
   });
 }
@@ -111,22 +117,26 @@ export default function HangingCards({ reduceMotion = false }: { reduceMotion?: 
     ]);
     anims.forEach((a) => a.start());
 
-    // Gentle continuous rope bend — each link phase-lagged so a soft wave runs
-    // down the string.
+    // Gentle continuous rope bend — a clean sinusoidal swing between the two
+    // extremes (fastest through the middle, easing to a stop only at the edges
+    // of the arc — no stutter at center), each link phase-lagged so a soft wave
+    // runs down the string.
     const loops = sways.flatMap((segs, i) =>
       segs.map((v, s) => {
         const amp = SEG_AMP[s];
-        const half = hangers[i].period / 2;
-        const loop = Animated.loop(
-          Animated.sequence([
-            Animated.delay(s * (hangers[i].period / 6)),
-            Animated.timing(v, { toValue: -amp, duration: half, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-            Animated.timing(v, { toValue: amp, duration: hangers[i].period, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-            Animated.timing(v, { toValue: 0, duration: half, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-          ]),
-        );
-        loop.start();
-        return loop;
+        const dur = hangers[i].period / 2;
+        v.setValue(-amp);
+        const started = Animated.sequence([
+          Animated.delay(s * (dur / 3)), // phase-lag per link (once, then it loops clean)
+          Animated.loop(
+            Animated.sequence([
+              Animated.timing(v, { toValue: amp, duration: dur, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+              Animated.timing(v, { toValue: -amp, duration: dur, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+            ]),
+          ),
+        ]);
+        started.start();
+        return started;
       }),
     );
     return () => {
