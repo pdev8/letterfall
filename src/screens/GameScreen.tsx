@@ -464,6 +464,11 @@ export default function GameScreen({
         }
         dragXY.setValue({ x: gs.dx, y: gs.dy });
       },
+      // Once we're dragging, never hand the touch to a card/slot Pressable the
+      // finger passes over — that termination was springing the card home
+      // mid-drag (scale 1.08 -> 1), which read as flicker/size-change.
+      onPanResponderTerminationRequest: () => false,
+      onShouldBlockNativeResponder: () => true,
       onPanResponderRelease: (_evt, gs) => {
         if (Math.abs(gs.dx) < 6 && Math.abs(gs.dy) < 6) {
           settleDrag(true);
@@ -799,9 +804,21 @@ export default function GameScreen({
             <Text style={styles.pileCaption}>stock</Text>
           </Animated.View>
 
-          <View style={styles.reserveWrap}>
-            {/* The placemat always sits on the lowest layer; the card stacks on top. */}
-            <View style={{ width: pileW, height: pileH }}>
+          <View
+            style={[
+              styles.reserveWrap,
+              (draggingReserve || returningReserve) && styles.reserveOnTop,
+            ]}
+          >
+            {/* The placemat always sits on the lowest layer; the card stacks on top.
+                While dragging, this container is lifted above the "reserve" caption
+                so the card never dips beneath it (or the stock / green cards). */}
+            <View
+              style={[
+                { width: pileW, height: pileH },
+                (draggingReserve || returningReserve) && styles.reserveOnTop,
+              ]}
+            >
               <View style={[styles.emptyPile, StyleSheet.absoluteFill]} />
               {reserveTop !== null && (
                 <PopIn key={`${state.dealIndex}-r-${state.reserve.length}`} reduceMotion={reduceMotion}>
@@ -1223,8 +1240,14 @@ const styles = StyleSheet.create({
     marginTop: 14,
   },
   pilesRowDragging: {
-    zIndex: 30,
-    elevation: 30,
+    zIndex: 50,
+    elevation: 50,
+  },
+  // The dragged reserve card sits above its own caption, the stock, and the
+  // tableau — a stable top z-order so it never flickers under overlapping cards.
+  reserveOnTop: {
+    zIndex: 60,
+    elevation: 60,
   },
   stockCount: {
     position: 'absolute',
