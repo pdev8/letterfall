@@ -11,10 +11,10 @@ describe('seeds.json schema', () => {
     expect(Object.keys(seedsJson as object)).toEqual(['deals']);
   });
 
-  it('every deal has the klondike shape: 7 columns, heights 1..7, 28 cards, 20 stock', () => {
+  it('every deal has the flat shape: 7 columns of 4, 28 cards, 20 stock', () => {
     for (const deal of seeds.deals) {
       expect(deal.columns).toHaveLength(7);
-      expect(deal.columns.map((c) => c.length)).toEqual([1, 2, 3, 4, 5, 6, 7]);
+      expect(deal.columns.map((c) => c.length)).toEqual([4, 4, 4, 4, 4, 4, 4]);
       expect(deal.columns.join('')).toMatch(/^[a-z]{28}$/);
       expect(deal.stock).toMatch(/^[a-z]{20}$/);
       expect(['smooth', 'tight']).toContain(deal.label);

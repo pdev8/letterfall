@@ -19,7 +19,8 @@ from collections import Counter
 LEXICON = 'assets/lexicon.json'
 OUT = 'assets/seeds.json'
 
-COL_CAPS = [1, 2, 3, 4, 5, 6, 7]  # column c holds exactly c+1 cards, 28 total
+COL_CAPS = [4, 4, 4, 4, 4, 4, 4]  # flat: 7 columns of 4 cards each, 28 total
+# (was the [1..7] staircase; flattened per design — 7 piles of 4, no stairstep)
 STOCK_LEN = 20
 import argparse
 _ap = argparse.ArgumentParser()
