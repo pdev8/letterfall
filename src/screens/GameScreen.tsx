@@ -325,14 +325,18 @@ export default function GameScreen({
 
   // ---------------- layout metrics
   const pad = 12;
-  const colW = Math.floor((width - pad * 2 - 4 * 6) / 7);
-  const cardH = Math.round(colW * 1.35);
+  // Tableau wraps 4 columns per row (layout preview): fewer per row → bigger,
+  // evenly-distributed cards, in two rows instead of one cramped row of seven.
+  const colGap = 14;
+  const colW = Math.floor((width - pad * 2 - 3 * colGap) / 4);
+  const cardH = Math.round(colW * 1.34);
   // How much of each stacked face-down card peeks out below the one in front —
   // enough to show its rounded top corners so every hidden card reads as a full
   // card, not a flat stub. Kept below liftShift so a trayed top card still rises
   // clear of the stack.
   const cascadeReveal = Math.round(cardH * 0.18);
-  const pileW = colW + 8;
+  // Piles stay compact — independent of the bigger tableau cards.
+  const pileW = Math.floor((width - pad * 2 - 4 * 6) / 7) + 8;
   const pileH = Math.round(pileW * 1.3);
   const trayW = Math.floor((width - pad * 2 - 5 * 7) / MAX_WORD);
   const trayH = Math.round(trayW * 1.28);
@@ -869,98 +873,117 @@ export default function GameScreen({
           </View>
         </View>
 
-        {/* park-bay indicators (PL-179): these columns accept a parked reserve
-            card once cleared — clear them first to open parking space */}
-        <View style={styles.bayRow}>
-          {state.columns.map((_, i) => (
-            <View key={i} style={{ width: colW, alignItems: 'center' }}>
-              {state.bays.includes(i) ? <Text style={styles.bayMark}>▾</Text> : null}
+        {/* tableau — wrapped 4 columns per row (layout preview): the 7 real
+            columns plus a dashed placeholder 8th slot, laid out as a 2×4 grid.
+            Park-bay markers (PL-179, ▾) sit above each row. */}
+        {[
+          [0, 1, 2, 3],
+          [4, 5, 6, 7],
+        ].map((rowIdx, r) => (
+          <View key={r} style={r > 0 ? styles.boardRowGap : undefined}>
+            <View style={styles.bayRow}>
+              {rowIdx.map((i) => (
+                <View key={i} style={{ width: colW, alignItems: 'center' }}>
+                  {i < state.columns.length && state.bays.includes(i) ? (
+                    <Text style={styles.bayMark}>▾</Text>
+                  ) : null}
+                </View>
+              ))}
             </View>
-          ))}
-        </View>
-
-        {/* tableau columns */}
-        <View style={styles.columnsRow}>
-          {state.columns.map((col, i) => {
-            const inTray = state.tray.some((e) => e.source === i);
-            const faceDown = Math.max(0, col.length - 1);
-            const top = col.length > 0 ? col[col.length - 1] : null;
-            // Lifted cards slide up out of the stack in layout (no transform, so
-            // nothing clips). Every face-down card renders as a full card back,
-            // cascaded so only its top edge (cascadeReveal) peeks out.
-            const liftShift = Math.round(cardH * 0.2);
-            const cascade = { marginTop: cascadeReveal - cardH };
-            const isBay = state.bays.includes(i); // PL-179: park target column
-            return (
-              <View key={i} style={{ width: colW }}>
-                {Array.from({ length: faceDown }, (_, j) => (
-                  <View key={j} style={j > 0 ? cascade : undefined}>
-                    <CardBack width={colW} height={cardH} />
-                  </View>
-                ))}
-                {inTray && faceDown === 0 ? (
-                  // Nothing beneath to reveal: a ghost spot marks the lifted
-                  // card's home instead.
-                  <View style={[styles.emptyColSlot, { width: colW, height: cardH }]} />
-                ) : null}
-                {top !== null ? (
-                  <PopIn
-                    key={`${state.dealIndex}-c${i}-${col.length}`}
-                    style={
-                      inTray
-                        ? faceDown > 0
-                          ? // Selected over a stack: slide down from the cascade
-                            // resting spot so more of the card back behind shows.
-                            { marginTop: cascadeReveal - cardH + liftShift }
-                          : // Selected on a bare column: slide down over the ghost home.
-                            { marginTop: liftShift - cardH }
-                        : faceDown > 0
-                          ? cascade
-                          : undefined
-                    }
-                  >
-                    <Pressable
-                      disabled={busy}
-                      onPress={() => onTapColumn(i)}
-                      style={({ pressed }) => (pressed ? { opacity: 0.8 } : null)}
-                    >
-                      <LetterCard
-                        letter={top.letter}
-                        width={colW}
-                        height={cardH}
-                        glow={!inTray}
-                        lifted={inTray}
-                        stock={top.fromStock}
+            <View style={styles.columnsRow}>
+              {rowIdx.map((i) => {
+                if (i >= state.columns.length) {
+                  // Placeholder 8th slot — preview only, not a playable column.
+                  return (
+                    <View key={i} style={{ width: colW }}>
+                      <View
+                        style={[
+                          styles.emptyColSlot,
+                          styles.placeholderSlot,
+                          { width: colW, height: cardH },
+                        ]}
                       />
-                    </Pressable>
-                  </PopIn>
-                ) : isBay ? (
-                  // Cleared bay: the only kind of empty column you can park on.
-                  <Pressable
-                    ref={(r) => {
-                      slotRefs.current[i] = r;
-                    }}
-                    disabled={busy || !canPark}
-                    onPress={() => onParkReserve(i)}
-                    style={({ pressed }) => [
-                      styles.emptyColSlot,
-                      { width: colW, height: cardH },
-                      draggingReserve && canPark && styles.emptyColSlotTarget,
-                      pressed && canPark && { opacity: 0.6 },
-                    ]}
-                  >
-                    {/* A cleared bay is marked by the plus alone — no orange
-                        outline. Bright when a card is ready to park, dim otherwise. */}
-                    <Text style={canPark ? styles.parkGlyph : styles.bayGlyph}>+</Text>
-                  </Pressable>
-                ) : (
-                  // Non-bay empty column: inert — never a park target.
-                  <View style={[styles.emptyColSlot, { width: colW, height: cardH }]} />
-                )}
-              </View>
-            );
-          })}
-        </View>
+                    </View>
+                  );
+                }
+                const col = state.columns[i];
+                const inTray = state.tray.some((e) => e.source === i);
+                const faceDown = Math.max(0, col.length - 1);
+                const top = col.length > 0 ? col[col.length - 1] : null;
+                // Lifted cards slide up out of the stack in layout (no transform,
+                // so nothing clips). Every face-down card renders as a full card
+                // back, cascaded so only its top edge (cascadeReveal) peeks out.
+                const liftShift = Math.round(cardH * 0.2);
+                const cascade = { marginTop: cascadeReveal - cardH };
+                const isBay = state.bays.includes(i); // PL-179: park target column
+                return (
+                  <View key={i} style={{ width: colW }}>
+                    {Array.from({ length: faceDown }, (_, j) => (
+                      <View key={j} style={j > 0 ? cascade : undefined}>
+                        <CardBack width={colW} height={cardH} />
+                      </View>
+                    ))}
+                    {inTray && faceDown === 0 ? (
+                      // Nothing beneath to reveal: a ghost spot marks the lifted
+                      // card's home instead.
+                      <View style={[styles.emptyColSlot, { width: colW, height: cardH }]} />
+                    ) : null}
+                    {top !== null ? (
+                      <PopIn
+                        key={`${state.dealIndex}-c${i}-${col.length}`}
+                        style={
+                          inTray
+                            ? faceDown > 0
+                              ? { marginTop: cascadeReveal - cardH + liftShift }
+                              : { marginTop: liftShift - cardH }
+                            : faceDown > 0
+                              ? cascade
+                              : undefined
+                        }
+                      >
+                        <Pressable
+                          disabled={busy}
+                          onPress={() => onTapColumn(i)}
+                          style={({ pressed }) => (pressed ? { opacity: 0.8 } : null)}
+                        >
+                          <LetterCard
+                            letter={top.letter}
+                            width={colW}
+                            height={cardH}
+                            glow={!inTray}
+                            lifted={inTray}
+                            stock={top.fromStock}
+                          />
+                        </Pressable>
+                      </PopIn>
+                    ) : isBay ? (
+                      // Cleared bay: the only kind of empty column you can park on.
+                      <Pressable
+                        ref={(rf) => {
+                          slotRefs.current[i] = rf;
+                        }}
+                        disabled={busy || !canPark}
+                        onPress={() => onParkReserve(i)}
+                        style={({ pressed }) => [
+                          styles.emptyColSlot,
+                          { width: colW, height: cardH },
+                          draggingReserve && canPark && styles.emptyColSlotTarget,
+                          pressed && canPark && { opacity: 0.6 },
+                        ]}
+                      >
+                        {/* A cleared bay is marked by the plus alone. */}
+                        <Text style={canPark ? styles.parkGlyph : styles.bayGlyph}>+</Text>
+                      </Pressable>
+                    ) : (
+                      // Non-bay empty column: inert — never a park target.
+                      <View style={[styles.emptyColSlot, { width: colW, height: cardH }]} />
+                    )}
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+        ))}
 
         <View style={styles.hintRow}>
           {showNoPlayHint ? (
@@ -1362,6 +1385,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 14,
   },
+  // Vertical gap between the two wrapped board rows.
+  boardRowGap: {
+    marginTop: 18,
+  },
   // Ghost spot: same treatment as the tray slots, no accent outline.
   emptyColSlot: {
     borderRadius: 8,
@@ -1370,6 +1397,13 @@ const styles = StyleSheet.create({
     backgroundColor: C.surface,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  // The preview-only 8th slot: dashed + faint so it reads as "not real yet".
+  placeholderSlot: {
+    borderStyle: 'dashed',
+    borderColor: C.borderSoft,
+    backgroundColor: 'transparent',
+    opacity: 0.45,
   },
   emptyColSlotTarget: {
     backgroundColor: C.stockFaint,
